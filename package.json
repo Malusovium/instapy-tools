@@ -1,0 +1,36 @@
+{
+  "name": "instapy-tools",
+  "version": "0.0.1",
+  "description": "Build tools around InstaPy",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "ts-node-dev src/index.ts",
+    "instapy:clone": "git clone https://github.com/timgrossmann/InstaPy",
+    "instapy:update": "cd InstaPy; git pull",
+    "gen:api": "",
+    "gen:": "",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Malusovium/instapy-tools.git"
+  },
+  "keywords": [
+    "instapy",
+    "instapy-gui"
+  ],
+  "author": "Michiel Kamphuis",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Malusovium/instapy-tools/issues"
+  },
+  "homepage": "https://github.com/Malusovium/instapy-tools#readme",
+  "dependencies": {
+    "rambda": "^1.1.5",
+    "typescript": "^2.9.2"
+  },
+  "devDependencies": {
+    "ts-node": "^7.0.0",
+    "ts-node-dev": "^1.0.0-pre.26"
+  }
+}
