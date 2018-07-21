@@ -660,14 +660,6 @@
       ]
     },
     {
-      "_name": "**kwargs",
-      "_types": [
-        {
-          "_name": "None"
-        }
-      ]
-    },
-    {
       "_name": "unfollow",
       "_types": [
         {

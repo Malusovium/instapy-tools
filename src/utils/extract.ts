@@ -89,6 +89,7 @@ const extractArg =
 const formatArg =
   pipe
   ( reject<any>(equals('self'))
+  , reject<any>(equals('**kwargs'))
   , map(extractArg)
   )
 
@@ -199,7 +200,7 @@ const formatMethod = // Method
 
 const isName =
   (name:string) =>
-    ({_name}: Method) =>
+    ({_name}: Method | Arg) =>
       _name === name
 
 const replaceNameMethod =
