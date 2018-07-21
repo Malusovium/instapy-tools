@@ -7,8 +7,8 @@
     "dev": "ts-node-dev src/index.ts",
     "instapy:clone": "git clone https://github.com/timgrossmann/InstaPy",
     "instapy:update": "cd InstaPy; git pull",
-    "gen:api": "",
-    "gen:": "",
+    "gen-api": "ts-node ./src/utils/instapy.ts",
+    "gen-api:dev": "ts-node-dev ./src/utils/instapy.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -27,10 +27,12 @@
   "homepage": "https://github.com/Malusovium/instapy-tools#readme",
   "dependencies": {
     "rambda": "^1.1.5",
+    "ts-node": "^6.2.0",
     "typescript": "^2.9.2"
   },
   "devDependencies": {
-    "ts-node": "^7.0.0",
-    "ts-node-dev": "^1.0.0-pre.26"
+    "@types/node": "^10.5.2",
+    "ts-node-dev": "^1.0.0-pre.26",
+    "tslint": "^5.10.0"
   }
 }
