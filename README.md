@@ -32,6 +32,6 @@ npm run gen-api:dev
 ```
 
 ## To-Do
-  [x] generate api.json, 'including types'
-  [] expose api generated from api.json
-  [] add bot controls
+  - [x] generate api.json, 'including types'
+  - [ ] expose api generated from api.json
+  - [ ] add bot controls
