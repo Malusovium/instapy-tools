@@ -1,2 +1,3 @@
-import { pluck } from 'rambda'
-import { readFileSync } from 'fs'
+export { genApi
+       } from './gen'
+

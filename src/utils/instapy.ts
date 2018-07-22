@@ -25,7 +25,7 @@ const addGitHash =
     }
   )
 
-const genApi =
+export const genApi =
   (rawInstapy: string) =>
     pipe
     ( trimExcessData
@@ -33,15 +33,15 @@ const genApi =
     , suplement
     , addGitHash
     )(rawInstapy)
-  // trimExcessData(testArr)
+
 const api = genApi(rawInstapyData)
 
-writeFileSync
-( './api.json'
-, JSON.stringify( api, null, 2)
-)
+// writeFileSync
+// ( './api.json'
+// , JSON.stringify( api, null, 2)
+// )
 
-console.log(api)
+// console.log(api)
 // only used for dev:
 const sleepWait =
   (internal: number) => setTimeout(sleepWait, internal)

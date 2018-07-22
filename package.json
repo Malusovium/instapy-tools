@@ -7,8 +7,8 @@
     "dev": "ts-node-dev src/index.ts",
     "instapy:clone": "git clone https://github.com/timgrossmann/InstaPy",
     "instapy:update": "cd InstaPy; git pull",
-    "gen-api": "ts-node ./src/utils/instapy.ts",
-    "gen-api:dev": "ts-node-dev ./src/utils/instapy.ts",
+    "gen-api": "ts-node ./gen-api.ts",
+    "gen-api:dev": "ts-node-dev ./gen-api.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
