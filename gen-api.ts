@@ -1,13 +1,8 @@
 import { genApi
        } from './src'
 
-import { readFileSync
-       , writeFileSync
-       } from 'fs'
+import { writeFileSync } from 'fs'
 
-// const rawInstapyData =
-//   readFileSync( `InstaPy/instapy/instapy.py`, 'utf-8')
-//
 const api = genApi('./InstaPy')
 
 writeFileSync
