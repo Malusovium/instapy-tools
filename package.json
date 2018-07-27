@@ -7,6 +7,7 @@
     "dev": "ts-node-dev src/index.ts",
     "instapy:clone": "git clone https://github.com/timgrossmann/InstaPy",
     "instapy:update": "cd InstaPy; git pull",
+    "controls:dev": "NODE_ENV=test ts-node-dev ./src/controls/index.ts",
     "gen-api": "ts-node ./gen-api.ts",
     "gen-api:dev": "NODE_ENV=test ts-node-dev ./gen-api.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
