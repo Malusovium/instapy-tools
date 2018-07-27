@@ -1,5 +1,5 @@
 {
-  "git": "925134c08320a5e807ee4232b443295b1e81b061",
+  "git": "b266a2bd6a01ed3699848a513864a772bf63f832",
   "args": [
     {
       "_name": "username",
@@ -1183,6 +1183,19 @@
       ]
     },
     {
+      "_name": "set_simulation",
+      "_args": [
+        {
+          "_name": "enabled",
+          "_default": "True"
+        },
+        {
+          "_name": "percentage",
+          "_default": "100"
+        }
+      ]
+    },
+    {
       "_name": "like_by_locations",
       "_args": [
         {
@@ -1236,10 +1249,6 @@
           "_default": "50"
         },
         {
-          "_name": "media",
-          "_default": "None"
-        },
-        {
           "_name": "skip_top_posts",
           "_default": "True"
         },
@@ -1250,6 +1259,14 @@
         {
           "_name": "interact",
           "_default": "False"
+        },
+        {
+          "_name": "randomize",
+          "_default": "False"
+        },
+        {
+          "_name": "media",
+          "_default": "None"
         }
       ]
     },
@@ -1622,16 +1639,20 @@
           "_default": "50"
         },
         {
-          "_name": "media",
-          "_default": "None"
-        },
-        {
           "_name": "skip_top_posts",
           "_default": "True"
         },
         {
           "_name": "use_smart_hashtags",
           "_default": "False"
+        },
+        {
+          "_name": "randomize",
+          "_default": "False"
+        },
+        {
+          "_name": "media",
+          "_default": "None"
         }
       ]
     },
