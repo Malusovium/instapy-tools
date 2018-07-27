@@ -9,14 +9,13 @@ const dockerCompose =
 const wrappedExec =
   (command:string) =>
     new Promise( (res, rej) =>
-      exec( command
-          , (error, stdout, stderr) => {
-              console.log(error, stdout, stderr)
-              error || stderr
-                ? rej(error ? error : new Error(stderr))
-                : res(stdout)
-            }
-          )
+      exec
+      ( command
+      , (error, stdout, stderr) =>
+          error
+            ? rej(error)
+            : res(stdout || stderr )
+      )
     )
 
 export const composeExec =
