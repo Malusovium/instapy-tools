@@ -66,7 +66,7 @@ status()
 ```ts
 // Get bot-logs using docker-compose
 // returns: Last 30 lines of logs from InstaPy's output
-status()
+logs()
   .then( (val:any) => {console.log(val)}) // Array of logLines
 ```
 
