@@ -12,7 +12,9 @@
     "controls:dev": "NODE_ENV=test ts-node-dev ./src/controls/index.ts",
     "gen-api": "ts-node ./gen-api.ts",
     "gen-api:dev": "NODE_ENV=test ts-node-dev ./gen-api.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "npm run build",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
