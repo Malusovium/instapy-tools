@@ -2,7 +2,7 @@
   "name": "instapy-tools",
   "version": "0.3.1",
   "description": "Build tools around InstaPy",
-  "main": "lib/index.ts",
+  "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "dev": "ts-node-dev src/index.ts",
