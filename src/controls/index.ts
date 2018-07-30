@@ -3,8 +3,11 @@ import { start } from './start'
 import { stop } from './stop'
 import { logs } from './logs'
 
+const defaultInstapyPath = `${__dirname}/../../InstaPy`
+console.log(defaultInstapyPath)
+
 type controls =
-  (projectPath:string) => (
+  (projectPath?:string) => (
     { start: () => Promise<string>
     , stop: () => Promise<string>
     , status: () => Promise<string>
@@ -13,7 +16,7 @@ type controls =
   )
 
 export const controls: controls =
-  (projectPath) => (
+  (projectPath = defaultInstapyPath) => (
     { start: () => start(projectPath)
     , stop: () => stop(projectPath)
     , logs: () => logs(projectPath)

@@ -1,6 +1,6 @@
 import { controls } from './src'
 
-const { start, stop, status, logs } = controls('InstaPy')
+const { start, stop, status, logs } = controls()
 
 type log = (val:any) => any
 const log:log =
