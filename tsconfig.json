@@ -1,17 +1,16 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    // "baseUrl": "types",
-    // "typeRoots": ["types"],
+    "outDir": "lib",
     "noEmitOnError": false,
     "module": "commonjs",
+    "declaration": true,
     "moduleResolution": "node",
-    "target": "es2017",
+    "target": "es5",
     "sourceMap": true,
     "noImplicitReturns": false,
     "strict": true,
     "strictFunctionTypes": false,
-    "allowJs": true,
     "lib": [
       "esnext",
       "ES2015",
@@ -21,5 +20,6 @@
       "DOM"
     ]
   },
+  "include": ["src"],
   "exclude": ["node_modules", "build"]
 }

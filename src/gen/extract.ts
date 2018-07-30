@@ -1,4 +1,5 @@
 import { pipe
+       , Dictionary
        , pluck
        , uniq
        , update

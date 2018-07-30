@@ -1,5 +1,4 @@
-import { genApi
-       } from './src'
+import { genApi } from './src'
 
 import { writeFileSync } from 'fs'
 
