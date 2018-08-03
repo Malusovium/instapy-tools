@@ -2,7 +2,7 @@ import { genApi } from './src'
 
 import { writeFileSync } from 'fs'
 
-const api = genApi('./InstaPy')
+const api = genApi()
 
 writeFileSync
 ( './api.json'

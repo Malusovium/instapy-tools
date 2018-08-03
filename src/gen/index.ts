@@ -6,6 +6,9 @@ import { pipe } from 'rambda'
 import { trimExcessData } from './trim'
 import { extract } from './extract'
 import { suplement } from './suplement'
+import { format } from './format'
+
+const defaultInstapyPath = `${__dirname}/../../InstaPy`
 
 const getInstapyHash =
   (projectPath: string) =>
@@ -26,10 +29,11 @@ const getRawInstapy =
     readFileSync( `${projectPath}/instapy/instapy.py`, 'utf-8')
 
 export const genApi =
-  (projectPath: string) =>
+  (projectPath: string = defaultInstapyPath) =>
     pipe
     ( trimExcessData
     , extract
     , suplement
+    , format
     , addGitHash(projectPath)
     )(getRawInstapy(projectPath))
