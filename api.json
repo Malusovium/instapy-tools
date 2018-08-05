@@ -132,7 +132,7 @@
         "_name": "None"
       },
       {
-        "_name": "Tuple",
+        "_name": "Union",
         "_options": [
           "Photo",
           "Video"
@@ -233,7 +233,7 @@
         "_name": "String"
       },
       {
-        "_name": "Tuple",
+        "_name": "Union",
         "_options": [
           "top",
           "random"
@@ -458,7 +458,7 @@
             "_subTypes": "String"
           },
           {
-            "_name": "Tuple",
+            "_name": "Union",
             "_options": [
               "all",
               "nonfollowers"
@@ -475,7 +475,7 @@
             "_name": "Boolean"
           },
           {
-            "_name": "Tuple",
+            "_name": "Union",
             "_options": [
               "all",
               "nonfollowers"
@@ -497,7 +497,7 @@
     "style": [
       "NAT",
       {
-        "_name": "Tuple",
+        "_name": "Union",
         "_options": [
           "FIFO",
           "LIFO",
@@ -557,7 +557,7 @@
     ],
     "compare_by": [
       {
-        "_name": "Tuple",
+        "_name": "Union",
         "_options": [
           "latest",
           "earliest",
@@ -569,7 +569,7 @@
     ],
     "compare_track": [
       {
-        "_name": "Tuple",
+        "_name": "Union",
         "_options": [
           "first",
           "median",

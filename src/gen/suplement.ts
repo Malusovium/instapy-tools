@@ -148,27 +148,27 @@ const arrayTypes =
     )
   )
 
-const tupleTypes =
+const unionTypes =
   pipe
   ( concatTypes
     ( 'media'
-    , [ createType.tuple([ 'Photo', 'Video' ]) ]
+    , [ createType.union([ 'Photo', 'Video' ]) ]
     )
   , concatTypes
     ( 'sort'
-    , [ createType.tuple([ 'top', 'random' ]) ]
+    , [ createType.union([ 'top', 'random' ]) ]
     )
   , concatTypes
     ( 'style'
-    , [ createType.tuple([ 'FIFO', 'LIFO', 'RANDOM' ]) ]
+    , [ createType.union([ 'FIFO', 'LIFO', 'RANDOM' ]) ]
     )
   , replaceTypes
     ( 'compare_by'
-    , [ createType.tuple([ 'latest', 'earliest', 'day', 'month', 'year' ]) ]
+    , [ createType.union([ 'latest', 'earliest', 'day', 'month', 'year' ]) ]
     )
   , replaceTypes
     ( 'compare_track'
-    , [ createType.tuple([ 'first', 'median', 'last' ]) ]
+    , [ createType.union([ 'first', 'median', 'last' ]) ]
     )
   )
 
@@ -210,9 +210,7 @@ const deepTypes =
           .array
            ( [ createType.boolean()
              , createType.array('String')
-             , createType
-                .tuple
-                 ([ 'all', 'nonfollowers' ])
+             , createType.union([ 'all', 'nonfollowers' ])
              ]
            ) 
       ]
@@ -222,9 +220,7 @@ const deepTypes =
     , [ createType
           .array
            ( [ createType.boolean()
-             , createType
-                .tuple
-                 ([ 'all', 'nonfollowers' ])
+             , createType.union([ 'all', 'nonfollowers' ])
              ]
            ) 
       ]
@@ -330,7 +326,7 @@ export const suplement =
       // ( map(log)
       ( stringTypes
       , arrayTypes
-      , tupleTypes
+      , unionTypes
       , booleanTypes
       , numberTypes
       , deepTypes

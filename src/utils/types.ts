@@ -30,6 +30,11 @@ export type Arr =
   , _subTypes: Type[] | 'Number' | 'String'
   }
 
+export type Union =
+  { _name: 'Union'
+  , _options: any[]
+  }
+
 export type Tuple =
   { _name: 'Tuple'
   , _options: any[]
@@ -41,7 +46,8 @@ export type Type =
   | Num
   | Str
   | Arr
-  | Tuple
+  | Union
+  // | Tuple
 
 const ifValExists =
   (prop: string, val?: any) => 
@@ -81,10 +87,10 @@ export const createType =
         , _subTypes: types
         }
       )
-  , tuple:
+  , union:
       ( options: any[]
-      ): Tuple => (
-        { _name: 'Tuple'
+      ): Union => (
+        { _name: 'Union'
         , _options: options
         }
       )
@@ -147,7 +153,7 @@ const validateArray =
                )(typeList)
       }
     }
-const validateTuple =
+const validateUnion =
   (options: Tuple["_options"]): TypeValidator =>
     (val) =>
       contains(val, options)
@@ -159,5 +165,5 @@ export const makeValidation =
     : _type._name === 'String' ? validateString
     : _type._name === 'Number' ? validateNumber(_type._constraints)
     : _type._name === 'Array' ? validateArray(_type._subTypes)
-    : _type._name === 'Tuple' ? validateTuple(_type._options)
+    : _type._name === 'Union' ? validateUnion(_type._options)
     : (val:any) => false
