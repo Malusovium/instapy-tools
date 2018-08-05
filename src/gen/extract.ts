@@ -21,7 +21,7 @@ import { pipe
 import { mergeWithLastWhen
        } from './reducers'
 
-import { createType } from './types'
+import { createType } from '../utils/types'
 
 type MethodLine = string
 

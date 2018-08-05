@@ -6,7 +6,7 @@ import { pipe
 
 import { Type
        , createType
-       } from './types'
+       } from '../utils/types'
 
 type Arg =
   { _name: string
@@ -19,7 +19,6 @@ const longPipe =
       const [ pipeFnHead, ...pipeFnTail ] =
         pipeFns.reverse()
 
-      // console.log( pipeFnHead)
       return pipeFnHead === undefined
         ? val
         : pipeFnHead( longPipe(...pipeFnTail.reverse())(val) )
