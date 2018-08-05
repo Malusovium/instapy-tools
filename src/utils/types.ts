@@ -27,7 +27,7 @@ export type Str =
 
 export type Arr =
   { _name: 'Array'
-  , _subTypes: Type[] | 'Number' | 'String'
+  , _subType: 'Number' | 'String'
   }
 
 export type Union =
@@ -37,7 +37,7 @@ export type Union =
 
 export type Tuple =
   { _name: 'Tuple'
-  , _options: any[]
+  , _subTypes: Type[]
   }
 
 export type Type =
@@ -45,9 +45,9 @@ export type Type =
   | Bool
   | Num
   | Str
-  | Arr
   | Union
-  // | Tuple
+  | Arr
+  | Tuple
 
 const ifValExists =
   (prop: string, val?: any) => 
@@ -80,18 +80,25 @@ export const createType =
           }
         }
       )
-  , array:
-      ( types: Type[] | 'String' | 'Number'
-      ): Arr => (
-        { _name: 'Array'
-        , _subTypes: types
-        }
-      )
   , union:
       ( options: any[]
       ): Union => (
         { _name: 'Union'
         , _options: options
+        }
+      )
+  , array:
+      ( _type:  'String' | 'Number'
+      ): Arr => (
+        { _name: 'Array'
+        , _subType: _type
+        }
+      )
+  , tuple:
+      ( types: Type[]
+      ): Tuple => (
+        { _name: 'Tuple'
+        , _subTypes: types
         }
       )
   }
@@ -132,15 +139,28 @@ const validateNumber =
       && (_min === undefined || val > _min)
       && (_max === undefined || val < _max)
 
+const validateUnion =
+  (options: Union["_options"]): TypeValidator =>
+    (val) =>
+      contains(val, options)
+
 const validateArray =
-  (typeList: Arr["_subTypes"]): TypeValidator =>
+  (_type: Arr["_subType"]): TypeValidator =>
+    (val) => {
+      if (_type === 'String') {
+        return val.reduce(isTypeReducer('String'), true)
+      } else if(_type === 'Number') {
+        return val.reduce(isTypeReducer('Number'), true)
+      } else {
+        return false
+      }
+    }
+
+const validateTuple =
+  (typeList: Tuple["_subTypes"]): TypeValidator =>
     (val) => {
       if (val.length === typeList.length) {
         return false
-      } else if (typeList === 'String') {
-        return val.reduce(isTypeReducer('String'), true)
-      } else if(typeList === 'Number') {
-        return val.reduce(isTypeReducer('Number'), true)
       } else {
         return compose
                ( reduce
@@ -152,11 +172,8 @@ const validateArray =
                , map<any, any>(makeValidation)
                )(typeList)
       }
-    }
-const validateUnion =
-  (options: Tuple["_options"]): TypeValidator =>
-    (val) =>
-      contains(val, options)
+  }
+
 
 export const makeValidation =
   (_type: Type) =>
@@ -164,6 +181,7 @@ export const makeValidation =
     : _type._name === 'Boolean' ? validateBoolean
     : _type._name === 'String' ? validateString
     : _type._name === 'Number' ? validateNumber(_type._constraints)
-    : _type._name === 'Array' ? validateArray(_type._subTypes)
     : _type._name === 'Union' ? validateUnion(_type._options)
+    : _type._name === 'Array' ? validateArray(_type._subType)
+    : _type._name === 'Tuple' ? validateTuple(_type._subTypes)
     : (val:any) => false

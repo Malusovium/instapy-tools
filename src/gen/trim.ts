@@ -29,13 +29,6 @@ const toOneLineMethod =
   , ''
   , isRawInstapyMethod
   )
-  // (acc:string[], curr:string) =>
-  //   acc.length > 0
-  //   && isRawInstapyMethod(acc[acc.length - 1])
-  //   && acc[acc.length - 1].includes('(')
-  //   && not( acc[acc.length - 1].endsWith('):') )
-  //     ? [ ...dropLast(1, acc), `${acc[acc.length - 1]}${curr}` ]
-  //     : [ ...acc, curr ]
 
 const isNConsecutiveTimes =
   (char: string, arr: string[], index: number = 0) => {

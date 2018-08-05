@@ -158,7 +158,7 @@ const unionTypes =
     ( 'sort'
     , [ createType.union([ 'top', 'random' ]) ]
     )
-  , concatTypes
+  , replaceTypes
     ( 'style'
     , [ createType.union([ 'FIFO', 'LIFO', 'RANDOM' ]) ]
     )
@@ -180,34 +180,12 @@ const booleanTypes =
     )
   )
 
-// type deepLog = (val:any) => any
-// const deepLog: deepLog =
-//   (val) => {
-//     Array.isArray(val) || typeof val === 'object'
-//       ? map(deepLog, val)
-//       : console.log(val)
-//
-//     return val
-//   }
-//
-// type subLog = (prop: string) => (val:any) => any
-// const subLog: subLog =
-//   (prop) =>
-//     (val) => {
-//       typeof val === 'object'
-//       && val[prop] !== undefined
-//         ? console.log(val[prop])
-//         : console.log(val)
-//
-//       return val
-//     }
-
-const deepTypes =
+const tupleTypes =
   pipe
   ( replaceTypes
     ( 'customList'
     , [ createType
-          .array
+          .tuple
            ( [ createType.boolean()
              , createType.array('String')
              , createType.union([ 'all', 'nonfollowers' ])
@@ -218,7 +196,7 @@ const deepTypes =
   , replaceTypes
     ( 'InstapyFollowed'
     , [ createType
-          .array
+          .tuple
            ( [ createType.boolean()
              , createType.union([ 'all', 'nonfollowers' ])
              ]
@@ -226,12 +204,6 @@ const deepTypes =
       ]
     )
   )
-
-type log = (val:any) => any
-const log: log =
-  (val) => {console.log(val); return val}
-
-// Have no clue on: proxy_chrome_extension
 
 const numberTypes =
   longPipe
@@ -321,17 +293,14 @@ const numberTypes =
 
 export const suplement =
   ({methods, args}:any) => (
-    { args: // args
+    { args:
       longPipe
-      // ( map(log)
       ( stringTypes
       , arrayTypes
       , unionTypes
       , booleanTypes
       , numberTypes
-      , deepTypes
-      // , map(log)
-      // , map(subLog('_types'))
+      , tupleTypes
       )(args)
     , methods: methods
     }

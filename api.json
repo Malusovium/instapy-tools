@@ -1,851 +1,1485 @@
 {
   "git": "925134c08320a5e807ee4232b443295b1e81b061",
-  "args": {
-    "username": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "String"
-      }
-    ],
-    "password": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "String"
-      }
-    ],
-    "nogui": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "selenium_local_session": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "use_firefox": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "browser_profile_path": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "String"
-      }
-    ],
-    "page_delay": [
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 0
+  "args": [
+    {
+      "_name": "username",
+      "_types": [
+        {
+          "_name": "None"
         }
-      }
-    ],
-    "show_logs": [
-      {
-        "_name": "Boolean"
-      },
-      {
-        "_name": "None"
-      }
-    ],
-    "headless_browser": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "proxy_address": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "String"
-      }
-    ],
-    "proxy_chrome_extension": [
-      {
-        "_name": "None"
-      }
-    ],
-    "proxy_port": [
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 1,
-          "_max": 65535
+      ]
+    },
+    {
+      "_name": "password",
+      "_types": [
+        {
+          "_name": "None"
         }
-      }
-    ],
-    "bypass_suspicious_attempt": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "multi_logs": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "selenium_url": [
-      {
-        "_name": "String"
-      }
-    ],
-    "percentage": [
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 0,
-          "_max": 100
+      ]
+    },
+    {
+      "_name": "nogui",
+      "_types": [
+        {
+          "_name": "Boolean"
         }
-      }
-    ],
-    "enabled": [
-      {
-        "_name": "Boolean"
-      },
-      {
-        "_name": "None"
-      }
-    ],
-    "comments": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Array",
-        "_subTypes": "String"
-      }
-    ],
-    "media": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Union",
-        "_options": [
-          "Photo",
-          "Video"
-        ]
-      }
-    ],
-    "times": [
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 1
+      ]
+    },
+    {
+      "_name": "selenium_local_session",
+      "_types": [
+        {
+          "_name": "Boolean"
         }
-      }
-    ],
-    "tags": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Array",
-        "_subTypes": "String"
-      }
-    ],
-    "amount": [
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 1
+      ]
+    },
+    {
+      "_name": "use_firefox",
+      "_types": [
+        {
+          "_name": "Boolean"
         }
-      },
-      {
-        "_name": "None"
-      }
-    ],
-    "randomize": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "users": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Array",
-        "_subTypes": "String"
-      }
-    ],
-    "words": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Array",
-        "_subTypes": "String"
-      }
-    ],
-    "friends": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Array",
-        "_subTypes": "String"
-      }
-    ],
-    "option": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "api_key": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "String"
-      }
-    ],
-    "full_match": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "limit": [
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 1
+      ]
+    },
+    {
+      "_name": "browser_profile_path",
+      "_types": [
+        {
+          "_name": "None"
         }
-      }
-    ],
-    "sort": [
-      {
-        "_name": "String"
-      },
-      {
-        "_name": "Union",
-        "_options": [
-          "top",
-          "random"
-        ]
-      }
-    ],
-    "log_tags": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "tags_skip": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Array",
-        "_subTypes": "String"
-      }
-    ],
-    "comment": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "usernames": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Array",
-        "_subTypes": "String"
-      }
-    ],
-    "daysold": [
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 0
+      ]
+    },
+    {
+      "_name": "page_delay",
+      "_types": [
+        {
+          "_name": "Number",
+          "_constraints": {}
         }
-      }
-    ],
-    "max_pic": [
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 1
+      ]
+    },
+    {
+      "_name": "show_logs",
+      "_types": [
+        {
+          "_name": "Boolean"
+        },
+        {
+          "_name": "None"
         }
-      }
-    ],
-    "sleep_delay": [
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 0
+      ]
+    },
+    {
+      "_name": "headless_browser",
+      "_types": [
+        {
+          "_name": "Boolean"
         }
-      }
-    ],
-    "interact": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "photos_grab_amount": [
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 1
+      ]
+    },
+    {
+      "_name": "proxy_address",
+      "_types": [
+        {
+          "_name": "None"
         }
-      }
-    ],
-    "follow_likers_per_photo": [
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 0
+      ]
+    },
+    {
+      "_name": "proxy_chrome_extension",
+      "_types": [
+        {
+          "_name": "None"
         }
-      }
-    ],
-    "followlist": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Array",
-        "_subTypes": "String"
-      }
-    ],
-    "potency_ratio": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 0.01,
-          "_min": 0
+      ]
+    },
+    {
+      "_name": "proxy_port",
+      "_types": [
+        {
+          "_name": "Number",
+          "_constraints": {}
         }
-      }
-    ],
-    "delimit_by_numbers": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "max_followers": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 1
+      ]
+    },
+    {
+      "_name": "bypass_suspicious_attempt",
+      "_types": [
+        {
+          "_name": "Boolean"
         }
-      }
-    ],
-    "max_following": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 1
+      ]
+    },
+    {
+      "_name": "multi_logs",
+      "_types": [
+        {
+          "_name": "Boolean"
         }
-      }
-    ],
-    "min_followers": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 0
+      ]
+    },
+    {
+      "_name": "selenium_url",
+      "_types": [
+        "NAT"
+      ]
+    },
+    {
+      "_name": "percentage",
+      "_types": [
+        {
+          "_name": "None"
+        },
+        {
+          "_name": "Number",
+          "_constraints": {}
         }
-      }
-    ],
-    "min_following": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 0
+      ]
+    },
+    {
+      "_name": "enabled",
+      "_types": [
+        {
+          "_name": "Boolean"
+        },
+        {
+          "_name": "None"
         }
-      }
-    ],
-    "max": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 1
+      ]
+    },
+    {
+      "_name": "comments",
+      "_types": [
+        {
+          "_name": "None"
         }
-      }
-    ],
-    "min": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 0
+      ]
+    },
+    {
+      "_name": "media",
+      "_types": [
+        {
+          "_name": "None"
         }
-      }
-    ],
-    "locations": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Array",
-        "_subTypes": "String"
-      }
-    ],
-    "skip_top_posts": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "use_smart_hashtags": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "url": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "String"
-      }
-    ],
-    "customList": [
-      {
-        "_name": "Array",
-        "_subTypes": [
-          {
-            "_name": "Boolean"
-          },
-          {
-            "_name": "Array",
-            "_subTypes": "String"
-          },
-          {
-            "_name": "Union",
-            "_options": [
-              "all",
-              "nonfollowers"
-            ]
-          }
-        ]
-      }
-    ],
-    "InstapyFollowed": [
-      {
-        "_name": "Array",
-        "_subTypes": [
-          {
-            "_name": "Boolean"
-          },
-          {
-            "_name": "Union",
-            "_options": [
-              "all",
-              "nonfollowers"
-            ]
-          }
-        ]
-      }
-    ],
-    "nonFollowers": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "allFollowing": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "style": [
-      "NAT",
-      {
-        "_name": "Union",
-        "_options": [
-          "FIFO",
-          "LIFO",
-          "RANDOM"
-        ]
-      }
-    ],
-    "unfollow_after": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 0
+      ]
+    },
+    {
+      "_name": "times",
+      "_types": [
+        {
+          "_name": "Number",
+          "_constraints": {}
         }
-      }
-    ],
-    "unfollow": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "posts": [
-      {
-        "_name": "Number",
-        "_constraints": {
-          "_step": 1,
-          "_min": 1
+      ]
+    },
+    {
+      "_name": "tags",
+      "_types": [
+        {
+          "_name": "None"
         }
-      }
-    ],
-    "boundary": [
-      {
-        "_name": "Number",
-        "_constraints": {}
-      }
-    ],
-    "campaign": [
-      {
-        "_name": "None"
-      },
-      {
-        "_name": "String"
-      }
-    ],
-    "live_match": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "store_locally": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "compare_by": [
-      {
-        "_name": "Union",
-        "_options": [
-          "latest",
-          "earliest",
-          "day",
-          "month",
-          "year"
-        ]
-      }
-    ],
-    "compare_track": [
-      {
-        "_name": "Union",
-        "_options": [
-          "first",
-          "median",
-          "last"
-        ]
-      }
-    ],
-    "print_out": [
-      {
-        "_name": "Boolean"
-      }
-    ],
-    "urls": [
-      {
-        "_name": "Array",
-        "_subTypes": "String"
-      }
-    ]
-  },
-  "methods": {
-    "__init__": {
-      "username": "None",
-      "password": "None",
-      "nogui": "False",
-      "selenium_local_session": "True",
-      "use_firefox": "False",
-      "browser_profile_path": "None",
-      "page_delay": "25",
-      "show_logs": "True",
-      "headless_browser": "False",
-      "proxy_address": "None",
-      "proxy_chrome_extension": "None",
-      "proxy_port": "0",
-      "bypass_suspicious_attempt": "False",
-      "multi_logs": "False"
+      ]
     },
-    "get_instapy_logger": {
-      "show_logs": "None"
+    {
+      "_name": "amount",
+      "_types": [
+        {
+          "_name": "Number",
+          "_constraints": {}
+        },
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "set_selenium_local_session": {},
-    "set_selenium_remote_session": {
-      "selenium_url": "''"
+    {
+      "_name": "randomize",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
     },
-    "login": {},
-    "set_sleep_reduce": {
-      "percentage": "None"
+    {
+      "_name": "users",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "set_do_comment": {
-      "enabled": "False",
-      "percentage": "0"
+    {
+      "_name": "words",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "set_comments": {
-      "comments": "None",
-      "media": "None"
+    {
+      "_name": "friends",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "set_do_follow": {
-      "enabled": "False",
-      "percentage": "0",
-      "times": "1"
+    {
+      "_name": "option",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
     },
-    "set_do_like": {
-      "enabled": "False",
-      "percentage": "0"
+    {
+      "_name": "api_key",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "set_dont_like": {
-      "tags": "None"
+    {
+      "_name": "full_match",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
     },
-    "set_user_interact": {
-      "amount": "10",
-      "percentage": "100",
-      "randomize": "False",
-      "media": "None"
+    {
+      "_name": "limit",
+      "_types": [
+        {
+          "_name": "Number",
+          "_constraints": {}
+        }
+      ]
     },
-    "set_ignore_users": {
-      "users": "None"
+    {
+      "_name": "sort",
+      "_types": [
+        "NAT"
+      ]
     },
-    "set_ignore_if_contains": {
-      "words": "None"
+    {
+      "_name": "log_tags",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
     },
-    "set_dont_include": {
-      "friends": "None"
+    {
+      "_name": "tags_skip",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "set_switch_language": {
-      "option": "True"
+    {
+      "_name": "comment",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
     },
-    "set_use_clarifai": {
-      "enabled": "False",
-      "api_key": "None",
-      "full_match": "False"
+    {
+      "_name": "usernames",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "set_smart_hashtags": {
-      "tags": "None",
-      "limit": "3",
-      "sort": "'top'",
-      "log_tags": "True"
+    {
+      "_name": "daysold",
+      "_types": [
+        {
+          "_name": "Number",
+          "_constraints": {}
+        }
+      ]
     },
-    "clarifai_check_img_for": {
-      "tags": "None",
-      "tags_skip": "None",
-      "comment": "False",
-      "comments": "None"
+    {
+      "_name": "max_pic",
+      "_types": [
+        {
+          "_name": "Number",
+          "_constraints": {}
+        }
+      ]
     },
-    "follow_commenters": {
-      "usernames": "None",
-      "amount": "10",
-      "daysold": "365",
-      "max_pic": "50",
-      "sleep_delay": "600",
-      "interact": "False"
+    {
+      "_name": "sleep_delay",
+      "_types": [
+        {
+          "_name": "Number",
+          "_constraints": {}
+        }
+      ]
     },
-    "follow_likers ": {
-      "usernames": "None",
-      "photos_grab_amount": "3",
-      "follow_likers_per_photo": "3",
-      "randomize": "True",
-      "sleep_delay": "600",
-      "interact": "False"
+    {
+      "_name": "interact",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
     },
-    "follow_by_list": {
-      "followlist": "None",
-      "times": "1",
-      "sleep_delay": "600",
-      "interact": "False"
+    {
+      "_name": "photos_grab_amount",
+      "_types": [
+        {
+          "_name": "Number",
+          "_constraints": {}
+        }
+      ]
     },
-    "set_relationship_bounds ": {
-      "enabled": "None",
-      "potency_ratio": "None",
-      "delimit_by_numbers": "None",
-      "max_followers": "None",
-      "max_following": "None",
-      "min_followers": "None",
-      "min_following": "None"
+    {
+      "_name": "follow_likers_per_photo",
+      "_types": [
+        {
+          "_name": "Number",
+          "_constraints": {}
+        }
+      ]
     },
-    "set_delimit_liking": {
-      "enabled": "None",
-      "max": "None",
-      "min": "None"
+    {
+      "_name": "followlist",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "set_delimit_commenting": {
-      "enabled": "False",
-      "max": "None",
-      "min": "None"
+    {
+      "_name": "potency_ratio",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "like_by_locations": {
-      "locations": "None",
-      "amount": "50",
-      "media": "None",
-      "skip_top_posts": "True"
+    {
+      "_name": "delimit_by_numbers",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "comment_by_locations": {
-      "locations": "None",
-      "amount": "50",
-      "media": "None",
-      "skip_top_posts": "True"
+    {
+      "_name": "max_followers",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "like_by_tags": {
-      "tags": "None",
-      "amount": "50",
-      "media": "None",
-      "skip_top_posts": "True",
-      "use_smart_hashtags": "False",
-      "interact": "False"
+    {
+      "_name": "max_following",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "like_by_users": {
-      "usernames": "None",
-      "amount": "10",
-      "randomize": "False",
-      "media": "None"
+    {
+      "_name": "min_followers",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "interact_by_users": {
-      "usernames": "None",
-      "amount": "10",
-      "randomize": "False",
-      "media": "None"
+    {
+      "_name": "min_following",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "like_from_image": {
-      "url": "None",
-      "amount": "50",
-      "media": "None"
+    {
+      "_name": "max",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "interact_user_followers": {
-      "usernames": "None",
-      "amount": "10",
-      "randomize": "False"
+    {
+      "_name": "min",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "interact_user_following": {
-      "usernames": "None",
-      "amount": "10",
-      "randomize": "False"
+    {
+      "_name": "locations",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "follow_user_followers": {
-      "usernames": "None",
-      "amount": "10",
-      "randomize": "False",
-      "interact": "False",
-      "sleep_delay": "600"
+    {
+      "_name": "skip_top_posts",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
     },
-    "follow_user_following": {
-      "usernames": "None",
-      "amount": "10",
-      "randomize": "False",
-      "interact": "False",
-      "sleep_delay": "600"
+    {
+      "_name": "use_smart_hashtags",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
     },
-    "unfollow_users": {
-      "amount": "10",
-      "customList": "(False, [], \"all\")",
-      "InstapyFollowed": "(False, \"all\")",
-      "nonFollowers": "False",
-      "allFollowing": "False",
-      "style": "\"FIFO\"",
-      "unfollow_after": "None",
-      "sleep_delay": "600"
+    {
+      "_name": "url",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "like_by_feed": {
-      "amount": "50",
-      "randomize": "False",
-      "unfollow": "False",
-      "interact": "False"
+    {
+      "_name": "customList",
+      "_types": [
+        "NAT"
+      ]
     },
-    "set_dont_unfollow_active_users": {
-      "enabled": "False",
-      "posts": "4",
-      "boundary": "500"
+    {
+      "_name": "InstapyFollowed",
+      "_types": [
+        "NAT"
+      ]
     },
-    "set_blacklist": {
-      "enabled": "None",
-      "campaign": "None"
+    {
+      "_name": "nonFollowers",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
     },
-    "grab_followers": {
-      "username": "None",
-      "amount": "None",
-      "live_match": "False",
-      "store_locally": "True"
+    {
+      "_name": "allFollowing",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
     },
-    "grab_following": {
-      "username": "None",
-      "amount": "None",
-      "live_match": "False",
-      "store_locally": "True"
+    {
+      "_name": "style",
+      "_types": [
+        {
+          "_name": "String"
+        }
+      ]
     },
-    "pick_unfollowers": {
-      "username": "None",
-      "compare_by": "\"latest\"",
-      "compare_track": "\"first\"",
-      "live_match": "False",
-      "store_locally": "True",
-      "print_out": "True"
+    {
+      "_name": "unfollow_after",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "pick_nonfollowers": {
-      "username": "None",
-      "live_match": "False",
-      "store_locally": "True"
+    {
+      "_name": "unfollow",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
     },
-    "pick_fans": {
-      "username": "None",
-      "live_match": "False",
-      "store_locally": "True"
+    {
+      "_name": "posts",
+      "_types": [
+        {
+          "_name": "Number",
+          "_constraints": {}
+        }
+      ]
     },
-    "pick_mutual_following": {
-      "username": "None",
-      "live_match": "False",
-      "store_locally": "True"
+    {
+      "_name": "boundary",
+      "_types": [
+        {
+          "_name": "Number",
+          "_constraints": {}
+        }
+      ]
     },
-    "end": {},
-    "follow_by_tags": {
-      "tags": "None",
-      "amount": "50",
-      "media": "None",
-      "skip_top_posts": "True",
-      "use_smart_hashtags": "False"
+    {
+      "_name": "campaign",
+      "_types": [
+        {
+          "_name": "None"
+        }
+      ]
     },
-    "interact_by_URL": {
-      "urls": "[]",
-      "randomize": "False",
-      "interact": "False"
+    {
+      "_name": "live_match",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
+    },
+    {
+      "_name": "store_locally",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
+    },
+    {
+      "_name": "compare_by",
+      "_types": [
+        {
+          "_name": "String"
+        }
+      ]
+    },
+    {
+      "_name": "compare_track",
+      "_types": [
+        {
+          "_name": "String"
+        }
+      ]
+    },
+    {
+      "_name": "print_out",
+      "_types": [
+        {
+          "_name": "Boolean"
+        }
+      ]
+    },
+    {
+      "_name": "urls",
+      "_types": [
+        {
+          "_name": "Array",
+          "_subType": "String"
+        }
+      ]
     }
-  }
+  ],
+  "methods": [
+    {
+      "_name": "__init__",
+      "_args": [
+        {
+          "_name": "username",
+          "_default": null
+        },
+        {
+          "_name": "password",
+          "_default": null
+        },
+        {
+          "_name": "nogui",
+          "_default": false
+        },
+        {
+          "_name": "selenium_local_session",
+          "_default": true
+        },
+        {
+          "_name": "use_firefox",
+          "_default": false
+        },
+        {
+          "_name": "browser_profile_path",
+          "_default": null
+        },
+        {
+          "_name": "page_delay",
+          "_default": 25
+        },
+        {
+          "_name": "show_logs",
+          "_default": true
+        },
+        {
+          "_name": "headless_browser",
+          "_default": false
+        },
+        {
+          "_name": "proxy_address",
+          "_default": null
+        },
+        {
+          "_name": "proxy_chrome_extension",
+          "_default": null
+        },
+        {
+          "_name": "proxy_port",
+          "_default": 0
+        },
+        {
+          "_name": "bypass_suspicious_attempt",
+          "_default": false
+        },
+        {
+          "_name": "multi_logs",
+          "_default": false
+        }
+      ]
+    },
+    {
+      "_name": "get_instapy_logger",
+      "_args": [
+        {
+          "_name": "show_logs",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "set_selenium_local_session",
+      "_args": []
+    },
+    {
+      "_name": "set_selenium_remote_session",
+      "_args": [
+        {
+          "_name": "selenium_url",
+          "_default": "''"
+        }
+      ]
+    },
+    {
+      "_name": "login",
+      "_args": []
+    },
+    {
+      "_name": "set_sleep_reduce",
+      "_args": [
+        {
+          "_name": "percentage",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "set_do_comment",
+      "_args": [
+        {
+          "_name": "enabled",
+          "_default": false
+        },
+        {
+          "_name": "percentage",
+          "_default": 0
+        }
+      ]
+    },
+    {
+      "_name": "set_comments",
+      "_args": [
+        {
+          "_name": "comments",
+          "_default": null
+        },
+        {
+          "_name": "media",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "set_do_follow",
+      "_args": [
+        {
+          "_name": "enabled",
+          "_default": false
+        },
+        {
+          "_name": "percentage",
+          "_default": 0
+        },
+        {
+          "_name": "times",
+          "_default": 1
+        }
+      ]
+    },
+    {
+      "_name": "set_do_like",
+      "_args": [
+        {
+          "_name": "enabled",
+          "_default": false
+        },
+        {
+          "_name": "percentage",
+          "_default": 0
+        }
+      ]
+    },
+    {
+      "_name": "set_dont_like",
+      "_args": [
+        {
+          "_name": "tags",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "set_user_interact",
+      "_args": [
+        {
+          "_name": "amount",
+          "_default": 10
+        },
+        {
+          "_name": "percentage",
+          "_default": 100
+        },
+        {
+          "_name": "randomize",
+          "_default": false
+        },
+        {
+          "_name": "media",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "set_ignore_users",
+      "_args": [
+        {
+          "_name": "users",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "set_ignore_if_contains",
+      "_args": [
+        {
+          "_name": "words",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "set_dont_include",
+      "_args": [
+        {
+          "_name": "friends",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "set_switch_language",
+      "_args": [
+        {
+          "_name": "option",
+          "_default": true
+        }
+      ]
+    },
+    {
+      "_name": "set_use_clarifai",
+      "_args": [
+        {
+          "_name": "enabled",
+          "_default": false
+        },
+        {
+          "_name": "api_key",
+          "_default": null
+        },
+        {
+          "_name": "full_match",
+          "_default": false
+        }
+      ]
+    },
+    {
+      "_name": "set_smart_hashtags",
+      "_args": [
+        {
+          "_name": "tags",
+          "_default": null
+        },
+        {
+          "_name": "limit",
+          "_default": 3
+        },
+        {
+          "_name": "sort",
+          "_default": "'top'"
+        },
+        {
+          "_name": "log_tags",
+          "_default": true
+        }
+      ]
+    },
+    {
+      "_name": "clarifai_check_img_for",
+      "_args": [
+        {
+          "_name": "tags",
+          "_default": null
+        },
+        {
+          "_name": "tags_skip",
+          "_default": null
+        },
+        {
+          "_name": "comment",
+          "_default": false
+        },
+        {
+          "_name": "comments",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "follow_commenters",
+      "_args": [
+        {
+          "_name": "usernames",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": 10
+        },
+        {
+          "_name": "daysold",
+          "_default": 365
+        },
+        {
+          "_name": "max_pic",
+          "_default": 50
+        },
+        {
+          "_name": "sleep_delay",
+          "_default": 600
+        },
+        {
+          "_name": "interact",
+          "_default": false
+        }
+      ]
+    },
+    {
+      "_name": "follow_likers ",
+      "_args": [
+        {
+          "_name": "usernames",
+          "_default": null
+        },
+        {
+          "_name": "photos_grab_amount",
+          "_default": 3
+        },
+        {
+          "_name": "follow_likers_per_photo",
+          "_default": 3
+        },
+        {
+          "_name": "randomize",
+          "_default": true
+        },
+        {
+          "_name": "sleep_delay",
+          "_default": 600
+        },
+        {
+          "_name": "interact",
+          "_default": false
+        }
+      ]
+    },
+    {
+      "_name": "follow_by_list",
+      "_args": [
+        {
+          "_name": "followlist",
+          "_default": null
+        },
+        {
+          "_name": "times",
+          "_default": 1
+        },
+        {
+          "_name": "sleep_delay",
+          "_default": 600
+        },
+        {
+          "_name": "interact",
+          "_default": false
+        }
+      ]
+    },
+    {
+      "_name": "set_relationship_bounds ",
+      "_args": [
+        {
+          "_name": "enabled",
+          "_default": null
+        },
+        {
+          "_name": "potency_ratio",
+          "_default": null
+        },
+        {
+          "_name": "delimit_by_numbers",
+          "_default": null
+        },
+        {
+          "_name": "max_followers",
+          "_default": null
+        },
+        {
+          "_name": "max_following",
+          "_default": null
+        },
+        {
+          "_name": "min_followers",
+          "_default": null
+        },
+        {
+          "_name": "min_following",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "set_delimit_liking",
+      "_args": [
+        {
+          "_name": "enabled",
+          "_default": null
+        },
+        {
+          "_name": "max",
+          "_default": null
+        },
+        {
+          "_name": "min",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "set_delimit_commenting",
+      "_args": [
+        {
+          "_name": "enabled",
+          "_default": false
+        },
+        {
+          "_name": "max",
+          "_default": null
+        },
+        {
+          "_name": "min",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "like_by_locations",
+      "_args": [
+        {
+          "_name": "locations",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": 50
+        },
+        {
+          "_name": "media",
+          "_default": null
+        },
+        {
+          "_name": "skip_top_posts",
+          "_default": true
+        }
+      ]
+    },
+    {
+      "_name": "comment_by_locations",
+      "_args": [
+        {
+          "_name": "locations",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": 50
+        },
+        {
+          "_name": "media",
+          "_default": null
+        },
+        {
+          "_name": "skip_top_posts",
+          "_default": true
+        }
+      ]
+    },
+    {
+      "_name": "like_by_tags",
+      "_args": [
+        {
+          "_name": "tags",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": 50
+        },
+        {
+          "_name": "media",
+          "_default": null
+        },
+        {
+          "_name": "skip_top_posts",
+          "_default": true
+        },
+        {
+          "_name": "use_smart_hashtags",
+          "_default": false
+        },
+        {
+          "_name": "interact",
+          "_default": false
+        }
+      ]
+    },
+    {
+      "_name": "like_by_users",
+      "_args": [
+        {
+          "_name": "usernames",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": 10
+        },
+        {
+          "_name": "randomize",
+          "_default": false
+        },
+        {
+          "_name": "media",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "interact_by_users",
+      "_args": [
+        {
+          "_name": "usernames",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": 10
+        },
+        {
+          "_name": "randomize",
+          "_default": false
+        },
+        {
+          "_name": "media",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "like_from_image",
+      "_args": [
+        {
+          "_name": "url",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": 50
+        },
+        {
+          "_name": "media",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "interact_user_followers",
+      "_args": [
+        {
+          "_name": "usernames",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": 10
+        },
+        {
+          "_name": "randomize",
+          "_default": false
+        }
+      ]
+    },
+    {
+      "_name": "interact_user_following",
+      "_args": [
+        {
+          "_name": "usernames",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": 10
+        },
+        {
+          "_name": "randomize",
+          "_default": false
+        }
+      ]
+    },
+    {
+      "_name": "follow_user_followers",
+      "_args": [
+        {
+          "_name": "usernames",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": 10
+        },
+        {
+          "_name": "randomize",
+          "_default": false
+        },
+        {
+          "_name": "interact",
+          "_default": false
+        },
+        {
+          "_name": "sleep_delay",
+          "_default": 600
+        }
+      ]
+    },
+    {
+      "_name": "follow_user_following",
+      "_args": [
+        {
+          "_name": "usernames",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": 10
+        },
+        {
+          "_name": "randomize",
+          "_default": false
+        },
+        {
+          "_name": "interact",
+          "_default": false
+        },
+        {
+          "_name": "sleep_delay",
+          "_default": 600
+        }
+      ]
+    },
+    {
+      "_name": "unfollow_users",
+      "_args": [
+        {
+          "_name": "amount",
+          "_default": 10
+        },
+        {
+          "_name": "customList",
+          "_default": [
+            false,
+            [],
+            "all"
+          ]
+        },
+        {
+          "_name": "InstapyFollowed",
+          "_default": [
+            false,
+            "all"
+          ]
+        },
+        {
+          "_name": "nonFollowers",
+          "_default": false
+        },
+        {
+          "_name": "allFollowing",
+          "_default": false
+        },
+        {
+          "_name": "style",
+          "_default": "FIFO"
+        },
+        {
+          "_name": "unfollow_after",
+          "_default": null
+        },
+        {
+          "_name": "sleep_delay",
+          "_default": 600
+        }
+      ]
+    },
+    {
+      "_name": "like_by_feed",
+      "_args": [
+        {
+          "_name": "amount",
+          "_default": 50
+        },
+        {
+          "_name": "randomize",
+          "_default": false
+        },
+        {
+          "_name": "unfollow",
+          "_default": false
+        },
+        {
+          "_name": "interact",
+          "_default": false
+        }
+      ]
+    },
+    {
+      "_name": "set_dont_unfollow_active_users",
+      "_args": [
+        {
+          "_name": "enabled",
+          "_default": false
+        },
+        {
+          "_name": "posts",
+          "_default": 4
+        },
+        {
+          "_name": "boundary",
+          "_default": 500
+        }
+      ]
+    },
+    {
+      "_name": "set_blacklist",
+      "_args": [
+        {
+          "_name": "enabled",
+          "_default": null
+        },
+        {
+          "_name": "campaign",
+          "_default": null
+        }
+      ]
+    },
+    {
+      "_name": "grab_followers",
+      "_args": [
+        {
+          "_name": "username",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": null
+        },
+        {
+          "_name": "live_match",
+          "_default": false
+        },
+        {
+          "_name": "store_locally",
+          "_default": true
+        }
+      ]
+    },
+    {
+      "_name": "grab_following",
+      "_args": [
+        {
+          "_name": "username",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": null
+        },
+        {
+          "_name": "live_match",
+          "_default": false
+        },
+        {
+          "_name": "store_locally",
+          "_default": true
+        }
+      ]
+    },
+    {
+      "_name": "pick_unfollowers",
+      "_args": [
+        {
+          "_name": "username",
+          "_default": null
+        },
+        {
+          "_name": "compare_by",
+          "_default": "latest"
+        },
+        {
+          "_name": "compare_track",
+          "_default": "first"
+        },
+        {
+          "_name": "live_match",
+          "_default": false
+        },
+        {
+          "_name": "store_locally",
+          "_default": true
+        },
+        {
+          "_name": "print_out",
+          "_default": true
+        }
+      ]
+    },
+    {
+      "_name": "pick_nonfollowers",
+      "_args": [
+        {
+          "_name": "username",
+          "_default": null
+        },
+        {
+          "_name": "live_match",
+          "_default": false
+        },
+        {
+          "_name": "store_locally",
+          "_default": true
+        }
+      ]
+    },
+    {
+      "_name": "pick_fans",
+      "_args": [
+        {
+          "_name": "username",
+          "_default": null
+        },
+        {
+          "_name": "live_match",
+          "_default": false
+        },
+        {
+          "_name": "store_locally",
+          "_default": true
+        }
+      ]
+    },
+    {
+      "_name": "pick_mutual_following",
+      "_args": [
+        {
+          "_name": "username",
+          "_default": null
+        },
+        {
+          "_name": "live_match",
+          "_default": false
+        },
+        {
+          "_name": "store_locally",
+          "_default": true
+        }
+      ]
+    },
+    {
+      "_name": "end",
+      "_args": []
+    },
+    {
+      "_name": "follow_by_tags",
+      "_args": [
+        {
+          "_name": "tags",
+          "_default": null
+        },
+        {
+          "_name": "amount",
+          "_default": 50
+        },
+        {
+          "_name": "media",
+          "_default": null
+        },
+        {
+          "_name": "skip_top_posts",
+          "_default": true
+        },
+        {
+          "_name": "use_smart_hashtags",
+          "_default": false
+        }
+      ]
+    },
+    {
+      "_name": "interact_by_URL",
+      "_args": [
+        {
+          "_name": "urls",
+          "_default": []
+        },
+        {
+          "_name": "randomize",
+          "_default": false
+        },
+        {
+          "_name": "interact",
+          "_default": false
+        }
+      ]
+    }
+  ]
 }

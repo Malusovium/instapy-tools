@@ -77,6 +77,7 @@ const argDefault =
         , reverse
         , take(1)
         , join('')
+        // , pythonToJs
         )(arg)
       : 'None'
 
@@ -111,10 +112,19 @@ const extractMethodArgs =
     , formatArg
     )(methodLine)
 
+const isNone =
+  (def: string) =>
+    def === 'None'
+
+const isBoolean =
+  (def: string) =>
+    def === 'True'
+    || def === 'False'
+
 const isString =
   (def: string) =>
-    def.startsWith(`'`)
-    && def.endsWith(`'`)
+    def.startsWith(`"`)
+    && def.endsWith(`"`)
 
 const isNumber =
   (def: any) =>
@@ -125,14 +135,10 @@ const isArray =
     def.startsWith('[')
     && def.endsWith(']')
 
-const isBoolean =
+const isTuple =
   (def: string) =>
-    def === 'True'
-    || def === 'False'
-
-const isNone =
-  (def: string) =>
-    def === 'None'
+    def.startsWith('(')
+    && def.endsWith(')')
 
 const extractType =
   (def: string) =>
@@ -141,6 +147,7 @@ const extractType =
     : isString(def) ? createType.string()
     : isNumber(def) ? createType.number()
     : isArray(def) ? createType.array('String')
+    // : isTuple(def) ? createType.tuple()
     : 'NAT'
 
 const replaceDefaultType =
@@ -212,6 +219,63 @@ const replaceNameMethod =
       }
     )
 
+const isPythonString =
+  (val:string) =>
+    val.startsWith(`"`)
+    && val.endsWith(`"`)
+
+const removeOuter1 =
+  (val:string) =>
+    pipe
+    ( split('')
+    , drop(1)
+    , reverse
+    , drop(1)
+    , reverse
+    , join('')
+    )(val)
+
+const toArray =
+  (str: string) =>
+    pipe
+    ( removeOuter1
+    , split(', ')
+    , reject<any>( (str:string) => str === '')
+    )(str)
+
+const toTuple =
+  (str: string): Dictionary<any> =>
+    pipe
+    ( removeOuter1
+    , split(', ')
+    , map(pythonToJs)
+    )(str)
+
+const pythonToJs =
+  (val:any) =>
+    val === 'None' ? null
+    : val === 'False' ? false
+    : val === 'True' ? true
+    : isPythonString(val) ? removeOuter1(val)
+    : isNumber(val) ? Number(val)
+    : isArray(val) ? toArray(val)
+    : isTuple(val) ? toTuple(val)
+    : val
+
+const defaultPyJs =
+  ({_name, _default}: MethodArg) => (
+    { _name
+    , _default: pythonToJs(_default)
+    }
+  )
+
+const methodArgDefaultPyJs =
+  ({_name, _args}: Method) => (
+    { _name: _name
+    , _args: map(defaultPyJs, _args)
+    }
+  )
+
 const extractMethods =
   (methodLines: MethodLine[]) =>
     pipe
@@ -225,6 +289,7 @@ const extractMethods =
               : _name
         )
       )
+    , map<any, any>(methodArgDefaultPyJs)
     )(methodLines)
 
 export const extract =
