@@ -4,7 +4,6 @@ import { stop } from './stop'
 import { logs } from './logs'
 
 const defaultInstapyPath = `${__dirname}/../../InstaPy`
-console.log(defaultInstapyPath)
 
 type controls =
   (projectPath?:string) => (

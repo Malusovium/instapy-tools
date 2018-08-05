@@ -43,8 +43,10 @@
     "page_delay": [
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 0
+        "_constraints": {
+          "_step": 1,
+          "_min": 0
+        }
       }
     ],
     "show_logs": [
@@ -76,9 +78,11 @@
     "proxy_port": [
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 1,
-        "_max": 65535
+        "_constraints": {
+          "_step": 1,
+          "_min": 1,
+          "_max": 65535
+        }
       }
     ],
     "bypass_suspicious_attempt": [
@@ -99,9 +103,11 @@
     "percentage": [
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 0,
-        "_max": 100
+        "_constraints": {
+          "_step": 1,
+          "_min": 0,
+          "_max": 100
+        }
       }
     ],
     "enabled": [
@@ -136,8 +142,10 @@
     "times": [
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 1
+        "_constraints": {
+          "_step": 1,
+          "_min": 1
+        }
       }
     ],
     "tags": [
@@ -152,8 +160,10 @@
     "amount": [
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 1
+        "_constraints": {
+          "_step": 1,
+          "_min": 1
+        }
       },
       {
         "_name": "None"
@@ -212,8 +222,10 @@
     "limit": [
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 1
+        "_constraints": {
+          "_step": 1,
+          "_min": 1
+        }
       }
     ],
     "sort": [
@@ -259,22 +271,28 @@
     "daysold": [
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 0
+        "_constraints": {
+          "_step": 1,
+          "_min": 0
+        }
       }
     ],
     "max_pic": [
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 1
+        "_constraints": {
+          "_step": 1,
+          "_min": 1
+        }
       }
     ],
     "sleep_delay": [
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 0
+        "_constraints": {
+          "_step": 1,
+          "_min": 0
+        }
       }
     ],
     "interact": [
@@ -285,15 +303,19 @@
     "photos_grab_amount": [
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 1
+        "_constraints": {
+          "_step": 1,
+          "_min": 1
+        }
       }
     ],
     "follow_likers_per_photo": [
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 0
+        "_constraints": {
+          "_step": 1,
+          "_min": 0
+        }
       }
     ],
     "followlist": [
@@ -311,8 +333,10 @@
       },
       {
         "_name": "Number",
-        "_step": 0.01,
-        "_min": 0
+        "_constraints": {
+          "_step": 0.01,
+          "_min": 0
+        }
       }
     ],
     "delimit_by_numbers": [
@@ -329,8 +353,10 @@
       },
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 1
+        "_constraints": {
+          "_step": 1,
+          "_min": 1
+        }
       }
     ],
     "max_following": [
@@ -339,8 +365,10 @@
       },
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 1
+        "_constraints": {
+          "_step": 1,
+          "_min": 1
+        }
       }
     ],
     "min_followers": [
@@ -349,8 +377,10 @@
       },
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 0
+        "_constraints": {
+          "_step": 1,
+          "_min": 0
+        }
       }
     ],
     "min_following": [
@@ -359,8 +389,10 @@
       },
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 0
+        "_constraints": {
+          "_step": 1,
+          "_min": 0
+        }
       }
     ],
     "max": [
@@ -369,8 +401,10 @@
       },
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 1
+        "_constraints": {
+          "_step": 1,
+          "_min": 1
+        }
       }
     ],
     "min": [
@@ -379,8 +413,10 @@
       },
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 0
+        "_constraints": {
+          "_step": 1,
+          "_min": 0
+        }
       }
     ],
     "locations": [
@@ -475,8 +511,10 @@
       },
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 0
+        "_constraints": {
+          "_step": 1,
+          "_min": 0
+        }
       }
     ],
     "unfollow": [
@@ -487,13 +525,16 @@
     "posts": [
       {
         "_name": "Number",
-        "_step": 1,
-        "_min": 1
+        "_constraints": {
+          "_step": 1,
+          "_min": 1
+        }
       }
     ],
     "boundary": [
       {
-        "_name": "Number"
+        "_name": "Number",
+        "_constraints": {}
       }
     ],
     "campaign": [
