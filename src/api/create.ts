@@ -2,9 +2,7 @@ import { writeFileSync } from 'fs'
 
 const defaultInstapyPath = `${__dirname}/../../InstaPy`
 
-const makeHeadTmpl = `
-from instapy import InstaPy
-`
+const importInstapy = 'from instapy import InstaPy'
 
 type setupCreate =
   (projectPath?: string) =>
@@ -15,7 +13,8 @@ export const setupCreate: setupCreate =
   (projectPath = defaultInstapyPath) =>
     (configLines, write = false, out = 'docker_quickstart.py') => {
       const config =
-        [ makeHeadTmpl
+        [ importInstapy
+        , '\n'
         , ...configLines
         ].join('\n') + '\n'
 
