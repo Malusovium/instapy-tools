@@ -249,6 +249,13 @@ npm run gen-api
 npm run gen-api:dev
 ```
 
+#### Updating and publishing the Project
+
+```
+npm version <major | minor | patch>
+npm publish
+```
+
 ## To-Do
   - [x] generate api.json, 'including types'
   - [x] expose api generated from api.json
