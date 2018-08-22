@@ -33,7 +33,7 @@ export const genApi =
     pipe
     ( trimExcessData
     , extract
-    // , suplement
-    // , format
+    , suplement
+    , format
     , addGitHash(projectPath)
     )(getRawInstapy(projectPath))

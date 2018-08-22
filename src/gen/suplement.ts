@@ -1,4 +1,5 @@
 import { pipe
+       , Dictionary
        , findIndex
        , map
        , update
@@ -76,6 +77,19 @@ const concatTypes =
       }
     }
 
+const to1Type =
+  (arr: Type[]) =>
+    arr.length === 0 ? undefined
+    : arr.length === 1 ? arr[0]
+    : createType.union(arr)
+
+const topLevelType =
+  ({_name, _types}: Arg) => (
+    { _name: _name
+    , _type: to1Type(_types)
+    }
+  )
+
 const stringTypes =
   longPipe
   ( concatTypes
@@ -104,6 +118,10 @@ const stringTypes =
     )
   , concatTypes
     ( 'campaign'
+    , [ createType.string() ]
+    )
+  , replaceTypes
+    ( 'selenium_url'
     , [ createType.string() ]
     )
   )
@@ -154,7 +172,7 @@ const unionTypes =
     ( 'media'
     , [ createType.union([ 'Photo', 'Video' ]) ]
     )
-  , concatTypes
+  , replaceTypes
     ( 'sort'
     , [ createType.union([ 'top', 'random' ]) ]
     )
@@ -291,17 +309,25 @@ const numberTypes =
     )
   )
 
+const suplementTypes =
+  longPipe
+  ( stringTypes
+  , arrayTypes
+  , unionTypes
+  , booleanTypes
+  , numberTypes
+  , tupleTypes
+  )
+
+const suplementArgs =
+  pipe
+  ( suplementTypes
+  , map(topLevelType)
+  )
+
 export const suplement =
   ({methods, args}:any) => (
-    { args:
-      longPipe
-      ( stringTypes
-      , arrayTypes
-      , unionTypes
-      , booleanTypes
-      , numberTypes
-      , tupleTypes
-      )(args)
+    { args: suplementArgs(args)
     , methods: methods
     }
   )

@@ -1,5 +1,9 @@
 import { Dictionary
+       , equals
+       , toLower
+       , reject
        , is
+       , anyPass
        , contains
        , zip
        , reduce
@@ -123,7 +127,7 @@ const executeValFunc =
     func(val)
 
 const validateNone: TypeValidator =
-  (val) => val === 'None'
+  (val) => val === null
 
 const validateBoolean: TypeValidator =
   (val) => is(Boolean, val)
@@ -139,10 +143,40 @@ const validateNumber =
       && (_min === undefined || val > _min)
       && (_max === undefined || val < _max)
 
+const isExact =
+  (expected: any) =>
+    (got:any) =>
+      equals(expected, got)
+
+const toArray =
+  (input: any) => [...input]
+
 const validateUnion =
   (options: Union["_options"]): TypeValidator =>
-    (val) =>
-      contains(val, options)
+    (val) => {
+      if(options.length === 0) {
+        return true
+      } else {
+        const typeValidators: any[] =
+          compose
+          ( toArray // hacky function to satisfy typescript /w Dictionary It shouldn't have to be called
+          , map(makeValidation)
+          , reject( ({_name}:any) => _name === undefined)
+          )(options)
+        // console.log(typeValidators)
+
+        const exactValueValidators =
+          compose
+          ( toArray // hacky function to satisfy typescript /w Dictionary It shouldn't have to be called
+          , map(isExact)
+          , reject( ({_name}:any) => _name !== undefined)
+          )(options)
+
+        const validators: any = [ ...typeValidators, ...exactValueValidators ]
+
+        return anyPass(validators)(val)
+      }
+    }
 
 const validateArray =
   (_type: Arr["_subType"]): TypeValidator =>
@@ -174,14 +208,51 @@ const validateTuple =
       }
   }
 
+export type TypesWithFunctions =
+  { _default: (input:any) => any
+  , none: (input: any) => any
+  , boolean: (input: any) => any
+  , string: (input: any) => any
+  , number: (_constraints: Num["_constraints"]) => (input: any) => any
+  , union: (_options: Union["_options"]) => (input: any) => any
+  , array: (_subType: Arr["_subType"]) => (input: any) => any
+  , tuple: (_subTypes: Tuple["_subTypes"]) => (input:any) => any
+  }
+
+type MakeDoAtType =
+  (typesWithFunctions: TypesWithFunctions) =>
+    (_type: Type) => any
+
+export const makeDoAtType: MakeDoAtType =
+  ( { _default
+    , none
+    , boolean
+    , string
+    , number
+    , union
+    , array
+    , tuple
+    }
+  ) =>
+    (_type) => // typesWithFunctions[toLower(getTypeName(_type))]
+      _type._name === 'None' ? none
+      : _type._name === 'Boolean' ? boolean
+      : _type._name === 'String' ? string
+      : _type._name === 'Number' ? number(_type._constraints)
+      : _type._name === 'Union' ? union(_type._options)
+      : _type._name === 'Array' ? array(_type._subType)
+      : _type._name === 'Tuple' ? tuple(_type._subTypes)
+      : _default
 
 export const makeValidation =
-  (_type: Type) =>
-    _type._name === 'None' ? validateNone
-    : _type._name === 'Boolean' ? validateBoolean
-    : _type._name === 'String' ? validateString
-    : _type._name === 'Number' ? validateNumber(_type._constraints)
-    : _type._name === 'Union' ? validateUnion(_type._options)
-    : _type._name === 'Array' ? validateArray(_type._subType)
-    : _type._name === 'Tuple' ? validateTuple(_type._subTypes)
-    : (val:any) => false
+  makeDoAtType
+  ( { _default: (val) => false
+    , none: validateNone
+    , boolean: validateBoolean
+    , string: validateString
+    , number: validateNumber
+    , union: validateUnion
+    , array: validateArray
+    , tuple: validateTuple
+    }
+  )

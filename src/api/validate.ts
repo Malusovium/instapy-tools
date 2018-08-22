@@ -12,7 +12,7 @@ import { Type
        } from '../utils/types'
 
 type ApiArgs =
-  { [index: string]: Type[]
+  { [index: string]: Type
   }
 
 type MethodName = string
@@ -35,23 +35,20 @@ const exists =
     }
   )
 
-const typesToValidator =
-  (types: Type[]) =>
-    compose
-    ( anyPass
-    , map<any, any>(makeValidation)
-    )(types)
+const typeToValidator =
+  (type: Type) =>
+    makeValidation(type)
 
-const argTypesToValidators =
+const argTypeToValidator =
   (apiArgs: ApiArgs) =>
-    map(typesToValidator, apiArgs)
+    map(typeToValidator, apiArgs)
 
 const pickArgTypeValidators =
   (apiArgs: ApiArgs) =>
     (argsToPick: string[]) =>
       compose
       ( pick(argsToPick)
-      , argTypesToValidators
+      , argTypeToValidator
       )(apiArgs)
 
 const allArgsExistOnMethod =
@@ -70,21 +67,23 @@ const allArgsExistOnMethod =
 const keys =
   (obj:any) => Object.keys(obj)
 
+const logIt = (val:any) => { console.log(val); return val }
+
 export const setupValidateMethod =
   (apiJsonObj:any) =>
-    (methodName: MethodName, args: MethodArgs): boolean =>  {
+    ({name, args}: {name: string, args: MethodArgs}): boolean =>  {
       const pickedMethodArgs: any =
         compose
         ( pickArgTypeValidators(apiJsonObj.args)
         , keys
-        , path(`methods.${methodName}`)
+        , path(`methods.${name}`)
         )(apiJsonObj)
 
-      console.log(pickedMethodArgs)
       if (allArgsExistOnMethod(pickedMethodArgs, args)) {
         const validatedList =
           compose
           ( reduce(gotBool(false), true)
+          // , logIt
           , values
           , map( (val:any, key:string) => pickedMethodArgs[key](val))
           )(args)

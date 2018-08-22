@@ -18,7 +18,7 @@ const toObject =
 
 
 const toObjectArgs =
-  toObject('_name', '_types')
+  toObject('_name', '_type')
 
 const toObjectMethods =
   toObject('_name', '_args')
