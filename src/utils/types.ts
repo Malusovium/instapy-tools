@@ -163,7 +163,6 @@ const validateUnion =
           , map(makeValidation)
           , reject( ({_name}:any) => _name === undefined)
           )(options)
-        // console.log(typeValidators)
 
         const exactValueValidators =
           compose
