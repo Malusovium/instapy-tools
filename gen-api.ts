@@ -5,7 +5,7 @@ import { writeFileSync } from 'fs'
 const api = genApi()
 
 writeFileSync
-( './api.json'
+( './src/api.json'
 , JSON.stringify( api, null, 2)
 )
 

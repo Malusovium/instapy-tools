@@ -6,7 +6,8 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "dev": "ts-node-dev src/index.ts",
-    "build": "tsc",
+    "build": "node fuse build",
+    "build:tsc": "tsc",
     "instapy:clone": "git clone https://github.com/timgrossmann/InstaPy",
     "instapy:update": "cd InstaPy; git pull",
     "controls:dev": "NODE_ENV=test ts-node-dev ./src/controls/index.ts",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@types/node": "^10.5.2",
     "ava": "^0.25.0",
+    "fuse-box": "3.3.0",
     "ts-node-dev": "^1.0.0-pre.26",
     "tslint": "^5.10.0"
   }

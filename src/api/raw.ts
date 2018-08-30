@@ -1,4 +1,6 @@
-import { readFileSync } from 'fs'
+import * as jsonApiObj from '../api.json'
 
 export const raw =
-  JSON.parse(readFileSync(__dirname + '/../../api.json', 'utf-8'))
+  jsonApiObj
+
+console.log(raw)
