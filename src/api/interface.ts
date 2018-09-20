@@ -10,6 +10,9 @@ import { makeDoAtType
 type methodComponent =
   (args:object) => any
 
+type argComponent =
+  (_type: any) => any
+
 type buildComponentArg =
   (argName: string, def: any) => any
 
@@ -38,13 +41,16 @@ const buildMethodWithArgs: buildMethodWithArgs =
       return methodComponent(buildedArgs)
     }
 
+export const setupArgComponent =
+  makeDoAtType
+
 export const setupInterface =
   ( {args, methods}:any
     , methodComponent: methodComponent
-    , typeWithFunctions: TypesWithFunctions
+    , argComponent: argComponent
   ) => {
     const argToTypeFns:any =
-      map(makeDoAtType(typeWithFunctions), args)
+      map(argComponent, args)
     const buildedComponents =
       map(buildMethodWithArgs(methodComponent, argToTypeFns), methods)
 

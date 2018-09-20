@@ -2,7 +2,9 @@ import { setupCreate } from './create'
 import { setupValidateMethod } from './validate'
 import { setupMethod } from './method'
 import { raw } from './raw'
-import { setupInterface } from './interface'
+import { setupInterface
+       , setupArgComponent
+       } from './interface'
 
 export const api =
   { setupCreate
@@ -10,4 +12,5 @@ export const api =
   , setupMethod
   , raw
   , setupInterface
+  , setupArgComponent
   }

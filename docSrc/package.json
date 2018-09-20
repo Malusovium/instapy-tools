@@ -1,0 +1,30 @@
+{
+  "name": "docsrc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node fuse dev",
+    "build": "node fuse build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cycle-restart": "^0.2.3",
+    "fuse-box": "^3.4.0",
+    "typescript": "^3.0.1",
+    "uglify-es": "^3.3.9"
+  },
+  "dependencies": {
+    "@cycle/dom": "^21.0.0",
+    "@cycle/isolate": "^3.4.0",
+    "csstips": "^0.3.0",
+    "csx": "^9.0.0",
+    "cycle-onionify": "^6.1.0",
+    "cyclejs-utils": "^3.2.0",
+    "rambda": "^1.2.0",
+    "typestyle": "^2.0.1",
+    "xstream": "^11.7.0"
+  }
+}
