@@ -6,6 +6,10 @@ import { setupInterface
        , setupArgComponent
        } from './interface'
 
+export { MethodComponent
+       , ArgComponent
+       } from './interface'
+
 export const api =
   { setupCreate
   , setupValidateMethod

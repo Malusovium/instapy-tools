@@ -40,7 +40,7 @@
   "devDependencies": {
     "@types/node": "^10.5.2",
     "ava": "^0.25.0",
-    "fuse-box": "3.3.0",
+    "fuse-box": "^3.5.0",
     "ts-node-dev": "^1.0.0-pre.26",
     "tslint": "^5.10.0"
   }

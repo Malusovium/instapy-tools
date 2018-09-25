@@ -208,14 +208,14 @@ const validateTuple =
   }
 
 export type TypesWithFunctions =
-  { _default: (input:any) => any
-  , none: (input: any) => any
-  , boolean: (input: any) => any
-  , string: (input: any) => any
-  , number: (_constraints: Num["_constraints"]) => (input: any) => any
-  , union: (_options: Union["_options"]) => (input: any) => any
-  , array: (_subType: Arr["_subType"]) => (input: any) => any
-  , tuple: (_subTypes: Tuple["_subTypes"]) => (input:any) => any
+  { _default: any
+  , none: any
+  , boolean: any
+  , string: any
+  , number: (_constraints: Num["_constraints"]) => any
+  , union: (_options: Union["_options"]) => any
+  , array: (_subType: Arr["_subType"]) => any
+  , tuple: (_subTypes: Tuple["_subTypes"]) => any
   }
 
 type MakeDoAtType =

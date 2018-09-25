@@ -1,3 +1,6 @@
 export { genApi } from './gen'
 export { controls } from './controls'
-export { api } from './api'
+export { api
+       , MethodComponent
+       , ArgComponent
+       } from './api'

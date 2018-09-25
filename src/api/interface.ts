@@ -7,38 +7,38 @@ import { makeDoAtType
        , TypesWithFunctions
        } from '../utils/types'
 
-type methodComponent =
-  (args:object) => any
+export type MethodComponent =
+  (args: object, methodName: string) => any
 
-type argComponent =
+export type ArgComponent =
   (_type: any) => any
 
-type buildComponentArg =
+type BuildComponentArg =
   (argName: string, def: any) => any
 
-type componentArgs =
-  { [index: string]: buildComponentArg }
+type ComponentArgs =
+  { [index: string]: BuildComponentArg }
 
-type buildArg =
-  (argsTypes: componentArgs) =>
-    (def:any, argName: string) => any
+type BuildArg =
+  (argsTypes: ComponentArgs) =>
+    (def: any, argName: string) => any
 
-const buildArg: buildArg =
+const buildArg: BuildArg =
   (argsTypes) =>
-    (def:any, argName: string) =>
-      argsTypes[argName](argName, def)
+    (def: any, argName: string) =>
+      argsTypes[argName](def, argName)
 
-type buildMethodWithArgs =
-  (methodComponent: methodComponent, argsTypes: componentArgs) =>
+type BuildMethodWithArgs =
+  (methodComponent: MethodComponent, argsTypes: ComponentArgs) =>
     (argsMethod: any, methodName: string) => ({[index:string]: any})
 
-const buildMethodWithArgs: buildMethodWithArgs =
+const buildMethodWithArgs: BuildMethodWithArgs =
   (methodComponent, argsTypes) =>
     (argsMethod, methodName) => {
       const buildedArgs =
         map(buildArg(argsTypes), argsMethod)
 
-      return methodComponent(buildedArgs)
+      return methodComponent(buildedArgs, methodName)
     }
 
 export const setupArgComponent =
@@ -46,8 +46,8 @@ export const setupArgComponent =
 
 export const setupInterface =
   ( {args, methods}:any
-    , methodComponent: methodComponent
-    , argComponent: argComponent
+    , methodComponent: MethodComponent
+    , argComponent: ArgComponent
   ) => {
     const argToTypeFns:any =
       map(argComponent, args)

@@ -19,29 +19,74 @@ ___scope___.file("docSrc/src/components/app.js", function(exports, require, modu
 Object.defineProperty(exports, "__esModule", { value: true });
 const xstream_1 = require("xstream");
 const dom_1 = require("@cycle/dom");
+const rambda_1 = require("rambda");
 // Typestyle setup
 const csstips_1 = require("csstips");
 csstips_1.normalize();
 csstips_1.setupPage('#app');
-const api = require("../../../lib");
+const src_1 = require("../../../src");
+const method_1 = require("./method");
 exports.defaultState = {
-    counter: { count: 5 },
+    count: 5
 };
-function App(sources) {
-    const initReducer$ = xstream_1.default.of(prevState => (prevState === undefined ? exports.defaultState : prevState));
-    // const { setupArgComponent, raw } = api
-    // const { raw } = api
-    console.log(api);
-    // console.log(typeof setupArgComponent)
-    return {
-        DOM: xstream_1.default.of(dom_1.div('hi'))
-        // DOM: xs.of(div(api.raw === undefined ? 'Undefined': 'Is somthing'))
+const { raw, setupInterface, setupArgComponent } = src_1.api;
+const argToDiv = (component, name) => dom_1.div(`This arg = ${name}`);
+const baseMethodComponent = (args) => dom_1.div(['Method_something',
+    ...rambda_1.compose(rambda_1.values, rambda_1.map(argToDiv))(args)
+]);
+const simpleBaseArgComponent = setupArgComponent({ _default: method_1.SimpleArgComponent,
+    none: method_1.SimpleArgComponent,
+    boolean: method_1.SimpleArgComponent,
+    string: method_1.SimpleArgComponent,
+    number: (_constrains) => method_1.SimpleArgComponent,
+    union: (_options) => method_1.SimpleArgComponent,
+    array: (_subType) => method_1.SimpleArgComponent,
+    tuple: (_subTypes) => method_1.SimpleArgComponent
+});
+// const baseArgComponent: ArgComponent =
+//   setupArgComponent
+//   ( { _default: (def, argName) => argName + '_default'
+//     , none: (def, argName) => argName + 'none'
+//     , boolean: (def, argName) => argName + 'boolean'
+//     , string: (def, argName) => argName + 'string'
+//     , number: (_constrains) => (def, argName) => argName + 'number'
+//     , union: (_options) => (def, argName) => argName + 'union'
+//     , array: (_subType) => (def, argName) => argName + 'array'
+//     , tuple: (_subTypes) => (def, argName) => argName + 'tuple'
+//     }
+//   )
+exports.App = ({ DOM, onion }) => {
+    // const interfaceApi =
+    //   setupInterface
+    //   ( raw
+    //   , baseMethodComponent
+    //   , baseArgComponent
+    //   )
+    const interfaceApi = setupInterface(raw, method_1.Method, simpleBaseArgComponent);
+    const testObj = { first: 'val1',
+        second: 'val2',
+        third: 'val3'
     };
-}
-exports.App = App;
+    // console.log(api.raw)
+    // console.log(interfaceApi['set_user_interact']) 
+    const setUserInteract = interfaceApi['set_user_interact']({ DOM, onion });
+    return ({ DOM: view(onion.state$
+            .debug('well?'), [setUserInteract.DOM]),
+        onion: actions(DOM, [setUserInteract.onion])
+    });
+};
+const actions = (DOM, components) => {
+    const init$ = xstream_1.default.of((prev) => prev ? prev : exports.defaultState);
+    return xstream_1.default.merge(init$, ...components);
+};
+const view = (state$, components) => xstream_1.default.combine(state$, ...components)
+    // state$
+    .map(([{ count }, ...components]) => dom_1.div([dom_1.div('app' + count),
+    dom_1.div(components)
+]));
 //# sourceMappingURL=app.js.map
 });
-___scope___.file("lib/index.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/index.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -51,9 +96,11 @@ var controls_1 = require("./controls");
 exports.controls = controls_1.controls;
 var api_1 = require("./api");
 exports.api = api_1.api;
+exports.MethodComponent = api_1.MethodComponent;
+exports.ArgComponent = api_1.ArgComponent;
 //# sourceMappingURL=index.js.map
 });
-___scope___.file("lib/gen/index.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/gen/index.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -68,14 +115,12 @@ const defaultInstapyPath = `${__dirname}/../../InstaPy`;
 const getInstapyHash = (projectPath) => child_process_1.execSync(`cd ${projectPath}; git rev-parse HEAD`)
     .toString('utf8')
     .split('\n')[0];
-const addGitHash = (projectPath) => (api) => ({ git: getInstapyHash(projectPath),
-    ...api
-});
+const addGitHash = (projectPath) => (api) => (Object.assign({ git: getInstapyHash(projectPath) }, api));
 const getRawInstapy = (projectPath) => fs_1.readFileSync(`${projectPath}/instapy/instapy.py`, 'utf-8');
 exports.genApi = (projectPath = defaultInstapyPath) => rambda_1.pipe(trim_1.trimExcessData, extract_1.extract, suplement_1.suplement, format_1.format, addGitHash(projectPath))(getRawInstapy(projectPath));
 //# sourceMappingURL=index.js.map
 });
-___scope___.file("lib/gen/trim.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/gen/trim.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -106,7 +151,7 @@ const dropDef = (str) => rambda_1.pipe(rambda_1.split(''), rambda_1.drop(5), ram
 exports.trimExcessData = (rawInstapy) => rambda_1.pipe(rambda_1.split('\n'), rambda_1.reduce(toOneLineMethod, []), rambda_1.filter(isString), rambda_1.filter(isRawInstapyMethod), rambda_1.map(trimExcessWhiteSpace), rambda_1.map(dropDef))(rawInstapy);
 //# sourceMappingURL=trim.js.map
 });
-___scope___.file("lib/gen/reducers.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/gen/reducers.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -121,7 +166,7 @@ exports.mergeWithLastWhen = (has, ends, joinWith, checkLastFn = (last) => true) 
     : [...acc, curr];
 //# sourceMappingURL=reducers.js.map
 });
-___scope___.file("lib/gen/extract.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/gen/extract.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -213,7 +258,7 @@ exports.extract = (methodLines) => ({ args: extractArgs(methodLines),
 });
 //# sourceMappingURL=extract.js.map
 });
-___scope___.file("lib/utils/types.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/utils/types.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -225,10 +270,7 @@ exports.createType = { none: () => ({ _name: 'None' }),
     boolean: () => ({ _name: 'Boolean' }),
     string: () => ({ _name: 'String' }),
     number: ({ step, min, max } = {}) => ({ _name: 'Number',
-        _constraints: { ...ifValExists('_step', step),
-            ...ifValExists('_min', min),
-            ...ifValExists('_max', max)
-        }
+        _constraints: Object.assign({}, ifValExists('_step', step), ifValExists('_min', min), ifValExists('_max', max))
     }),
     union: (options) => ({ _name: 'Union',
         _options: options
@@ -306,7 +348,7 @@ exports.makeValidation = exports.makeDoAtType({ _default: (val) => false,
 });
 //# sourceMappingURL=types.js.map
 });
-___scope___.file("lib/gen/suplement.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/gen/suplement.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -374,14 +416,12 @@ exports.suplement = ({ methods, args }) => ({ args: suplementArgs(args),
 });
 //# sourceMappingURL=suplement.js.map
 });
-___scope___.file("lib/gen/format.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/gen/format.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const rambda_1 = require("rambda");
-const objReducer = (key, value) => (acc, curr) => ({ ...acc,
-    [curr[key]]: curr[value]
-});
+const objReducer = (key, value) => (acc, curr) => (Object.assign({}, acc, { [curr[key]]: curr[value] }));
 const toObject = (key, value) => (arr) => rambda_1.reduce(objReducer(key, value), {})(arr);
 const toObjectArgs = toObject('_name', '_type');
 const toObjectMethods = toObject('_name', '_args');
@@ -397,7 +437,7 @@ exports.format = ({ args, methods }) => ({ args: formatArgs(args),
 });
 //# sourceMappingURL=format.js.map
 });
-___scope___.file("lib/controls/index.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/controls/index.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -413,7 +453,7 @@ exports.controls = (projectPath = defaultInstapyPath) => ({ start: () => start_1
 });
 //# sourceMappingURL=index.js.map
 });
-___scope___.file("lib/controls/status.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/controls/status.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -443,7 +483,7 @@ exports.prettyBotStatus = (projectPath) => exports.botStatus(projectPath)
     .then(toPrettyBotStatus);
 //# sourceMappingURL=status.js.map
 });
-___scope___.file("lib/controls/utils.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/controls/utils.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -457,7 +497,7 @@ const wrappedExec = (command) => new Promise((res, rej) => child_process_1.exec(
 exports.composeExec = (projectPath) => (...args) => wrappedExec(dockerCompose(projectPath, ...args));
 //# sourceMappingURL=utils.js.map
 });
-___scope___.file("lib/controls/start.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/controls/start.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -466,7 +506,7 @@ exports.start = (projectPath) => utils_1.composeExec(projectPath)('up', '-d', '-
     .then(() => 'succes');
 //# sourceMappingURL=start.js.map
 });
-___scope___.file("lib/controls/stop.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/controls/stop.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -475,7 +515,7 @@ exports.stop = (projectPath) => utils_1.composeExec(projectPath)('stop')
     .then(() => 'succes');
 //# sourceMappingURL=stop.js.map
 });
-___scope___.file("lib/controls/logs.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/controls/logs.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -486,7 +526,7 @@ exports.logs = (projectPath) => utils_1.composeExec(projectPath)('logs', 'web')
     .then(rambda_1.takeLast(30));
 //# sourceMappingURL=logs.js.map
 });
-___scope___.file("lib/api/index.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/api/index.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -495,6 +535,9 @@ const validate_1 = require("./validate");
 const method_1 = require("./method");
 const raw_1 = require("./raw");
 const interface_1 = require("./interface");
+var interface_2 = require("./interface");
+exports.MethodComponent = interface_2.MethodComponent;
+exports.ArgComponent = interface_2.ArgComponent;
 exports.api = { setupCreate: create_1.setupCreate,
     setupValidateMethod: validate_1.setupValidateMethod,
     setupMethod: method_1.setupMethod,
@@ -504,7 +547,7 @@ exports.api = { setupCreate: create_1.setupCreate,
 };
 //# sourceMappingURL=index.js.map
 });
-___scope___.file("lib/api/create.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/api/create.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -523,7 +566,7 @@ exports.setupCreate = (projectPath = defaultInstapyPath) => (configLines, write 
 };
 //# sourceMappingURL=create.js.map
 });
-___scope___.file("lib/api/validate.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/api/validate.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -555,7 +598,7 @@ exports.setupValidateMethod = (apiJsonObj) => ({ name, args }) => {
 };
 //# sourceMappingURL=validate.js.map
 });
-___scope___.file("lib/api/method.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/api/method.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -602,7 +645,7 @@ const toPythonArgs = (apiJsonArgs) => (args) => rambda_1.compose(addParenthesis,
 exports.setupMethod = (apiJsonObj, session = 'session') => ({ name, args }) => rambda_1.compose(rambda_1.ifElse(name === '__init__', rambda_1.compose(affix(session), affix(' = '), affix('InstaPy')), rambda_1.compose(affix(session), affix('.'), affix(name))), toPythonArgs(apiJsonObj.args))(args);
 //# sourceMappingURL=method.js.map
 });
-___scope___.file("lib/api/raw.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/api/raw.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1476,16 +1519,16 @@ exports.raw = {
 };
 //# sourceMappingURL=raw.js.map
 });
-___scope___.file("lib/api/interface.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("src/api/interface.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const rambda_1 = require("rambda");
 const types_1 = require("../utils/types");
-const buildArg = (argsTypes) => (def, argName) => argsTypes[argName](argName, def);
+const buildArg = (argsTypes) => (def, argName) => argsTypes[argName](def, argName);
 const buildMethodWithArgs = (methodComponent, argsTypes) => (argsMethod, methodName) => {
     const buildedArgs = rambda_1.map(buildArg(argsTypes), argsMethod);
-    return methodComponent(buildedArgs);
+    return methodComponent(buildedArgs, methodName);
 };
 exports.setupArgComponent = types_1.makeDoAtType;
 exports.setupInterface = ({ args, methods }, methodComponent, argComponent) => {
@@ -1494,6 +1537,50 @@ exports.setupInterface = ({ args, methods }, methodComponent, argComponent) => {
     return buildedComponents;
 };
 //# sourceMappingURL=interface.js.map
+});
+___scope___.file("docSrc/src/components/method.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const xstream_1 = require("xstream");
+const dom_1 = require("@cycle/dom");
+const isolate_1 = require("@cycle/isolate");
+const rambda_1 = require("rambda");
+const toArray = (input) => [...input];
+exports.defaultState = { count: 5
+};
+exports.SimpleArgComponent = (def, name) => isolate_1.default(({ DOM, onion }) => ({ DOM: xstream_1.default.of(dom_1.div(name + ': arg input' + '\n' + 'default Input: ' + def)),
+    onion: xstream_1.default.of((prev) => prev)
+}), name);
+// {[index:string]: (sources: any) => ({onion: any, DOM: any})}
+exports.Method = (args, methodName) => isolate_1.default(({ DOM, onion }) => {
+    const argsList = rambda_1.compose(rambda_1.map((component) => component({ DOM, onion })), rambda_1.values)(args);
+    // console.log(map(path('DOM'), argsList))
+    // console.log(argsList)
+    return ({ DOM: view(onion.state$
+            .debug('component?'), rambda_1.map(rambda_1.path('DOM'), argsList)),
+        onion: xstream_1.default.of((prev) => ({ count: 20 }))
+            .debug('something')
+        // actions
+        // ( DOM
+        // , map(path('onion'), argsList)
+        // )
+    });
+}, methodName);
+const actions = (DOM, args) => {
+    const init$ = xstream_1.default.of((prev) => prev ? prev : exports.defaultState);
+    return xstream_1.default.merge(init$
+    // , ...args
+    );
+};
+const view = (state$, args) => xstream_1.default.combine(state$, ...args)
+    // state$
+    // xs.combine(...args)
+    .map(([state, ...divList]) => {
+    console.log(divList);
+    return dom_1.div(divList);
+});
+//# sourceMappingURL=method.js.map
 });
 return ___scope___.entry = "docSrc/src/index.js";
 });
@@ -3773,9 +3860,9 @@ FuseBox.pkg("child_process", {}, function(___scope___){
 ___scope___.file("index.js", function(exports, require, module, __filename, __dirname){
 
 if (FuseBox.isServer) {
-    module.exports = global.require("child_process");
+	module.exports = global.require("child_process");
 } else {
-    module.exports = {};
+	module.exports = {};
 }
 
 });
@@ -5004,285 +5091,256 @@ ___scope___.file("index.js", function(exports, require, module, __filename, __di
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 if (FuseBox.isServer) {
-    module.exports = global.require("events");
+	module.exports = global.require("events");
 } else {
-    function EventEmitter() {
-        this._events = this._events || {};
-        this._maxListeners = this._maxListeners || undefined;
-    }
-    module.exports = EventEmitter;
+	function EventEmitter() {
+		this._events = this._events || {};
+		this._maxListeners = this._maxListeners || undefined;
+	}
+	module.exports = EventEmitter;
 
-    // Backwards-compat with node 0.10.x
-    EventEmitter.EventEmitter = EventEmitter;
+	// Backwards-compat with node 0.10.x
+	EventEmitter.EventEmitter = EventEmitter;
 
-    EventEmitter.prototype._events = undefined;
-    EventEmitter.prototype._maxListeners = undefined;
+	EventEmitter.prototype._events = undefined;
+	EventEmitter.prototype._maxListeners = undefined;
 
-    // By default EventEmitters will print a warning if more than 10 listeners are
-    // added to it. This is a useful default which helps finding memory leaks.
-    EventEmitter.defaultMaxListeners = 10;
+	// By default EventEmitters will print a warning if more than 10 listeners are
+	// added to it. This is a useful default which helps finding memory leaks.
+	EventEmitter.defaultMaxListeners = 10;
 
-    // Obviously not all Emitters should be limited to 10. This function allows
-    // that to be increased. Set to zero for unlimited.
-    EventEmitter.prototype.setMaxListeners = function(n) {
-        if (!isNumber(n) || n < 0 || isNaN(n))
-            throw TypeError("n must be a positive number");
-        this._maxListeners = n;
-        return this;
-    };
+	// Obviously not all Emitters should be limited to 10. This function allows
+	// that to be increased. Set to zero for unlimited.
+	EventEmitter.prototype.setMaxListeners = function(n) {
+		if (!isNumber(n) || n < 0 || isNaN(n)) throw TypeError("n must be a positive number");
+		this._maxListeners = n;
+		return this;
+	};
 
-    EventEmitter.prototype.emit = function(type) {
-        var er, handler, len, args, i, listeners;
+	EventEmitter.prototype.emit = function(type) {
+		var er, handler, len, args, i, listeners;
 
-        if (!this._events)
-            this._events = {};
+		if (!this._events) this._events = {};
 
-        // If there is no 'error' event listener then throw.
-        if (type === "error") {
-            if (!this._events.error ||
-                (isObject(this._events.error) && !this._events.error.length)) {
-                er = arguments[1];
-                if (er instanceof Error) {
-                    throw er; // Unhandled 'error' event
-                }
-                throw TypeError("Uncaught, unspecified \"error\" event.");
-            }
-        }
+		// If there is no 'error' event listener then throw.
+		if (type === "error") {
+			if (!this._events.error || (isObject(this._events.error) && !this._events.error.length)) {
+				er = arguments[1];
+				if (er instanceof Error) {
+					throw er; // Unhandled 'error' event
+				}
+				throw TypeError('Uncaught, unspecified "error" event.');
+			}
+		}
 
-        handler = this._events[type];
+		handler = this._events[type];
 
-        if (isUndefined(handler))
-            return false;
+		if (isUndefined(handler)) return false;
 
-        if (isFunction(handler)) {
-            switch (arguments.length) {
-                // fast cases
-                case 1:
-                    handler.call(this);
-                    break;
-                case 2:
-                    handler.call(this, arguments[1]);
-                    break;
-                case 3:
-                    handler.call(this, arguments[1], arguments[2]);
-                    break;
-                    // slower
-                default:
-                    args = Array.prototype.slice.call(arguments, 1);
-                    handler.apply(this, args);
-            }
-        } else if (isObject(handler)) {
-            args = Array.prototype.slice.call(arguments, 1);
-            listeners = handler.slice();
-            len = listeners.length;
-            for (i = 0; i < len; i++)
-                listeners[i].apply(this, args);
-        }
+		if (isFunction(handler)) {
+			switch (arguments.length) {
+				// fast cases
+				case 1:
+					handler.call(this);
+					break;
+				case 2:
+					handler.call(this, arguments[1]);
+					break;
+				case 3:
+					handler.call(this, arguments[1], arguments[2]);
+					break;
+				// slower
+				default:
+					args = Array.prototype.slice.call(arguments, 1);
+					handler.apply(this, args);
+			}
+		} else if (isObject(handler)) {
+			args = Array.prototype.slice.call(arguments, 1);
+			listeners = handler.slice();
+			len = listeners.length;
+			for (i = 0; i < len; i++) listeners[i].apply(this, args);
+		}
 
-        return true;
-    };
+		return true;
+	};
 
-    EventEmitter.prototype.addListener = function(type, listener) {
-        var m;
+	EventEmitter.prototype.addListener = function(type, listener) {
+		var m;
 
-        if (!isFunction(listener))
-            throw TypeError("listener must be a function");
+		if (!isFunction(listener)) throw TypeError("listener must be a function");
 
-        if (!this._events)
-            this._events = {};
+		if (!this._events) this._events = {};
 
-        // To avoid recursion in the case that type === "newListener"! Before
-        // adding it to the listeners, first emit "newListener".
-        if (this._events.newListener)
-            this.emit("newListener", type,
-                isFunction(listener.listener) ?
-                listener.listener : listener);
+		// To avoid recursion in the case that type === "newListener"! Before
+		// adding it to the listeners, first emit "newListener".
+		if (this._events.newListener) this.emit("newListener", type, isFunction(listener.listener) ? listener.listener : listener);
 
-        if (!this._events[type])
-        // Optimize the case of one listener. Don't need the extra array object.
-            this._events[type] = listener;
-        else if (isObject(this._events[type]))
-        // If we've already got an array, just append.
-            this._events[type].push(listener);
-        else
-        // Adding the second element, need to change to array.
-            this._events[type] = [this._events[type], listener];
+		if (!this._events[type])
+			// Optimize the case of one listener. Don't need the extra array object.
+			this._events[type] = listener;
+		else if (isObject(this._events[type]))
+			// If we've already got an array, just append.
+			this._events[type].push(listener);
+		// Adding the second element, need to change to array.
+		else this._events[type] = [this._events[type], listener];
 
-        // Check for listener leak
-        if (isObject(this._events[type]) && !this._events[type].warned) {
-            if (!isUndefined(this._maxListeners)) {
-                m = this._maxListeners;
-            } else {
-                m = EventEmitter.defaultMaxListeners;
-            }
+		// Check for listener leak
+		if (isObject(this._events[type]) && !this._events[type].warned) {
+			if (!isUndefined(this._maxListeners)) {
+				m = this._maxListeners;
+			} else {
+				m = EventEmitter.defaultMaxListeners;
+			}
 
-            if (m && m > 0 && this._events[type].length > m) {
-                this._events[type].warned = true;
-                console.error("(node) warning: possible EventEmitter memory " +
-                    "leak detected. %d listeners added. " +
-                    "Use emitter.setMaxListeners() to increase limit.",
-                    this._events[type].length);
-                if (typeof console.trace === "function") {
-                    // not supported in IE 10
-                    console.trace();
-                }
-            }
-        }
+			if (m && m > 0 && this._events[type].length > m) {
+				this._events[type].warned = true;
+				console.error(
+					"(node) warning: possible EventEmitter memory " + "leak detected. %d listeners added. " + "Use emitter.setMaxListeners() to increase limit.",
+					this._events[type].length
+				);
+				if (typeof console.trace === "function") {
+					// not supported in IE 10
+					console.trace();
+				}
+			}
+		}
 
-        return this;
-    };
+		return this;
+	};
 
-    EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+	EventEmitter.prototype.on = EventEmitter.prototype.addListener;
 
-    EventEmitter.prototype.once = function(type, listener) {
-        if (!isFunction(listener))
-            throw TypeError("listener must be a function");
+	EventEmitter.prototype.once = function(type, listener) {
+		if (!isFunction(listener)) throw TypeError("listener must be a function");
 
-        var fired = false;
+		var fired = false;
 
-        function g() {
-            this.removeListener(type, g);
+		function g() {
+			this.removeListener(type, g);
 
-            if (!fired) {
-                fired = true;
-                listener.apply(this, arguments);
-            }
-        }
+			if (!fired) {
+				fired = true;
+				listener.apply(this, arguments);
+			}
+		}
 
-        g.listener = listener;
-        this.on(type, g);
+		g.listener = listener;
+		this.on(type, g);
 
-        return this;
-    };
+		return this;
+	};
 
-    // emits a 'removeListener' event iff the listener was removed
-    EventEmitter.prototype.removeListener = function(type, listener) {
-        var list, position, length, i;
+	// emits a 'removeListener' event iff the listener was removed
+	EventEmitter.prototype.removeListener = function(type, listener) {
+		var list, position, length, i;
 
-        if (!isFunction(listener))
-            throw TypeError("listener must be a function");
+		if (!isFunction(listener)) throw TypeError("listener must be a function");
 
-        if (!this._events || !this._events[type])
-            return this;
+		if (!this._events || !this._events[type]) return this;
 
-        list = this._events[type];
-        length = list.length;
-        position = -1;
+		list = this._events[type];
+		length = list.length;
+		position = -1;
 
-        if (list === listener ||
-            (isFunction(list.listener) && list.listener === listener)) {
-            delete this._events[type];
-            if (this._events.removeListener)
-                this.emit("removeListener", type, listener);
+		if (list === listener || (isFunction(list.listener) && list.listener === listener)) {
+			delete this._events[type];
+			if (this._events.removeListener) this.emit("removeListener", type, listener);
+		} else if (isObject(list)) {
+			for (i = length; i-- > 0; ) {
+				if (list[i] === listener || (list[i].listener && list[i].listener === listener)) {
+					position = i;
+					break;
+				}
+			}
 
-        } else if (isObject(list)) {
-            for (i = length; i-- > 0;) {
-                if (list[i] === listener ||
-                    (list[i].listener && list[i].listener === listener)) {
-                    position = i;
-                    break;
-                }
-            }
+			if (position < 0) return this;
 
-            if (position < 0)
-                return this;
+			if (list.length === 1) {
+				list.length = 0;
+				delete this._events[type];
+			} else {
+				list.splice(position, 1);
+			}
 
-            if (list.length === 1) {
-                list.length = 0;
-                delete this._events[type];
-            } else {
-                list.splice(position, 1);
-            }
+			if (this._events.removeListener) this.emit("removeListener", type, listener);
+		}
 
-            if (this._events.removeListener)
-                this.emit("removeListener", type, listener);
-        }
+		return this;
+	};
 
-        return this;
-    };
+	EventEmitter.prototype.removeAllListeners = function(type) {
+		var key, listeners;
 
-    EventEmitter.prototype.removeAllListeners = function(type) {
-        var key, listeners;
+		if (!this._events) return this;
 
-        if (!this._events)
-            return this;
+		// not listening for removeListener, no need to emit
+		if (!this._events.removeListener) {
+			if (arguments.length === 0) this._events = {};
+			else if (this._events[type]) delete this._events[type];
+			return this;
+		}
 
-        // not listening for removeListener, no need to emit
-        if (!this._events.removeListener) {
-            if (arguments.length === 0)
-                this._events = {};
-            else if (this._events[type])
-                delete this._events[type];
-            return this;
-        }
+		// emit removeListener for all listeners on all events
+		if (arguments.length === 0) {
+			for (key in this._events) {
+				if (key === "removeListener") continue;
+				this.removeAllListeners(key);
+			}
+			this.removeAllListeners("removeListener");
+			this._events = {};
+			return this;
+		}
 
-        // emit removeListener for all listeners on all events
-        if (arguments.length === 0) {
-            for (key in this._events) {
-                if (key === "removeListener") continue;
-                this.removeAllListeners(key);
-            }
-            this.removeAllListeners("removeListener");
-            this._events = {};
-            return this;
-        }
+		listeners = this._events[type];
 
-        listeners = this._events[type];
+		if (isFunction(listeners)) {
+			this.removeListener(type, listeners);
+		} else if (listeners) {
+			// LIFO order
+			while (listeners.length) this.removeListener(type, listeners[listeners.length - 1]);
+		}
+		delete this._events[type];
 
-        if (isFunction(listeners)) {
-            this.removeListener(type, listeners);
-        } else if (listeners) {
-            // LIFO order
-            while (listeners.length)
-                this.removeListener(type, listeners[listeners.length - 1]);
-        }
-        delete this._events[type];
+		return this;
+	};
 
-        return this;
-    };
+	EventEmitter.prototype.listeners = function(type) {
+		var ret;
+		if (!this._events || !this._events[type]) ret = [];
+		else if (isFunction(this._events[type])) ret = [this._events[type]];
+		else ret = this._events[type].slice();
+		return ret;
+	};
 
-    EventEmitter.prototype.listeners = function(type) {
-        var ret;
-        if (!this._events || !this._events[type])
-            ret = [];
-        else if (isFunction(this._events[type]))
-            ret = [this._events[type]];
-        else
-            ret = this._events[type].slice();
-        return ret;
-    };
+	EventEmitter.prototype.listenerCount = function(type) {
+		if (this._events) {
+			var evlistener = this._events[type];
 
-    EventEmitter.prototype.listenerCount = function(type) {
-        if (this._events) {
-            var evlistener = this._events[type];
+			if (isFunction(evlistener)) return 1;
+			else if (evlistener) return evlistener.length;
+		}
+		return 0;
+	};
 
-            if (isFunction(evlistener))
-                return 1;
-            else if (evlistener)
-                return evlistener.length;
-        }
-        return 0;
-    };
+	EventEmitter.listenerCount = function(emitter, type) {
+		return emitter.listenerCount(type);
+	};
 
-    EventEmitter.listenerCount = function(emitter, type) {
-        return emitter.listenerCount(type);
-    };
+	function isFunction(arg) {
+		return typeof arg === "function";
+	}
 
-    function isFunction(arg) {
-        return typeof arg === "function";
-    }
+	function isNumber(arg) {
+		return typeof arg === "number";
+	}
 
-    function isNumber(arg) {
-        return typeof arg === "number";
-    }
+	function isObject(arg) {
+		return typeof arg === "object" && arg !== null;
+	}
 
-    function isObject(arg) {
-        return typeof arg === "object" && arg !== null;
-    }
-
-    function isUndefined(arg) {
-        return arg === void 0;
-    }
+	function isUndefined(arg) {
+		return arg === void 0;
+	}
 }
 
 });
@@ -5757,9 +5815,9 @@ FuseBox.pkg("fs", {}, function(___scope___){
 ___scope___.file("index.js", function(exports, require, module, __filename, __dirname){
 
 if (FuseBox.isServer) {
-    module.exports = global.require("fs");
+	module.exports = global.require("fs");
 } else {
-    module.exports = {};
+	module.exports = {};
 }
 
 });
@@ -5773,33 +5831,33 @@ ___scope___.file("index.js", function(exports, require, module, __filename, __di
  * @module listens to `source-changed` socket events and actions hot reload
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var Client = require('fusebox-websocket').SocketClient, bundleErrors = {}, outputElement = document.createElement('div'), styleElement = document.createElement('style'), minimizeToggleId = 'fuse-box-toggle-minimized', hideButtonId = 'fuse-box-hide', expandedOutputClass = 'fuse-box-expanded-output', localStoragePrefix = '__fuse-box_';
+var Client = require("fusebox-websocket").SocketClient, bundleErrors = {}, outputElement = document.createElement("div"), styleElement = document.createElement("style"), minimizeToggleId = "fuse-box-toggle-minimized", hideButtonId = "fuse-box-hide", expandedOutputClass = "fuse-box-expanded-output", localStoragePrefix = "__fuse-box_";
 function storeSetting(key, value) {
     localStorage[localStoragePrefix + key] = value;
 }
 function getSetting(key) {
-    return localStorage[localStoragePrefix + key] === 'true' ? true : false;
+    return localStorage[localStoragePrefix + key] === "true" ? true : false;
 }
 var outputInBody = false, outputMinimized = getSetting(minimizeToggleId), outputHidden = false;
-outputElement.id = 'fuse-box-output';
+outputElement.id = "fuse-box-output";
 styleElement.innerHTML = "\n    #" + outputElement.id + ", #" + outputElement.id + " * {\n        box-sizing: border-box;\n    }\n    #" + outputElement.id + " {\n        z-index: 999999999999;\n        position: fixed;\n        top: 10px;\n        right: 10px;\n        width: 400px;\n        overflow: auto;\n        background: #fdf3f1;\n        border: 1px solid #eca494;\n        border-radius: 5px;\n        font-family: \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        box-shadow: 0px 3px 6px 1px rgba(0,0,0,.15);\n    }\n    #" + outputElement.id + "." + expandedOutputClass + " {\n        height: auto;\n        width: auto;\n        left: 10px;\n        max-height: calc(100vh - 50px);\n    }\n    #" + outputElement.id + " .fuse-box-errors {\n        display: none;\n    }\n    #" + outputElement.id + "." + expandedOutputClass + " .fuse-box-errors {\n        display: block;\n        border-top: 1px solid #eca494;\n        padding: 0 10px;\n    }\n    #" + outputElement.id + " button {\n        border: 1px solid #eca494;\n        padding: 5px 10px;\n        border-radius: 4px;\n        margin-left: 5px;\n        background-color: white;\n        color: black;\n        box-shadow: 0px 2px 2px 0px rgba(0,0,0,.05);\n    }\n    #" + outputElement.id + " .fuse-box-header {\n        padding: 10px;\n    }\n    #" + outputElement.id + " .fuse-box-header h4 {\n        display: inline-block;\n        margin: 4px;\n    }";
-styleElement.type = 'text/css';
-document.getElementsByTagName('head')[0].appendChild(styleElement);
+styleElement.type = "text/css";
+document.getElementsByTagName("head")[0].appendChild(styleElement);
 function displayBundleErrors() {
     var errorMessages = Object.keys(bundleErrors).reduce(function (allMessages, bundleName) {
         var bundleMessages = bundleErrors[bundleName];
         return allMessages.concat(bundleMessages.map(function (message) {
             var messageOutput = message
-                .replace(/\n/g, '<br>')
-                .replace(/\t/g, '&nbsp;&nbps;&npbs;&nbps;')
-                .replace(/ /g, '&nbsp;');
+                .replace(/\n/g, "<br>")
+                .replace(/\t/g, "&nbsp;&nbps;&npbs;&nbps;")
+                .replace(/ /g, "&nbsp;");
             return "<pre>" + messageOutput + "</pre>";
         }));
-    }, []), errorOutput = errorMessages.join('');
+    }, []), errorOutput = errorMessages.join("");
     if (errorOutput && !outputHidden) {
-        outputElement.innerHTML = "\n        <div class=\"fuse-box-header\" style=\"\">\n            <h4 style=\"\">Fuse Box Bundle Errors (" + errorMessages.length + "):</h4>\n            <div style=\"float: right;\">\n                <button id=\"" + minimizeToggleId + "\">" + (outputMinimized ? 'Expand' : 'Minimize') + "</button>\n                <button id=\"" + hideButtonId + "\">Hide</button>\n            </div>\n        </div>\n        <div class=\"fuse-box-errors\">\n            " + errorOutput + "\n        </div>\n        ";
+        outputElement.innerHTML = "\n        <div class=\"fuse-box-header\" style=\"\">\n            <h4 style=\"\">Fuse Box Bundle Errors (" + errorMessages.length + "):</h4>\n            <div style=\"float: right;\">\n                <button id=\"" + minimizeToggleId + "\">" + (outputMinimized ? "Expand" : "Minimize") + "</button>\n                <button id=\"" + hideButtonId + "\">Hide</button>\n            </div>\n        </div>\n        <div class=\"fuse-box-errors\">\n            " + errorOutput + "\n        </div>\n        ";
         document.body.appendChild(outputElement);
-        outputElement.className = outputMinimized ? '' : expandedOutputClass;
+        outputElement.className = outputMinimized ? "" : expandedOutputClass;
         outputInBody = true;
         document.getElementById(minimizeToggleId).onclick = function () {
             outputMinimized = !outputMinimized;
@@ -5823,13 +5881,13 @@ exports.connect = function (port, uri, reloadFullPage) {
     port = port || window.location.port;
     var client = new Client({
         port: port,
-        uri: uri,
+        uri: uri
     });
     client.connect();
-    client.on('page-reload', function (data) {
+    client.on("page-reload", function (data) {
         return window.location.reload();
     });
-    client.on('page-hmr', function (data) {
+    client.on("page-hmr", function (data) {
         FuseBox.flush();
         FuseBox.dynamic(data.path, data.content);
         if (FuseBox.mainFile) {
@@ -5837,7 +5895,7 @@ exports.connect = function (port, uri, reloadFullPage) {
                 FuseBox.import(FuseBox.mainFile);
             }
             catch (e) {
-                if (typeof e === 'string') {
+                if (typeof e === "string") {
                     if (/not found/.test(e)) {
                         return window.location.reload();
                     }
@@ -5846,8 +5904,8 @@ exports.connect = function (port, uri, reloadFullPage) {
             }
         }
     });
-    client.on('source-changed', function (data) {
-        console.info("%cupdate \"" + data.path + "\"", 'color: #237abe');
+    client.on("source-changed", function (data) {
+        console.info("%cupdate \"" + data.path + "\"", "color: #237abe");
         if (reloadFullPage) {
             return window.location.reload();
         }
@@ -5861,21 +5919,21 @@ exports.connect = function (port, uri, reloadFullPage) {
             }
         }
         if (data.type === "hosted-css") {
-            var fileId = data.path.replace(/^\//, '').replace(/[\.\/]+/g, '-');
+            var fileId = data.path.replace(/^\//, "").replace(/[\.\/]+/g, "-");
             var existing = document.getElementById(fileId);
             if (existing) {
                 existing.setAttribute("href", data.path + "?" + new Date().getTime());
             }
             else {
-                var node = document.createElement('link');
+                var node = document.createElement("link");
                 node.id = fileId;
-                node.type = 'text/css';
-                node.rel = 'stylesheet';
+                node.type = "text/css";
+                node.rel = "stylesheet";
                 node.href = data.path;
-                document.getElementsByTagName('head')[0].appendChild(node);
+                document.getElementsByTagName("head")[0].appendChild(node);
             }
         }
-        if (data.type === 'js' || data.type === "css") {
+        if (data.type === "js" || data.type === "css") {
             FuseBox.flush();
             FuseBox.dynamic(data.path, data.content);
             if (FuseBox.mainFile) {
@@ -5883,7 +5941,7 @@ exports.connect = function (port, uri, reloadFullPage) {
                     FuseBox.import(FuseBox.mainFile);
                 }
                 catch (e) {
-                    if (typeof e === 'string') {
+                    if (typeof e === "string") {
                         if (/not found/.test(e)) {
                             return window.location.reload();
                         }
@@ -5893,10 +5951,10 @@ exports.connect = function (port, uri, reloadFullPage) {
             }
         }
     });
-    client.on('error', function (error) {
+    client.on("error", function (error) {
         console.log(error);
     });
-    client.on('bundle-error', function (_a) {
+    client.on("bundle-error", function (_a) {
         var bundleName = _a.bundleName, message = _a.message;
         console.error("Bundle error in " + bundleName + ": " + message);
         var errorsForBundle = bundleErrors[bundleName] || [];
@@ -5904,7 +5962,7 @@ exports.connect = function (port, uri, reloadFullPage) {
         bundleErrors[bundleName] = errorsForBundle;
         displayBundleErrors();
     });
-    client.on('update-bundle-errors', function (_a) {
+    client.on("update-bundle-errors", function (_a) {
         var bundleName = _a.bundleName, messages = _a.messages;
         messages.forEach(function (message) { return console.error("Bundle error in " + bundleName + ": " + message); });
         bundleErrors[bundleName] = messages;
@@ -5920,13 +5978,13 @@ ___scope___.file("index.js", function(exports, require, module, __filename, __di
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var events = require('events');
+var events = require("events");
 var SocketClient = /** @class */ (function () {
     function SocketClient(opts) {
         opts = opts || {};
         var port = opts.port || window.location.port;
-        var protocol = location.protocol === 'https:' ? 'wss://' : 'ws://';
-        var domain = location.hostname || 'localhost';
+        var protocol = location.protocol === "https:" ? "wss://" : "ws://";
+        var domain = location.hostname || "localhost";
         this.url = opts.host || "" + protocol + domain + ":" + port;
         if (opts.uri) {
             this.url = opts.uri;
@@ -5937,7 +5995,7 @@ var SocketClient = /** @class */ (function () {
     SocketClient.prototype.reconnect = function (fn) {
         var _this = this;
         setTimeout(function () {
-            _this.emitter.emit('reconnect', { message: 'Trying to reconnect' });
+            _this.emitter.emit("reconnect", { message: "Trying to reconnect" });
             _this.connect(fn);
         }, 5000);
     };
@@ -5946,7 +6004,7 @@ var SocketClient = /** @class */ (function () {
     };
     SocketClient.prototype.connect = function (fn) {
         var _this = this;
-        console.log('%cConnecting to fusebox HMR at ' + this.url, 'color: #237abe');
+        console.log("%cConnecting to fusebox HMR at " + this.url, "color: #237abe");
         setTimeout(function () {
             _this.client = new WebSocket(_this.url);
             _this.bindEvents(fn);
@@ -5961,22 +6019,22 @@ var SocketClient = /** @class */ (function () {
         }
     };
     SocketClient.prototype.error = function (data) {
-        this.emitter.emit('error', data);
+        this.emitter.emit("error", data);
     };
     /** Wires up the socket client messages to be emitted on our event emitter */
     SocketClient.prototype.bindEvents = function (fn) {
         var _this = this;
         this.client.onopen = function (event) {
-            console.log('%cConnected', 'color: #237abe');
+            console.log("%cConnected", "color: #237abe");
             if (fn) {
                 fn(_this);
             }
         };
         this.client.onerror = function (event) {
-            _this.error({ reason: event.reason, message: 'Socket error' });
+            _this.error({ reason: event.reason, message: "Socket error" });
         };
         this.client.onclose = function (event) {
-            _this.emitter.emit('close', { message: 'Socket closed' });
+            _this.emitter.emit("close", { message: "Socket closed" });
             if (event.code !== 1011) {
                 _this.reconnect(fn);
             }
@@ -5986,7 +6044,7 @@ var SocketClient = /** @class */ (function () {
             if (data) {
                 var item = JSON.parse(data);
                 _this.emitter.emit(item.type, item.data);
-                _this.emitter.emit('*', item);
+                _this.emitter.emit("*", item);
             }
         };
     };
@@ -6003,137 +6061,142 @@ ___scope___.file("index.js", function(exports, require, module, __filename, __di
 // From https://github.com/defunctzombie/node-process/blob/master/browser.js
 // shim for using process in browser
 if (FuseBox.isServer) {
-    if (typeof __process_env__ !== "undefined") {
-        Object.assign(global.process.env, __process_env__);
-    }
-    module.exports = global.process;
+	if (typeof __process_env__ !== "undefined") {
+		Object.assign(global.process.env, __process_env__);
+	}
+	module.exports = global.process;
 } else {
-    // Object assign polyfill
-    if (typeof Object.assign != "function") {
-        Object.assign = function(target, varArgs) { // .length of function is 2
-            "use strict";
-            if (target == null) { // TypeError if undefined or null
-                throw new TypeError("Cannot convert undefined or null to object");
-            }
+	// Object assign polyfill
+	if (typeof Object.assign != "function") {
+		Object.assign = function(target, varArgs) {
+			// .length of function is 2
+			"use strict";
+			if (target == null) {
+				// TypeError if undefined or null
+				throw new TypeError("Cannot convert undefined or null to object");
+			}
 
-            var to = Object(target);
+			var to = Object(target);
 
-            for (var index = 1; index < arguments.length; index++) {
-                var nextSource = arguments[index];
+			for (var index = 1; index < arguments.length; index++) {
+				var nextSource = arguments[index];
 
-                if (nextSource != null) { // Skip over if undefined or null
-                    for (var nextKey in nextSource) {
-                        // Avoid bugs when hasOwnProperty is shadowed
-                        if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
-                            to[nextKey] = nextSource[nextKey];
-                        }
-                    }
-                }
-            }
-            return to;
-        };
-    }
+				if (nextSource != null) {
+					// Skip over if undefined or null
+					for (var nextKey in nextSource) {
+						// Avoid bugs when hasOwnProperty is shadowed
+						if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+							to[nextKey] = nextSource[nextKey];
+						}
+					}
+				}
+			}
+			return to;
+		};
+	}
 
+	var productionEnv = false; //require('@system-env').production;
 
+	var process = (module.exports = {});
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
 
-    var productionEnv = false; //require('@system-env').production;
+	function cleanUpNextTick() {
+		draining = false;
+		if (currentQueue.length) {
+			queue = currentQueue.concat(queue);
+		} else {
+			queueIndex = -1;
+		}
+		if (queue.length) {
+			drainQueue();
+		}
+	}
 
-    var process = module.exports = {};
-    var queue = [];
-    var draining = false;
-    var currentQueue;
-    var queueIndex = -1;
+	function drainQueue() {
+		if (draining) {
+			return;
+		}
+		var timeout = setTimeout(cleanUpNextTick);
+		draining = true;
 
-    function cleanUpNextTick() {
-        draining = false;
-        if (currentQueue.length) {
-            queue = currentQueue.concat(queue);
-        } else {
-            queueIndex = -1;
-        }
-        if (queue.length) {
-            drainQueue();
-        }
-    }
+		var len = queue.length;
+		while (len) {
+			currentQueue = queue;
+			queue = [];
+			while (++queueIndex < len) {
+				if (currentQueue) {
+					currentQueue[queueIndex].run();
+				}
+			}
+			queueIndex = -1;
+			len = queue.length;
+		}
+		currentQueue = null;
+		draining = false;
+		clearTimeout(timeout);
+	}
 
-    function drainQueue() {
-        if (draining) {
-            return;
-        }
-        var timeout = setTimeout(cleanUpNextTick);
-        draining = true;
+	process.nextTick = function(fun) {
+		var args = new Array(arguments.length - 1);
+		if (arguments.length > 1) {
+			for (var i = 1; i < arguments.length; i++) {
+				args[i - 1] = arguments[i];
+			}
+		}
+		queue.push(new Item(fun, args));
+		if (queue.length === 1 && !draining) {
+			setTimeout(drainQueue, 0);
+		}
+	};
 
-        var len = queue.length;
-        while (len) {
-            currentQueue = queue;
-            queue = [];
-            while (++queueIndex < len) {
-                if (currentQueue) {
-                    currentQueue[queueIndex].run();
-                }
-            }
-            queueIndex = -1;
-            len = queue.length;
-        }
-        currentQueue = null;
-        draining = false;
-        clearTimeout(timeout);
-    }
+	// v8 likes predictible objects
+	function Item(fun, array) {
+		this.fun = fun;
+		this.array = array;
+	}
+	Item.prototype.run = function() {
+		this.fun.apply(null, this.array);
+	};
+	process.title = "browser";
+	process.browser = true;
+	process.env = {
+		NODE_ENV: productionEnv ? "production" : "development"
+	};
+	if (typeof __process_env__ !== "undefined") {
+		Object.assign(process.env, __process_env__);
+	}
+	process.argv = [];
+	process.version = ""; // empty string to avoid regexp issues
+	process.versions = {};
 
-    process.nextTick = function(fun) {
-        var args = new Array(arguments.length - 1);
-        if (arguments.length > 1) {
-            for (var i = 1; i < arguments.length; i++) {
-                args[i - 1] = arguments[i];
-            }
-        }
-        queue.push(new Item(fun, args));
-        if (queue.length === 1 && !draining) {
-            setTimeout(drainQueue, 0);
-        }
-    };
+	function noop() {}
 
-    // v8 likes predictible objects
-    function Item(fun, array) {
-        this.fun = fun;
-        this.array = array;
-    }
-    Item.prototype.run = function() {
-        this.fun.apply(null, this.array);
-    };
-    process.title = "browser";
-    process.browser = true;
-    process.env = {
-        NODE_ENV: productionEnv ? "production" : "development",
-    };
-    if (typeof __process_env__ !== "undefined") {
-        Object.assign(process.env, __process_env__);
-    }
-    process.argv = [];
-    process.version = ""; // empty string to avoid regexp issues
-    process.versions = {};
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
 
-    function noop() {}
+	process.binding = function(name) {
+		throw new Error("process.binding is not supported");
+	};
 
-    process.on = noop;
-    process.addListener = noop;
-    process.once = noop;
-    process.off = noop;
-    process.removeListener = noop;
-    process.removeAllListeners = noop;
-    process.emit = noop;
-
-    process.binding = function(name) {
-        throw new Error("process.binding is not supported");
-    };
-
-    process.cwd = function() { return "/"; };
-    process.chdir = function(dir) {
-        throw new Error("process.chdir is not supported");
-    };
-    process.umask = function() { return 0; };
-
+	process.cwd = function() {
+		return "/";
+	};
+	process.chdir = function(dir) {
+		throw new Error("process.chdir is not supported");
+	};
+	process.umask = function() {
+		return 0;
+	};
 }
+
 });
 return ___scope___.entry = "index.js";
 });

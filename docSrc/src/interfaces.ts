@@ -8,5 +8,5 @@ export interface BaseSources {
 }
 
 export interface BaseSinks {
-  DOM?: Stream<VNode>
+  DOM: Stream<VNode>
 }
