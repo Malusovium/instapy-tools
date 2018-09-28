@@ -7,10 +7,10 @@ import { makeDoAtType
        , TypesWithFunctions
        } from '../utils/types'
 
-export type MethodComponent =
+export type MethodComponentType =
   (args: object, methodName: string) => any
 
-export type ArgComponent =
+export type ArgComponentType =
   (_type: any) => any
 
 type BuildComponentArg =

@@ -38,18 +38,6 @@ export const defaultState: State =
   }
 export type Reducer = (prev: State) => State;
 
-export const SimpleArgComponent =
-  (def, name) =>
-    isolate
-    ( ({DOM, onion}) => (
-        { DOM: xs.of(div(name + ': arg input' + '\n' + 'default Input: ' + def))
-        , onion: xs.of( (prev) => prev )
-        }
-      )
-    , name
-    )
-// {[index:string]: (sources: any) => ({onion: any, DOM: any})}
-
 export const Method =
   (args: any, methodName) =>
     isolate
@@ -60,21 +48,19 @@ export const Method =
           , values
           )(args)
 
-        // console.log(map(path('DOM'), argsList))
-        // console.log(argsList)
         return (
           { DOM:
               view
+              (methodName)
               ( onion.state$
                   .debug('component?')
               , map(path('DOM'), argsList)
               )
-          , onion: xs.of( (prev) => ({ count: 20}))
-                      .debug('something')
-              // actions
-              // ( DOM
-              // , map(path('onion'), argsList)
-              // )
+          , onion:
+              actions
+              ( DOM
+              , map(path('onion'), argsList)
+              )
           }
         )
       }
@@ -87,19 +73,19 @@ const actions =
 
     return xs.merge
               ( init$
-              // , ...args
+              , ...args
               )
   }
 
 const view =
-  (state$, args) =>
-    xs.combine(state$, ...args)
-    // state$
-    // xs.combine(...args)
-      .map
-       // ( (divList) => {
-       ( ([state, ...divList]) => {
-           console.log(divList)
-           return div(divList)
-         }
-       )
+  (methodName) =>
+    (state$, args) =>
+      xs.combine(state$, ...args)
+        .map
+         ( ([state, ...divList]) =>
+             div
+             ( [ div(methodName)
+               , div(divList)
+               ]
+             )
+         )

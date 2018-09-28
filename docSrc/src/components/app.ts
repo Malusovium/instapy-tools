@@ -16,13 +16,12 @@ normalize()
 setupPage('#app')
 
 import { api
-       , MethodComponent
-       , ArgComponent
+       , MethodComponentType
+       , ArgComponentType
        } from '../../../src'
 
-import { Method
-       , SimpleArgComponent
-       } from './method'
+import { Method } from './method'
+import { Arg } from './inputs'
 
 export interface Sources extends BaseSources {
   onion: StateSource<State>
@@ -46,7 +45,7 @@ const argToDiv =
   (component:any, name:string) =>
     div(`This arg = ${name}`)
 
-const baseMethodComponent: MethodComponent =
+const baseMethodComponent: MethodComponentType =
   (args: {}) =>
     div
     ( [ 'Method_something'
@@ -57,18 +56,18 @@ const baseMethodComponent: MethodComponent =
       ]
     )
 
-const simpleBaseArgComponent: ArgComponent =
-  setupArgComponent
-  ( { _default: SimpleArgComponent
-    , none: SimpleArgComponent
-    , boolean: SimpleArgComponent
-    , string: SimpleArgComponent
-    , number: (_constrains) => SimpleArgComponent
-    , union: (_options) => SimpleArgComponent
-    , array: (_subType) => SimpleArgComponent
-    , tuple: (_subTypes) => SimpleArgComponent
-    }
-  )
+// const simpleBaseArgComponent: ArgComponentType =
+//   setupArgComponent
+//   ( { _default: SimpleArgComponent
+//     , none: SimpleArgComponent
+//     , boolean: SimpleArgComponent
+//     , string: SimpleArgComponent
+//     , number: (_constrains) => SimpleArgComponent
+//     , union: (_options) => SimpleArgComponent
+//     , array: (_subType) => SimpleArgComponent
+//     , tuple: (_subTypes) => SimpleArgComponent
+//     }
+//   )
 
 // const baseArgComponent: ArgComponent =
 //   setupArgComponent
@@ -85,17 +84,12 @@ const simpleBaseArgComponent: ArgComponent =
 
 export const App =
   ({DOM, onion}: Sources): Sinks => {
-    // const interfaceApi =
-    //   setupInterface
-    //   ( raw
-    //   , baseMethodComponent
-    //   , baseArgComponent
-    //   )
     const interfaceApi =
       setupInterface
       ( raw
       , Method
-      , simpleBaseArgComponent
+      , Arg
+      // , simpleBaseArgComponent
       )
 
     const testObj =
@@ -103,8 +97,7 @@ export const App =
       , second: 'val2'
       , third: 'val3'
       }
-    // console.log(api.raw)
-    // console.log(interfaceApi['set_user_interact']) 
+
     const setUserInteract =
       interfaceApi['set_user_interact']({DOM, onion})
 
@@ -139,9 +132,7 @@ const actions =
 const view =
   (state$, components) =>
     xs.combine(state$, ...components)
-    // state$
       .map
-       // ( ({count}) =>
        ( ([{ count }, ...components]) =>
          div
          ( [ div('app' + count)

@@ -6,8 +6,8 @@ import { setupInterface
        , setupArgComponent
        } from './interface'
 
-export { MethodComponent
-       , ArgComponent
+export { MethodComponentType
+       , ArgComponentType
        } from './interface'
 
 export const api =
