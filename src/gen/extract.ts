@@ -223,6 +223,8 @@ const isPythonString =
   (val:string) =>
     val.startsWith(`"`)
     && val.endsWith(`"`)
+    || val.startsWith(`'`)
+    && val.endsWith(`'`)
 
 const removeOuter1 =
   (val:string) =>

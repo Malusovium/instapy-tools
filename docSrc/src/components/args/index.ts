@@ -3,6 +3,10 @@ import { api
        } from '../../../../src'
 import { None } from './none'
 import { Boolean } from './boolean'
+import { String } from './string'
+import { Number } from './number'
+
+import { Array } from './array'
 
 // <START to-remove
 import xs, { Stream } from 'xstream'
@@ -31,11 +35,11 @@ export const Arg: ArgComponentType =
   setupArgComponent
   ( { _default: SimpleArgComponent
     , none: None
-    , boolean: Boolean // SimpleArgComponent
-    , string: SimpleArgComponent
-    , number: (_constrains) => SimpleArgComponent
+    , boolean: Boolean
+    , string: String // SimpleArgComponent
+    , number: Number // (_constrains) => SimpleArgComponent
     , union: (_options) => SimpleArgComponent
-    , array: (_subType) => SimpleArgComponent
+    , array: Array // (_subType) => SimpleArgComponent
     , tuple: (_subTypes) => SimpleArgComponent
     }
   )

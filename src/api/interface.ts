@@ -29,7 +29,7 @@ const buildArg: BuildArg =
       argsTypes[argName](def, argName)
 
 type BuildMethodWithArgs =
-  (methodComponent: MethodComponent, argsTypes: ComponentArgs) =>
+  (methodComponent: MethodComponentType, argsTypes: ComponentArgs) =>
     (argsMethod: any, methodName: string) => ({[index:string]: any})
 
 const buildMethodWithArgs: BuildMethodWithArgs =
@@ -46,8 +46,8 @@ export const setupArgComponent =
 
 export const setupInterface =
   ( {args, methods}:any
-    , methodComponent: MethodComponent
-    , argComponent: ArgComponent
+    , methodComponent: MethodComponentType
+    , argComponent: ArgComponentType
   ) => {
     const argToTypeFns:any =
       map(argComponent, args)

@@ -9,6 +9,7 @@ import isolate from '@cycle/isolate'
 import { BaseSources, BaseSinks } from '../../interfaces'
 
 import { style } from 'typestyle'
+import * as csstips from 'csstips'
 
 import { values
        , compose
@@ -25,11 +26,13 @@ export interface Sinks extends BaseSinks {
 }
 
 // State
-export type State = boolean
-export const defaultState: State = false
+export type State =
+  null
+export const defaultState: State =
+  null
 export type Reducer = (prev: State) => State;
 
-export const Boolean =
+export const <arg> =
   (def, argName) =>
     isolate
     ( ({DOM, onion}) => {
@@ -37,11 +40,10 @@ export const Boolean =
         return (
           { DOM:
               view
-              ( argName )
+              (argName)
               ( onion.state$ )
           , onion:
               actions
-              ( def )
               ( DOM )
           }
         )
@@ -50,39 +52,46 @@ export const Boolean =
     )
 
 const actions =
-  (_defaultValue: boolean) =>
-    (DOM: DOMSource) => {
-      const init$ =
-        xs.of<Reducer>
-           ( (prev) =>
-               prev ? prev
-               : _defaultValue ? false // _defaultValue
-               : defaultState
-           )
+  (DOM: DOMSource) => {
+    const init$ = xs.of<Reducer>( (prev) => prev ? prev : defaultState )
 
-      const flip$ =
-        DOM
-          .select('.flip')
-          .events('click')
-          .mapTo<Reducer>
-           ( (prev) => !prev )
+    return xs.merge
+              ( init$
+              )
+  }
 
-      return xs.merge
-                ( init$
-                , flip$
-                )
+const wrapperStyle =
+  style
+  ( { fontSize: '1em'
+    , padding: '.4em'
     }
+  , csstips.vertical
+  )
+
+const nameStyle =
+  style
+  ()
+
+const inputStyle =
+  style
+  ()
+
+const styles =
+  { wrapper: wrapperStyle
+  , name: nameStyle
+  , input: inputStyle
+  }
 
 const view =
   (argName) =>
     (state$) =>
       state$
-        .debug('Boolean value:')
         .map
-         ( (value) =>
+         ( (empty) =>
              div
-             ( [ div(argName)
-               , div('.flip', value ? 'True' : 'False')
+             ( `.${styles.wrapper}`
+             , [ div(`.${styles.name}`, argName)
+               , div(`.${styles.input}`, 'None')
                ]
              )
          )

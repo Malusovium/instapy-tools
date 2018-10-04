@@ -9,6 +9,7 @@ import isolate from '@cycle/isolate'
 import { BaseSources, BaseSinks } from '../../interfaces'
 
 import { style } from 'typestyle'
+import * as csstips from 'csstips'
 
 import { values
        , compose
@@ -59,6 +60,28 @@ const actions =
               )
   }
 
+const wrapperStyle =
+  style
+  ( { fontSize: '1em'
+    , padding: '.4em'
+    }
+  , csstips.vertical
+  )
+
+const nameStyle =
+  style
+  ()
+
+const inputStyle =
+  style
+  ()
+
+const styles =
+  { wrapper: wrapperStyle
+  , name: nameStyle
+  , input: inputStyle
+  }
+
 const view =
   (argName) =>
     (state$) =>
@@ -66,8 +89,9 @@ const view =
         .map
          ( (empty) =>
              div
-             ( [ div(argName)
-               , div('None')
+             ( `.${styles.wrapper}`
+             , [ div(`.${styles.name}`, argName)
+               , div(`.${styles.input}`, 'None')
                ]
              )
          )

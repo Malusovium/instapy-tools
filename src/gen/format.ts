@@ -16,7 +16,6 @@ const toObject =
     (arr: any[]) =>
       reduce(objReducer(key, value), {})(arr)
 
-
 const toObjectArgs =
   toObject('_name', '_type')
 

@@ -613,7 +613,7 @@ export const raw =
     },
     "set_selenium_local_session": {},
     "set_selenium_remote_session": {
-      "selenium_url": "''"
+      "selenium_url": ""
     },
     "login": {},
     "set_sleep_reduce": {
@@ -668,7 +668,7 @@ export const raw =
     "set_smart_hashtags": {
       "tags": null,
       "limit": 3,
-      "sort": "'top'",
+      "sort": "top",
       "log_tags": true
     },
     "clarifai_check_img_for": {

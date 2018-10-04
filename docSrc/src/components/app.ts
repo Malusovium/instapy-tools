@@ -11,6 +11,9 @@ import { BaseSources, BaseSinks } from '../interfaces'
 import { map, values, compose } from 'rambda'
 
 // Typestyle setup
+
+import { style } from 'typestyle'
+import * as csstips from 'csstips'
 import { setupPage, normalize } from 'csstips'
 normalize()
 setupPage('#app')
@@ -21,7 +24,7 @@ import { api
        } from '../../../src'
 
 import { Method } from './method'
-import { Arg } from './inputs'
+import { Arg } from './args'
 
 export interface Sources extends BaseSources {
   onion: StateSource<State>
@@ -41,20 +44,20 @@ export type Reducer = (prev: State) => State;
 
 const { raw, setupInterface, setupArgComponent } = api
 
-const argToDiv =
-  (component:any, name:string) =>
-    div(`This arg = ${name}`)
-
-const baseMethodComponent: MethodComponentType =
-  (args: {}) =>
-    div
-    ( [ 'Method_something'
-      , ...compose
-        ( values
-        , map(argToDiv)
-        )(args)
-      ]
-    )
+// const argToDiv =
+//   (component:any, name:string) =>
+//     div(`This arg = ${name}`)
+//
+// const baseMethodComponent: MethodComponentType =
+//   (args: {}) =>
+//     div
+//     ( [ 'Method_something'
+//       , ...compose
+//         ( values
+//         , map(argToDiv)
+//         )(args)
+//       ]
+//     )
 
 // const simpleBaseArgComponent: ArgComponentType =
 //   setupArgComponent
@@ -99,7 +102,9 @@ export const App =
       }
 
     const setUserInteract =
-      interfaceApi['set_user_interact']({DOM, onion})
+      interfaceApi['interact_by_URL']({DOM, onion})
+      // interfaceApi['set_user_interact']({DOM, onion})
+      // interfaceApi['set_selenium_remote_session']({DOM, onion})
 
     return (
       { DOM:
@@ -129,14 +134,40 @@ const actions =
               )
   }
 
+const wrapperStyle =
+  style
+  ( { fontSize: '1em'
+    , padding: '2em'
+    , borderRadius: '.4em'
+    }
+  , csstips.vertical
+  )
+
+const titleStyle =
+  style
+  ( { fontSize: '3em'
+    }
+  )
+
+const componentsStyle =
+  style
+  ()
+
+const styles =
+  { wrapper: wrapperStyle
+  , title: titleStyle
+  , components: componentsStyle
+  }
+
 const view =
   (state$, components) =>
     xs.combine(state$, ...components)
       .map
        ( ([{ count }, ...components]) =>
          div
-         ( [ div('app' + count)
-           , div(components)
+         ( `.${styles.wrapper}`
+         , [ div(`.${styles.title}`, 'Instapy Tools GUI')
+           , div(`.${styles.components}`, components)
            ]
          )
        )

@@ -9,14 +9,13 @@ import isolate from '@cycle/isolate'
 import { BaseSources, BaseSinks } from '../interfaces'
 
 import { style } from 'typestyle'
+import * as csstips from 'csstips'
 
 import { values
        , compose
        , map
        , path
-       // , pick
        , Dictionary
-       // , toArray
        } from 'rambda'
 
 const toArray =
@@ -77,6 +76,32 @@ const actions =
               )
   }
 
+const wrapperStyle =
+  style
+  ( { fontSize: '1em'
+    , padding: '.4em'
+    , boxShadow: '0 .2rem 1rem #6662'
+    , borderRadius: '.4em'
+    }
+  , csstips.vertical
+  )
+
+const nameStyle =
+  style
+  ( { fontSize: '1.4em'
+    }
+  )
+
+const argsStyle =
+  style
+  ()
+
+const styles =
+  { wrapper: wrapperStyle
+  , name: nameStyle
+  , args: argsStyle
+  }
+
 const view =
   (methodName) =>
     (state$, args) =>
@@ -84,8 +109,9 @@ const view =
         .map
          ( ([state, ...divList]) =>
              div
-             ( [ div(methodName)
-               , div(divList)
+             ( `.${styles.wrapper}`
+             , [ div(`.${styles.name}`, methodName)
+               , div(`.${styles.args}`, divList)
                ]
              )
          )

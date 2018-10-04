@@ -9,6 +9,7 @@ import isolate from '@cycle/isolate'
 import { BaseSources, BaseSinks } from '../../interfaces'
 
 import { style } from 'typestyle'
+import * as csstips from 'csstips'
 
 import { values
        , compose
@@ -25,15 +26,13 @@ export interface Sinks extends BaseSinks {
 }
 
 // State
-export interface State {
-  count: number
-}
+export type State =
+  null
 export const defaultState: State =
-  { count: 5
-  }
+  null
 export type Reducer = (prev: State) => State;
 
-export const <inputArg> =
+export const <arg> =
   (def, argName) =>
     isolate
     ( ({DOM, onion}) => {
@@ -61,15 +60,38 @@ const actions =
               )
   }
 
+const wrapperStyle =
+  style
+  ( { fontSize: '1em'
+    , padding: '.4em'
+    }
+  , csstips.vertical
+  )
+
+const nameStyle =
+  style
+  ()
+
+const inputStyle =
+  style
+  ()
+
+const styles =
+  { wrapper: wrapperStyle
+  , name: nameStyle
+  , input: inputStyle
+  }
+
 const view =
   (argName) =>
     (state$) =>
       state$
         .map
-         ( ({count}) =>
+         ( (empty) =>
              div
-             ( [ div(argName)
-               , div(count)
+             ( `.${styles.wrapper}`
+             , [ div(`.${styles.name}`, argName)
+               , div(`.${styles.input}`, 'None')
                ]
              )
          )

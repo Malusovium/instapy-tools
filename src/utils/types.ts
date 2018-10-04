@@ -245,7 +245,7 @@ export const makeDoAtType: MakeDoAtType =
 
 export const makeValidation =
   makeDoAtType
-  ( { _default: (val) => false
+  ( { _default: (val:any) => false
     , none: validateNone
     , boolean: validateBoolean
     , string: validateString
