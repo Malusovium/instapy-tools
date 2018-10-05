@@ -91,7 +91,7 @@ export const App =
       setupInterface
       ( raw
       , Method
-      , Arg
+      , Arg(isolate)
       // , simpleBaseArgComponent
       )
 
@@ -102,7 +102,8 @@ export const App =
       }
 
     const setUserInteract =
-      interfaceApi['interact_by_URL']({DOM, onion})
+      interfaceApi['unfollow_users']({DOM, onion})
+      // interfaceApi['interact_by_URL']({DOM, onion})
       // interfaceApi['set_user_interact']({DOM, onion})
       // interfaceApi['set_selenium_remote_session']({DOM, onion})
 

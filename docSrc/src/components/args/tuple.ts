@@ -12,11 +12,17 @@ import { style } from 'typestyle'
 import * as csstips from 'csstips'
 
 import { values
+       , zip
        , compose
+       , take
+       , update
+       , pluck
        , map
        , path
        , Dictionary
        } from 'rambda'
+
+import { Arg } from './index'
 
 export interface Sources extends BaseSources {
   onion: StateSource<State>
@@ -27,36 +33,91 @@ export interface Sinks extends BaseSinks {
 
 // State
 export type State =
-  null
+  any[]
 export const defaultState: State =
-  null
+  []
 export type Reducer = (prev: State) => State;
 
-export const <arg> =
-  (def, argName) =>
-    isolate
-    ( ({DOM, onion}) => {
+const subLens =
+  (index) => (
+    { get: state => state[index]
+    , set: (state, childState) =>
+        update(index, childState, state)
+    }
+  )
 
-        return (
-          { DOM:
-              view
-              (argName)
-              ( onion.state$ )
-          , onion:
-              actions
-              ( DOM )
+const subIsolate =
+  (lens) =>
+    (component, name) =>
+      isolate
+      ( component
+      , { onion: lens
+        , '*': name + ' sub'
+        }
+      )
+
+const logIt =
+  (val) => { console.log(val); return val}
+
+export const Tuple =
+  (wrapFn) =>
+    (_subTypes) =>
+      (def, argName) =>
+        wrapFn
+        ( ({DOM, onion}) => {
+            const subArgs =
+              compose
+              ( map( (component:any) => component({DOM, onion}))
+              , map
+                ( ([index, wrappedComponent]) =>
+                    wrappedComponent(def[index], index + '')
+                )
+              , map<any, any>
+                ( ([index, _type]) =>
+                    [ index
+                    , Arg
+                      ( subIsolate(subLens(index))
+                      )(_type)
+                    ]
+                )
+              , zip<any>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+              )( _subTypes )
+
+            return (
+              { DOM:
+                  view
+                  ( argName )
+                  ( onion.state$
+                  , map(path('DOM'), subArgs)
+                  // , pluck('DOM', subArgs)
+                  )
+              , onion:
+                  actions
+                  ( def )
+                  ( DOM
+                  , map(path('onion'), subArgs)
+                  // , pluck('onion', subArgs)
+                  )
+              }
+            )
           }
+        , argName
         )
-      }
-    , argName
-    )
 
 const actions =
-  (DOM: DOMSource) => {
-    const init$ = xs.of<Reducer>( (prev) => prev ? prev : defaultState )
+  (_defaultValue: string[]) =>
+    (DOM: DOMSource, subArgs) => {
+      const init$ =
+        xs.of<Reducer>
+           ( (prev) =>
+               prev ? prev
+               : _defaultValue ? _defaultValue
+               : defaultState
+           )
 
     return xs.merge
               ( init$
+              , ...subArgs
               )
   }
 
@@ -84,14 +145,14 @@ const styles =
 
 const view =
   (argName) =>
-    (state$) =>
-      state$
+    (state$, subArgs) =>
+      xs.combine(state$, ...subArgs)
         .map
-         ( (empty) =>
+         ( ([empty, ...subDoms]) =>
              div
              ( `.${styles.wrapper}`
              , [ div(`.${styles.name}`, argName)
-               , div(`.${styles.input}`, 'None')
+               , div(`.${styles.input}`, subDoms)
                ]
              )
          )

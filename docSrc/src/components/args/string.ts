@@ -32,24 +32,25 @@ export const defaultState: State = ''
 export type Reducer = (prev: State) => State
 
 export const String =
-  (def, argName) =>
-    isolate
-    ( ({DOM, onion}) => {
+  (wrapFn:any) =>
+    (def, argName) =>
+      wrapFn
+      ( ({DOM, onion}) => {
 
-        return (
-          { DOM:
-              view
-              (argName)
-              ( onion.state$ )
-          , onion:
-              actions
-              ( def )
-              ( DOM )
-          }
-        )
-      }
-    , argName
-    )
+          return (
+            { DOM:
+                view
+                (argName)
+                ( onion.state$ )
+            , onion:
+                actions
+                ( def )
+                ( DOM )
+            }
+          )
+        }
+      , argName
+      )
 
 const actions =
   (_defaultValue: string) =>

@@ -33,23 +33,24 @@ export const defaultState: State =
 export type Reducer = (prev: State) => State;
 
 export const None =
-  (def, argName) =>
-    isolate
-    ( ({DOM, onion}) => {
+  (wrapFn:any) =>
+    (def, argName) =>
+      wrapFn 
+      ( ({DOM, onion}) => {
 
-        return (
-          { DOM:
-              view
-              (argName)
-              ( onion.state$ )
-          , onion:
-              actions
-              ( DOM )
-          }
-        )
-      }
-    , argName
-    )
+          return (
+            { DOM:
+                view
+                (argName)
+                ( onion.state$ )
+            , onion:
+                actions
+                ( DOM )
+            }
+          )
+        }
+      , argName
+      )
 
 const actions =
   (DOM: DOMSource) => {

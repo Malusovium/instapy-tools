@@ -31,24 +31,28 @@ export const defaultState: State = false
 export type Reducer = (prev: State) => State;
 
 export const Boolean =
-  (def, argName) =>
-    isolate
-    ( ({DOM, onion}) => {
+  (wrapFn:any) =>
+    (def, argName) =>
+      wrapFn
+      ( ({DOM, onion}) => {
 
-        return (
-          { DOM:
-              view
-              ( argName )
-              ( onion.state$ )
-          , onion:
-              actions
-              ( def )
-              ( DOM )
-          }
-        )
-      }
-    , argName
-    )
+        console.log(argName)
+        console.log(def)
+
+          return (
+            { DOM:
+                view
+                ( argName )
+                ( onion.state$ )
+            , onion:
+                actions
+                ( def )
+                ( DOM )
+            }
+          )
+        }
+      , argName
+      )
 
 const actions =
   (_defaultValue: boolean) =>

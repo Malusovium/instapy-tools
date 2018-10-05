@@ -35,32 +35,33 @@ export const defaultState: State =
 export type Reducer = (prev: State) => State;
 
 export const Array =
-  (_options) =>
-    (def, argName) =>
-      isolate
-      ( ({DOM, onion}) => {
+  (wrapFn:any) =>
+    (_options) =>
+      (def, argName) =>
+        wrapFn
+        ( ({DOM, onion}) => {
 
-          return (
-            { DOM:
-                view
-                ( argName )
-                ( onion.state$ )
-            , onion:
-                actions
-                ( def )
-                ( DOM )
-            }
-          )
-        }
-      , argName
-      )
+            return (
+              { DOM:
+                  view
+                  ( argName )
+                  ( onion.state$ )
+              , onion:
+                  actions
+                  ( def )
+                  ( DOM )
+              }
+            )
+          }
+        , argName
+        )
 
 type RemoveWhiteSpace = (string) => string
 
 const removeWhiteSpace: RemoveWhiteSpace =
   compose
   ( join('')
-  , reject( (val) => val === ' ' )
+  , reject<any>( (val) => val === ' ' )
   , split('')
   )
 
@@ -71,9 +72,8 @@ const actions =
         xs.of<Reducer>
            ( (prev) =>
                prev ? prev
-               : [ 'well hello there', 'look!', 'anothertag']
-               // : _defaultValue ? _defaultValue
-               // : defaultState
+               : _defaultValue ? _defaultValue
+               : defaultState
            )
 
       const update$ =
@@ -83,13 +83,8 @@ const actions =
           .map(path('target.value'))
           .map(removeWhiteSpace)
           .map(split(','))
-          .debug('preFilter')
-          .map(reject( (val) => val === ''))
-          .debug('postFilter')
-          .map
-           ( (next) =>
-               (prev) => next
-           )
+          .map<any>(reject( (val) => val === ''))
+          .map((next) => (prev) => next)
 
       return xs.merge
                 ( init$

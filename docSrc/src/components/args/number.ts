@@ -34,25 +34,26 @@ export const defaultState: State =
 export type Reducer = (prev: State) => State;
 
 export const Number =
-  (_constrains) =>
-    (def, argName) =>
-      isolate
-      ( ({DOM, onion}) => {
+  (wrapFn) =>
+    (_constrains) =>
+      (def, argName) =>
+        wrapFn
+        ( ({DOM, onion}) => {
 
-          return (
-            { DOM:
-                view
-                ( argName )
-                ( onion.state$ )
-            , onion:
-                actions
-                ( def )
-                ( DOM )
-            }
-          )
-        }
-      , argName
-      )
+            return (
+              { DOM:
+                  view
+                  ( argName )
+                  ( onion.state$ )
+              , onion:
+                  actions
+                  ( def )
+                  ( DOM )
+              }
+            )
+          }
+        , argName
+        )
 
 const actions =
   (_defaultValue: number) =>
