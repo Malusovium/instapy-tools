@@ -22,6 +22,7 @@ import { values
        , Dictionary
        } from 'rambda'
 
+import { initReducer } from './../../utils/comp-isolate'
 import { Arg } from './index'
 
 export interface Sources extends BaseSources {
@@ -33,28 +34,36 @@ export interface Sinks extends BaseSinks {
 
 // State
 export type State =
-  any[]
+  { value: any[] }
 export const defaultState: State =
-  []
+  { value: [] }
 export type Reducer = (prev: State) => State;
 
 const subLens =
   (index) => (
-    { get: state => state[index]
-    , set: (state, childState) =>
-        update(index, childState, state)
+    { get: state => (
+        { ...state[`_${index}`]
+        }
+      )
+    , set: (state, childState) => (
+        { ...state
+        , [`_${index}`]: childState
+        , value: update(index, childState.value, state.value)
+        }
+      )
     }
   )
 
 const subIsolate =
-  (lens) =>
-    (component, name) =>
-      isolate
-      ( component
-      , { onion: lens
-        , '*': name + ' sub'
-        }
-      )
+  () =>
+    (lens) =>
+      (component, name) =>
+        isolate
+        ( component
+        , { onion: lens
+          , '*': name + ' sub'
+          }
+        )
 
 const logIt =
   (val) => { console.log(val); return val}
@@ -105,15 +114,11 @@ export const Tuple =
         )
 
 const actions =
-  (_defaultValue: string[]) =>
+  (defaultValue) =>
     (DOM: DOMSource, subArgs) => {
       const init$ =
         xs.of<Reducer>
-           ( (prev) =>
-               prev ? prev
-               : _defaultValue ? _defaultValue
-               : defaultState
-           )
+           ( initReducer(defaultValue, defaultState) )
 
     return xs.merge
               ( init$

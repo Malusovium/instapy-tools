@@ -19,6 +19,8 @@ import { values
        , Dictionary
        } from 'rambda'
 
+import { initReducer } from './../../utils/comp-isolate'
+
 export interface Sources extends BaseSources {
   onion: StateSource<State>
 }
@@ -28,9 +30,9 @@ export interface Sinks extends BaseSinks {
 
 // State
 export type State =
-  number
+  { value: number }
 export const defaultState: State =
-  0
+  { value: 0 }
 export type Reducer = (prev: State) => State;
 
 export const Number =
@@ -56,15 +58,11 @@ export const Number =
         )
 
 const actions =
-  (_defaultValue: number) =>
+  (defaultValue) =>
     (DOM: DOMSource) => {
       const init$ =
         xs.of<Reducer>
-           ( (prev) =>
-               prev ? prev
-               : _defaultValue ? _defaultValue
-               : defaultState
-           )
+           ( initReducer(defaultValue, defaultState) )
 
       const update$ =
         DOM
@@ -73,8 +71,11 @@ const actions =
           .map(path('target.value'))
           .map
            ( (nextValue) =>
-               (prevValue) =>
-                 nextValue
+               (prev) => (
+                 { ...prev
+                 , value: nextValue
+                 }
+               )
            )
 
       return xs.merge
@@ -110,7 +111,7 @@ const view =
     (state$) =>
       state$
         .map
-         ( (value) =>
+         ( ({value}) =>
              div
              ( `.${styles.wrapper}`
              , [ div(`.${styles.name}`, argName)

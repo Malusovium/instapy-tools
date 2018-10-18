@@ -14,11 +14,16 @@ import * as csstips from 'csstips'
 
 import { split
        , path
+       , map
+       , flatten
+       , contains
        , reject
        , join
        , compose
        , Dictionary
        } from 'rambda'
+
+import { initReducer } from './../../utils/comp-isolate'
 
 export interface Sources extends BaseSources {
   onion: StateSource<State>
@@ -29,10 +34,15 @@ export interface Sinks extends BaseSinks {
 
 // State
 export type State =
-  string[] | number[]
+  { value: string[] | number[] }
 export const defaultState: State =
-  []
+  { value: [] }
 export type Reducer = (prev: State) => State;
+
+const prefix =
+  (add:string) =>
+    (source:string) =>
+      `${add}${source}`
 
 export const Array =
   (wrapFn:any) =>
@@ -65,26 +75,47 @@ const removeWhiteSpace: RemoveWhiteSpace =
   , split('')
   )
 
+const prefixChar =
+  (prefix:string, match:string) =>
+    (source:string) =>
+      source === match
+        ? `${prefix}${match}`
+        : source
+
+const replaceTo =
+  (match:string, to: string) =>
+    (source:string) =>
+      source === match
+        ? to
+        : source
+
 const actions =
-  (_defaultValue: string[]) =>
+  (defaultValue) =>
     (DOM: DOMSource) => {
       const init$ =
         xs.of<Reducer>
-           ( (prev) =>
-               prev ? prev
-               : _defaultValue ? _defaultValue
-               : defaultState
-           )
+           ( initReducer(defaultValue, defaultState) )
 
       const update$ =
         DOM
           .select('textarea')
-          .events('input')
+          .events('keyup')
           .map(path('target.value'))
-          .map(removeWhiteSpace)
-          .map(split(','))
-          .map<any>(reject( (val) => val === ''))
-          .map((next) => (prev) => next)
+          .map(split(''))
+          .map<any>(map(replaceTo('\n', ' ')))
+          .map<any>(map(replaceTo(',', ' ')))
+          .map<any>(map(prefixChar(' ', '#')))
+          .map(join(''))
+          .map<any>(split(' '))
+          .map<any>(reject( (val) => contains(val, ['', '#'])))
+          .map
+           ( (nextValue) =>
+               (prev) => (
+                 { ...prev
+                 , value: nextValue
+                 }
+               )
+           )
 
       return xs.merge
                 ( init$
@@ -106,7 +137,9 @@ const nameStyle =
 
 const inputStyle =
   style
-  ()
+  ( { padding: '.4em'
+    }
+  )
 
 const styles =
   { wrapper: wrapperStyle
@@ -118,7 +151,8 @@ const view =
   (argName) =>
     (state$) =>
       state$
-        .map(join(', '))
+        .map(path('value'))
+        .map(join(' '))
         .map
          ( (value) =>
              div

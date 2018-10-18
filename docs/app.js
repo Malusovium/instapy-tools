@@ -27,62 +27,49 @@ const csstips_1 = require("csstips");
 csstips_1.normalize();
 csstips_1.setupPage('#app');
 const src_1 = require("../../../src");
+const arg_1 = require("./arg");
 const method_1 = require("./method");
-const args_1 = require("./args");
 exports.defaultState = {
     count: 5
 };
 const { raw, setupInterface, setupArgComponent } = src_1.api;
-// const argToDiv =
-//   (component:any, name:string) =>
-//     div(`This arg = ${name}`)
-//
-// const baseMethodComponent: MethodComponentType =
-//   (args: {}) =>
-//     div
-//     ( [ 'Method_something'
-//       , ...compose
-//         ( values
-//         , map(argToDiv)
-//         )(args)
-//       ]
-//     )
-// const simpleBaseArgComponent: ArgComponentType =
-//   setupArgComponent
-//   ( { _default: SimpleArgComponent
-//     , none: SimpleArgComponent
-//     , boolean: SimpleArgComponent
-//     , string: SimpleArgComponent
-//     , number: (_constrains) => SimpleArgComponent
-//     , union: (_options) => SimpleArgComponent
-//     , array: (_subType) => SimpleArgComponent
-//     , tuple: (_subTypes) => SimpleArgComponent
+const lY = (value) => { console.log(value); return value; };
+// const methodLens =
+//   (methodName, args) => (
+//     { get: (parentState) => (
+//         { ...parentState[methodName]
+//         , subComponents: lY(args)
+//         , title: methodName
+//         }
+//       )
+//     , set: (parentState, childState) => (
+//         { ...parentState
+//         , [methodName]: childState
+//         }
+//       )
 //     }
 //   )
-// const baseArgComponent: ArgComponent =
-//   setupArgComponent
-//   ( { _default: (def, argName) => argName + '_default'
-//     , none: (def, argName) => argName + 'none'
-//     , boolean: (def, argName) => argName + 'boolean'
-//     , string: (def, argName) => argName + 'string'
-//     , number: (_constrains) => (def, argName) => argName + 'number'
-//     , union: (_options) => (def, argName) => argName + 'union'
-//     , array: (_subType) => (def, argName) => argName + 'array'
-//     , tuple: (_subTypes) => (def, argName) => argName + 'tuple'
-//     }
-//   )
+const methodLens = (name) => ({ get: (state) => state[name],
+    set: (state, childState) => (Object.assign({}, state, { [name]: childState }))
+});
+const tempComponent = ({ DOM, onion }) => ({ DOM: onion.state$.map(({ count }) => dom_1.div(`The counter is at: ${count}`)),
+    onion: xstream_1.default.of((prev => prev ? prev : { count: 1 }))
+});
+const tempMethodComponentList = [isolate_1.default(tempComponent, 'first'),
+    isolate_1.default(tempComponent, 'second'),
+    isolate_1.default(tempComponent, 'third')
+];
+const isolatedMethod = (args, methodName) => isolate_1.default(method_1.method(args), methodName);
 exports.App = ({ DOM, onion }) => {
-    const interfaceApi = setupInterface(raw, method_1.Method, args_1.Arg(isolate_1.default)
-    // , simpleBaseArgComponent
-    );
-    const testObj = { first: 'val1',
-        second: 'val2',
-        third: 'val3'
-    };
-    const setUserInteract = interfaceApi['unfollow_users']({ DOM, onion });
+    const interfaceApi = setupInterface(raw, isolatedMethod, arg_1.Arg({}));
+    const setUserInteract = 
+    // interfaceApi['end']({DOM, onion})
+    interfaceApi['unfollow_users']({ DOM, onion });
     // interfaceApi['interact_by_URL']({DOM, onion})
     // interfaceApi['set_user_interact']({DOM, onion})
     // interfaceApi['set_selenium_remote_session']({DOM, onion})
+    // const template =
+    //   isolate(component, 'template')({DOM, onion})
     return ({ DOM: view(onion.state$
             .debug('well?'), [setUserInteract.DOM]),
         onion: actions(DOM, [setUserInteract.onion])
@@ -119,6 +106,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./gen"));
 __export(require("./controls"));
 __export(require("./api"));
+const types_1 = require("./utils/types");
+exports.Type = types_1.Type;
 //# sourceMappingURL=index.js.map
 });
 ___scope___.file("src/gen/index.js", function(exports, require, module, __filename, __dirname){
@@ -1561,415 +1550,908 @@ exports.setupInterface = ({ args, methods }, methodComponent, argComponent) => {
 };
 //# sourceMappingURL=interface.js.map
 });
-___scope___.file("docSrc/src/components/method.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("docSrc/src/components/arg.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const xstream_1 = require("xstream");
-const dom_1 = require("@cycle/dom");
-const isolate_1 = require("@cycle/isolate");
-const typestyle_1 = require("typestyle");
-const csstips = require("csstips");
+const src_1 = require("../../../src");
 const rambda_1 = require("rambda");
-const toArray = (input) => [...input];
-exports.defaultState = { count: 5
-};
-exports.Method = (args, methodName) => isolate_1.default(({ DOM, onion }) => {
-    const argsList = rambda_1.compose(rambda_1.map((component) => component({ DOM, onion })), rambda_1.values)(args);
-    return ({ DOM: view(methodName)(onion.state$
-            .debug('component?'), rambda_1.map(rambda_1.path('DOM'), argsList)),
-        onion: actions(DOM, rambda_1.map(rambda_1.path('onion'), argsList))
-    });
-}, methodName);
-const actions = (DOM, args) => {
-    const init$ = xstream_1.default.of((prev) => prev ? prev : exports.defaultState);
-    return xstream_1.default.merge(init$, ...args);
-};
-const wrapperStyle = typestyle_1.style({ fontSize: '1em',
-    padding: '.4em',
-    boxShadow: '0 .2rem 1rem #6662',
-    borderRadius: '.4em'
-}, csstips.vertical);
-const nameStyle = typestyle_1.style({ fontSize: '1.4em'
-});
-const argsStyle = typestyle_1.style();
-const styles = { wrapper: wrapperStyle,
-    name: nameStyle,
-    args: argsStyle
-};
-const view = (methodName) => (state$, args) => xstream_1.default.combine(state$, ...args)
-    .map(([state, ...divList]) => dom_1.div(`.${styles.wrapper}`, [dom_1.div(`.${styles.name}`, methodName),
-    dom_1.div(`.${styles.args}`, divList)
-]));
-//# sourceMappingURL=method.js.map
-});
-___scope___.file("docSrc/src/components/args/index.js", function(exports, require, module, __filename, __dirname){
-
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const src_1 = require("../../../../src");
-const none_1 = require("./none");
-const boolean_1 = require("./boolean");
-const string_1 = require("./string");
-const number_1 = require("./number");
-const union_1 = require("./union");
-const array_1 = require("./array");
-const tuple_1 = require("./tuple");
+const input_none_1 = require("./input-none");
+const input_boolean_1 = require("./input-boolean");
+const input_string_1 = require("./input-string");
+const input_number_1 = require("./input-number");
+const input_array_1 = require("./input-array");
+const input_tuple_1 = require("./input-tuple");
+const input_union_1 = require("./input-union");
 // <START to-remove
 const xstream_1 = require("xstream");
 const dom_1 = require("@cycle/dom");
+const isolate_1 = require("@cycle/isolate");
 // END>
 const { setupArgComponent } = src_1.api;
-const SimpleArgComponent = (wrapFn) => (def, name) => wrapFn(({ DOM, onion }) => ({ DOM: xstream_1.default.of(dom_1.div(name + ': arg input' + '\n' + 'default Input: ' + def)),
-    onion: xstream_1.default.of((prev) => prev ? prev : def)
-}), name);
-exports.Arg = (wrapFn) => setupArgComponent({ _default: SimpleArgComponent(wrapFn),
-    none: none_1.None(wrapFn),
-    boolean: boolean_1.Boolean(wrapFn),
-    string: string_1.String(wrapFn) // SimpleArgComponent
-    ,
-    number: number_1.Number(wrapFn) // (_constrains) => SimpleArgComponent
-    ,
-    union: union_1.Union(wrapFn) //(_options) => SimpleArgComponent(wrapFn)
-    ,
-    array: array_1.Array(wrapFn) // (_subType) => SimpleArgComponent
-    ,
-    tuple: tuple_1.Tuple(wrapFn) //(_subTypes) => SimpleArgComponent
+const minimalArgComponent = ({ DOM, onion }) => ({ DOM: onion
+        .state$
+        .map(({ value, _default }) => dom_1.div(`value: ${value}, default: ${_default}`)),
+    onion: xstream_1.default.of((prev) => (Object.assign({ value: '', _default: '' }, prev)))
 });
+const logY = (value) => { console.log(value); return value; };
+const defaultLens = (def, argName, _) => ({ get: (parentState) => (Object.assign({}, parentState[`_${argName}`], { _default: def, name: argName, value: rambda_1.pathOr(def, [`_${argName}`, 'value'], parentState) })),
+    set: (parentState, childState) => (Object.assign({}, parentState, { [`_${argName}`]: childState, value: Object.assign({}, parentState.value, { [argName]: childState.value }) }))
+});
+const maybeObject = (key, value) => value === undefined
+    ? {}
+    : { [key]: value };
+const numberLens = (def, argName, { _step, _min, _max }) => ({ get: (parentState) => (Object.assign({}, parentState[`_${argName}`], { _default: def, name: argName, value: rambda_1.pathOr(def, [`_${argName}`, 'value'], parentState) }, maybeObject('step', _step), maybeObject('min', _min), maybeObject('max', _max))),
+    set: (parentState, childState) => (Object.assign({}, parentState, { [`_${argName}`]: childState, value: Object.assign({}, parentState.value, { [argName]: childState.value }) }))
+});
+const unionLens = (def, argName) => ({ get: (parentState) => (Object.assign({}, parentState[`_${argName}`], { _default: def, name: argName, value: rambda_1.pathOr(def, [`_${argName}`, 'value'], parentState) })),
+    set: (parentState, childState) => (Object.assign({}, parentState, { [`_${argName}`]: childState, value: Object.assign({}, parentState.value, { [argName]: childState[`_${childState.active}`] === undefined
+                ? def
+                : childState[`_${childState.active}`].value }) }))
+});
+const argIsolate = (component, lens, _sub = undefined) => (def, argName) => isolate_1.default(component, { onion: lens(def, argName, _sub),
+    '*': argName
+});
+exports.Arg = ({ _default = defaultLens, none = defaultLens, boolean = defaultLens, string = defaultLens, number = numberLens, array = defaultLens, tuple = defaultLens, union = unionLens }) => setupArgComponent({ _default: argIsolate(minimalArgComponent, _default),
+    none: argIsolate(input_none_1.inputNone, none),
+    boolean: argIsolate(input_boolean_1.inputBoolean, boolean),
+    string: argIsolate(input_string_1.inputString, string),
+    number: (_constraints) => argIsolate(input_number_1.inputNumber, number, _constraints),
+    array: () => argIsolate(input_array_1.inputArray, array),
+    tuple: (_subTypes) => argIsolate(input_tuple_1.inputTuple(_subTypes), tuple),
+    union: (_options) => argIsolate(input_union_1.inputUnion(_options), union)
+});
+//# sourceMappingURL=arg.js.map
+});
+___scope___.file("docSrc/src/components/input-none/index.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// index
+const intent_1 = require("./intent");
+const view_1 = require("./view");
+const types_1 = require("./types");
+exports.State = types_1.State;
+const inputNone = ({ DOM, onion }) => ({ DOM: view_1.view(onion.state$),
+    onion: intent_1.intent(DOM)
+});
+exports.inputNone = inputNone;
 //# sourceMappingURL=index.js.map
 });
-___scope___.file("docSrc/src/components/args/none.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("docSrc/src/components/input-none/intent.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// intent
 const xstream_1 = require("xstream");
-const dom_1 = require("@cycle/dom");
-const typestyle_1 = require("typestyle");
-const csstips = require("csstips");
-exports.defaultState = null;
-exports.None = (wrapFn) => (def, argName) => wrapFn(({ DOM, onion }) => {
-    return ({ DOM: view(argName)(onion.state$),
-        onion: actions(DOM)
-    });
-}, argName);
-const actions = (DOM) => {
-    const init$ = xstream_1.default.of((prev) => prev ? prev : exports.defaultState);
-    return xstream_1.default.merge(init$);
+const defaultState = { name: '',
+    value: null,
+    _default: null
 };
-const wrapperStyle = typestyle_1.style({ fontSize: '1em',
-    padding: '.4em'
-}, csstips.vertical);
-const nameStyle = typestyle_1.style();
-const inputStyle = typestyle_1.style();
-const styles = { wrapper: wrapperStyle,
-    name: nameStyle,
-    input: inputStyle
+const intent = (DOM) => {
+    const init$ = xstream_1.default
+        .of((prev) => (Object.assign({}, defaultState, prev)));
+    return init$;
 };
-const view = (argName) => (state$) => state$
-    .map((empty) => dom_1.div(`.${styles.wrapper}`, [dom_1.div(`.${styles.name}`, argName),
-    dom_1.div(`.${styles.input}`, 'None')
-]));
-//# sourceMappingURL=none.js.map
+exports.intent = intent;
+//# sourceMappingURL=intent.js.map
 });
-___scope___.file("docSrc/src/components/args/boolean.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("docSrc/src/components/input-none/view.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const xstream_1 = require("xstream");
 const dom_1 = require("@cycle/dom");
+const styles = require("./styles");
+const dom = ({ name, value, _default }) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.title}`, name),
+    dom_1.div(`.${styles.paragraph}`, 'None')
+]);
+const view = (state$) => state$
+    .map(dom);
+exports.view = view;
+//# sourceMappingURL=view.js.map
+});
+___scope___.file("docSrc/src/components/input-none/styles.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// styles
 const typestyle_1 = require("typestyle");
-const csstips = require("csstips");
-exports.defaultState = false;
-exports.Boolean = (wrapFn) => (def, argName) => wrapFn(({ DOM, onion }) => {
-    console.log(argName);
-    console.log(def);
-    return ({ DOM: view(argName)(onion.state$),
-        onion: actions(def)(DOM)
-    });
-}, argName);
-const actions = (_defaultValue) => (DOM) => {
-    const init$ = xstream_1.default.of((prev) => prev ? prev
-        : _defaultValue ? _defaultValue
-            : exports.defaultState);
+const csstips_1 = require("csstips");
+const container = typestyle_1.style({ borderStyle: 'solid',
+    padding: '.8rem'
+}, csstips_1.vertical);
+exports.container = container;
+const title = typestyle_1.style({ color: '#222'
+});
+exports.title = title;
+const paragraph = typestyle_1.style({ color: '#444'
+});
+exports.paragraph = paragraph;
+//# sourceMappingURL=styles.js.map
+});
+___scope___.file("docSrc/src/components/input-none/types.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=types.js.map
+});
+___scope___.file("docSrc/src/components/input-boolean/index.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// index
+const intent_1 = require("./intent");
+const view_1 = require("./view");
+const types_1 = require("./types");
+exports.State = types_1.State;
+const inputBoolean = ({ DOM, onion }) => ({ DOM: view_1.view(onion.state$),
+    onion: intent_1.intent(DOM)
+});
+exports.inputBoolean = inputBoolean;
+//# sourceMappingURL=index.js.map
+});
+___scope___.file("docSrc/src/components/input-boolean/intent.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// intent
+const xstream_1 = require("xstream");
+const defaultState = { name: '',
+    value: false,
+    _default: false
+};
+const intent = (DOM) => {
+    const init$ = xstream_1.default
+        .of((prev) => (Object.assign({}, defaultState, prev)));
     const flip$ = DOM
-        .select('.flip')
+        .select('div[data-flip]')
         .events('click')
-        .mapTo((prev) => !prev);
+        .mapTo((prev) => (Object.assign({}, prev, { value: !prev.value })));
     return xstream_1.default.merge(init$, flip$);
 };
-const wrapperStyle = typestyle_1.style({ fontSize: '1em',
-    padding: '.4em'
-}, csstips.vertical);
-const nameStyle = typestyle_1.style();
-const inputStyle = typestyle_1.style({ color: 'white',
-    textAlign: 'center'
+exports.intent = intent;
+//# sourceMappingURL=intent.js.map
 });
-const styles = { wrapper: wrapperStyle,
-    name: nameStyle,
-    input: inputStyle
-};
-const flipStateStyle = (isOn) => isOn
-    ? typestyle_1.style({ background: '#1e1'
-    })
-    : typestyle_1.style({ background: '#7d7d7d'
-    });
-const view = (argName) => (state$) => state$
-    .debug('Boolean value:')
-    .map((value) => dom_1.div(`.${styles.wrapper}`, [dom_1.div(`.${styles.name}`, argName),
-    dom_1.div(`.flip.${styles.input}.${flipStateStyle(value)}`, value ? 'True' : 'False')
-]));
-//# sourceMappingURL=boolean.js.map
-});
-___scope___.file("docSrc/src/components/args/string.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("docSrc/src/components/input-boolean/view.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const xstream_1 = require("xstream");
 const dom_1 = require("@cycle/dom");
+const styles = require("./styles");
+const dom = ({ name, value }) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.name}`, name),
+    dom_1.div(`.${styles.bool}.${(value ? styles.on : styles.off)}`, { dataset: { flip: true
+        }
+    }, value ? 'True' : 'False')
+]);
+const view = (state$) => state$
+    .map(dom);
+exports.view = view;
+//# sourceMappingURL=view.js.map
+});
+___scope___.file("docSrc/src/components/input-boolean/styles.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// styles
 const typestyle_1 = require("typestyle");
-const csstips = require("csstips");
+const csstips_1 = require("csstips");
+const container = typestyle_1.style({ borderStyle: 'solid',
+    padding: '.8rem'
+}, csstips_1.vertical);
+exports.container = container;
+const name = typestyle_1.style({ color: '#222'
+});
+exports.name = name;
+const bool = typestyle_1.style({ color: '#fff',
+    textAlign: 'center',
+    padding: '.4em'
+});
+exports.bool = bool;
+const on = typestyle_1.style({ background: '#3c3'
+});
+exports.on = on;
+const off = typestyle_1.style({ background: '#777'
+});
+exports.off = off;
+//# sourceMappingURL=styles.js.map
+});
+___scope___.file("docSrc/src/components/input-boolean/types.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=types.js.map
+});
+___scope___.file("docSrc/src/components/input-string/index.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// index
+const intent_1 = require("./intent");
+const view_1 = require("./view");
+const types_1 = require("./types");
+exports.State = types_1.State;
+const inputString = ({ DOM, onion }) => ({ DOM: view_1.view(onion.state$),
+    onion: intent_1.intent(DOM)
+});
+exports.inputString = inputString;
+//# sourceMappingURL=index.js.map
+});
+___scope___.file("docSrc/src/components/input-string/intent.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// intent
+const xstream_1 = require("xstream");
 const rambda_1 = require("rambda");
-exports.defaultState = '';
-exports.String = (wrapFn) => (def, argName) => wrapFn(({ DOM, onion }) => {
-    return ({ DOM: view(argName)(onion.state$),
-        onion: actions(def)(DOM)
-    });
-}, argName);
-const actions = (_defaultValue) => (DOM) => {
-    const init$ = xstream_1.default.of((prev) => prev ? prev
-        : _defaultValue ? _defaultValue
-            : exports.defaultState);
-    const update$ = DOM
+const defaultState = { name: '',
+    value: '',
+    _default: ''
+};
+const intent = (DOM) => {
+    const init$ = xstream_1.default
+        .of((prev) => (Object.assign({}, defaultState, prev)));
+    const input$ = DOM
         .select('input')
         .events('input')
         .map(rambda_1.path('target.value'))
-        .map((newVal) => (prevVal) => newVal);
-    return xstream_1.default.merge(init$, update$);
+        .map((newValue) => (prevState) => (Object.assign({}, prevState, { value: newValue })));
+    return xstream_1.default.merge(init$, input$);
 };
-const wrapperStyle = typestyle_1.style({ fontSize: '1em',
-    padding: '.4em'
-}, csstips.vertical);
-const nameStyle = typestyle_1.style();
-const inputStyle = typestyle_1.style();
-const styles = { wrapper: wrapperStyle,
-    name: nameStyle,
-    input: inputStyle
-};
-const view = (argName) => (state$) => state$
-    .map((stateValue) => dom_1.div(`.${styles.wrapper}`, [dom_1.div(`.${styles.name}`, argName),
-    dom_1.input({ props: { value: stateValue
-        }
-    })
-]));
-//# sourceMappingURL=string.js.map
+exports.intent = intent;
+//# sourceMappingURL=intent.js.map
 });
-___scope___.file("docSrc/src/components/args/number.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("docSrc/src/components/input-string/view.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const xstream_1 = require("xstream");
 const dom_1 = require("@cycle/dom");
+const styles = require("./styles");
+const dom = ({ name, value }) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.name}`, name),
+    dom_1.input(`.${styles.input}`, { props: { value: value } })
+]);
+const view = (state$) => state$
+    .map(dom);
+exports.view = view;
+//# sourceMappingURL=view.js.map
+});
+___scope___.file("docSrc/src/components/input-string/styles.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// styles
 const typestyle_1 = require("typestyle");
-const csstips = require("csstips");
+const csstips_1 = require("csstips");
+const container = typestyle_1.style({ borderStyle: 'solid',
+    padding: '.8rem'
+}, csstips_1.vertical);
+exports.container = container;
+const name = typestyle_1.style({ color: '#222'
+});
+exports.name = name;
+const input = typestyle_1.style({ color: '#444'
+});
+exports.input = input;
+//# sourceMappingURL=styles.js.map
+});
+___scope___.file("docSrc/src/components/input-string/types.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=types.js.map
+});
+___scope___.file("docSrc/src/components/input-number/index.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// index
+const intent_1 = require("./intent");
+const view_1 = require("./view");
+const types_1 = require("./types");
+exports.State = types_1.State;
+const inputNumber = ({ DOM, onion }) => ({ DOM: view_1.view(onion.state$),
+    onion: intent_1.intent(DOM)
+});
+exports.inputNumber = inputNumber;
+//# sourceMappingURL=index.js.map
+});
+___scope___.file("docSrc/src/components/input-number/intent.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// intent
+const xstream_1 = require("xstream");
 const rambda_1 = require("rambda");
-exports.defaultState = 0;
-exports.Number = (wrapFn) => (_constrains) => (def, argName) => wrapFn(({ DOM, onion }) => {
-    return ({ DOM: view(argName)(onion.state$),
-        onion: actions(def)(DOM)
-    });
-}, argName);
-const actions = (_defaultValue) => (DOM) => {
-    const init$ = xstream_1.default.of((prev) => prev ? prev
-        : _defaultValue ? _defaultValue
-            : exports.defaultState);
-    const update$ = DOM
+const defaultState = { name: '',
+    value: 1,
+    _default: 1,
+    step: 1,
+    min: -99999,
+    max: 99999
+};
+const maxRange = (max) => (value) => value > max ? max : value;
+const minRange = (min) => (value) => value < min ? min : value;
+const keepInRange = (min, max) => rambda_1.compose(maxRange(max), minRange(min), logY);
+const logY = (val) => { console.log(val); return val; };
+const keepValidNumber = (min, max, _default) => rambda_1.ifElse(isNaN, () => _default, keepInRange(min, max));
+const intent = (DOM) => {
+    const init$ = xstream_1.default
+        .of((prev) => (Object.assign({}, defaultState, prev)));
+    const input$ = DOM
         .select('input')
         .events('input')
         .map(rambda_1.path('target.value'))
-        .map((nextValue) => (prevValue) => nextValue);
-    return xstream_1.default.merge(init$, update$);
+        .map(Number)
+        .debug('in')
+        .map((newValue) => (prevState) => (Object.assign({}, prevState, { value: keepValidNumber(prevState.min, prevState.max, prevState._default)(newValue) })))
+        .debug('out');
+    return xstream_1.default.merge(init$, input$);
 };
-const wrapperStyle = typestyle_1.style({ fontSize: '1em',
-    padding: '.4em'
-}, csstips.vertical);
-const nameStyle = typestyle_1.style();
-const inputStyle = typestyle_1.style();
-const styles = { wrapper: wrapperStyle,
-    name: nameStyle,
-    input: inputStyle
-};
-const view = (argName) => (state$) => state$
-    .map((value) => dom_1.div(`.${styles.wrapper}`, [dom_1.div(`.${styles.name}`, argName),
-    dom_1.input(`.${styles.input}`, { attrs: { type: 'number'
-        },
-        props: { value: value
-        }
-    }),
-    dom_1.div(value)
-]));
-//# sourceMappingURL=number.js.map
+exports.intent = intent;
+//# sourceMappingURL=intent.js.map
 });
-___scope___.file("docSrc/src/components/args/union.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("docSrc/src/components/input-number/view.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const xstream_1 = require("xstream");
 const dom_1 = require("@cycle/dom");
-const typestyle_1 = require("typestyle");
-const csstips = require("csstips");
-const rambda_1 = require("rambda");
-exports.defaultState = null;
-const isType = (val) => val !== undefined
-    && val.name !== undefined
-    && val.name === 'None'
-    || val.name === 'Boolean'
-    || val.name === 'String'
-    || val.name === 'Number'
-    || val.name === 'Union'
-    || val.name === 'Array'
-    || val.name === 'Tuple';
-const miniComponent = (str) => ({ DOM, onion }) => ({ DOM: dom_1.div(str),
-    onion: xstream_1.default.of(str)
-});
-exports.Union = (wrapFn) => (_options) => (def, argName) => wrapFn(({ DOM, onion }) => {
-    const literals = rambda_1.reject(isType, _options);
-    // compose
-    // ( (component:any) => component({DOM, onion})
-    // , map(miniComponent)
-    // )(_options)
-    return ({ DOM: view(argName, literals)(onion.state$),
-        onion: actions(def)(DOM)
-    });
-}, argName);
-const actions = (_defaultValue) => (DOM) => {
-    const init$ = xstream_1.default.of((prev) => prev ? prev
-        : _defaultValue ? _defaultValue
-            : exports.defaultState);
-    const literal$ = DOM
-        .select('.literal')
-        .events('click')
-        .map(rambda_1.path('target.innerText'))
-        .map((next) => (prev) => (next));
-    return xstream_1.default.merge(init$, literal$);
-};
-const wrapperStyle = typestyle_1.style({ fontSize: '1em',
-    padding: '.4em'
-}, csstips.vertical);
-const nameStyle = typestyle_1.style();
-const inputStyle = typestyle_1.style(csstips.horizontal);
-const valueStyle = typestyle_1.style();
-const styles = { wrapper: wrapperStyle,
-    name: nameStyle,
-    input: inputStyle,
-    value: valueStyle
-};
-const divify = (val) => dom_1.div(`.literal`, val);
-const view = (argName, literals) => (state$) => state$
-    .map((value) => dom_1.div(`.${styles.wrapper}`, [dom_1.div(`.${styles.name}`, argName),
-    dom_1.div(`.${styles.input}`, [dom_1.div(rambda_1.map(divify, literals)),
-        dom_1.div(`.${styles.value}`, value === null ? 'None' : value)
+const styles = require("./styles");
+const dom = ({ name, value, step }) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.name}`, name),
+    dom_1.div(`.${styles.wrapper}`, [dom_1.input(`.${styles.input}`, { props: { value: value,
+                type: 'number',
+                step: step
+            }
+        }),
+        dom_1.div(`.${styles.value}`, value)
     ])
-]));
-//# sourceMappingURL=union.js.map
+]);
+const view = (state$) => state$
+    .map(dom);
+exports.view = view;
+//# sourceMappingURL=view.js.map
 });
-___scope___.file("docSrc/src/components/args/array.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("docSrc/src/components/input-number/styles.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const xstream_1 = require("xstream");
-const dom_1 = require("@cycle/dom");
+// styles
 const typestyle_1 = require("typestyle");
-const csstips = require("csstips");
+const csstips_1 = require("csstips");
+const container = typestyle_1.style({ borderStyle: 'solid',
+    padding: '.8rem'
+}, csstips_1.vertical);
+exports.container = container;
+const name = typestyle_1.style({ color: '#222'
+});
+exports.name = name;
+const wrapper = typestyle_1.style({ justifyContent: 'space-between' }, csstips_1.horizontal);
+exports.wrapper = wrapper;
+const input = typestyle_1.style({ color: '#444'
+});
+exports.input = input;
+const value = typestyle_1.style({ color: '#222'
+});
+exports.value = value;
+//# sourceMappingURL=styles.js.map
+});
+___scope___.file("docSrc/src/components/input-number/types.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=types.js.map
+});
+___scope___.file("docSrc/src/components/input-array/index.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// index
+const intent_1 = require("./intent");
+const view_1 = require("./view");
+const types_1 = require("./types");
+exports.State = types_1.State;
+const inputArray = ({ DOM, onion }) => ({ DOM: view_1.view(onion.state$),
+    onion: intent_1.intent(DOM)
+});
+exports.inputArray = inputArray;
+//# sourceMappingURL=index.js.map
+});
+___scope___.file("docSrc/src/components/input-array/intent.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// intent
+const xstream_1 = require("xstream");
 const rambda_1 = require("rambda");
-exports.defaultState = [];
-exports.Array = (wrapFn) => (_options) => (def, argName) => wrapFn(({ DOM, onion }) => {
-    return ({ DOM: view(argName)(onion.state$),
-        onion: actions(def)(DOM)
-    });
-}, argName);
-const removeWhiteSpace = rambda_1.compose(rambda_1.join(''), rambda_1.reject((val) => val === ' '), rambda_1.split(''));
-const actions = (_defaultValue) => (DOM) => {
-    const init$ = xstream_1.default.of((prev) => prev ? prev
-        : _defaultValue ? _defaultValue
-            : exports.defaultState);
-    const update$ = DOM
+const defaultState = { name: '',
+    value: [],
+    _default: []
+};
+const filterOut = rambda_1.compose(rambda_1.reject, rambda_1.equals);
+const intent = (DOM) => {
+    const init$ = xstream_1.default
+        .of((prev) => (Object.assign({}, defaultState, prev)));
+    const input$ = DOM
         .select('textarea')
         .events('input')
         .map(rambda_1.path('target.value'))
-        .map(removeWhiteSpace)
-        .map(rambda_1.split(','))
-        .map(rambda_1.reject((val) => val === ''))
-        .map((next) => (prev) => next);
-    return xstream_1.default.merge(init$, update$);
+        .map(rambda_1.replace(/#/g, ' #'))
+        .map(rambda_1.split(' '))
+        .map(filterOut(''))
+        .map(filterOut('#'))
+        .map((newValue) => (prevState) => (Object.assign({}, prevState, { value: newValue })));
+    return xstream_1.default.merge(init$, input$);
 };
-const wrapperStyle = typestyle_1.style({ fontSize: '1em',
-    padding: '.4em'
-}, csstips.vertical);
-const nameStyle = typestyle_1.style();
-const inputStyle = typestyle_1.style();
-const styles = { wrapper: wrapperStyle,
-    name: nameStyle,
-    input: inputStyle
-};
-const view = (argName) => (state$) => state$
-    .map(rambda_1.join(', '))
-    .map((value) => dom_1.div(`.${styles.wrapper}`, [dom_1.div(`.${styles.name}`, argName),
-    dom_1.textarea(`.${styles.input}`, { props: { value: value }
-    })
-]));
-//# sourceMappingURL=array.js.map
+exports.intent = intent;
+//# sourceMappingURL=intent.js.map
 });
-___scope___.file("docSrc/src/components/args/tuple.js", function(exports, require, module, __filename, __dirname){
+___scope___.file("docSrc/src/components/input-array/view.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const dom_1 = require("@cycle/dom");
+const styles = require("./styles");
+const rambda_1 = require("rambda");
+const dom = ({ name, value }) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.name}`, name),
+    dom_1.textarea(`.${styles.textarea}`, { props: { value: value } })
+]);
+const view = (state$) => state$
+    .map((state) => (Object.assign({}, state, { value: rambda_1.join(' ', state.value) })))
+    .map(dom);
+exports.view = view;
+//# sourceMappingURL=view.js.map
+});
+___scope___.file("docSrc/src/components/input-array/styles.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// styles
+const typestyle_1 = require("typestyle");
+const csstips_1 = require("csstips");
+const container = typestyle_1.style({ borderStyle: 'solid',
+    padding: '.8rem'
+}, csstips_1.vertical);
+exports.container = container;
+const name = typestyle_1.style({ color: '#222'
+});
+exports.name = name;
+const textarea = typestyle_1.style({ color: '#444'
+});
+exports.textarea = textarea;
+//# sourceMappingURL=styles.js.map
+});
+___scope___.file("docSrc/src/components/input-array/types.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=types.js.map
+});
+___scope___.file("docSrc/src/components/input-tuple/index.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// index
+const intent_1 = require("./intent");
+const view_1 = require("./view");
+const types_1 = require("./types");
+exports.State = types_1.State;
+const rambda_1 = require("rambda");
+const arg_1 = require("./../arg");
+const defaultLens = (_0, key, _1) => ({ get: (parentState) => (Object.assign({}, parentState[`_${key}`], { _default: parentState._default[key], value: rambda_1.pathOr(parentState._default[key], [`_${key}`, 'value'], parentState) })),
+    set: (parentState, childState) => (Object.assign({}, parentState, { [`_${key}`]: childState, value: rambda_1.update(key, childState.value, parentState.value) }))
+});
+const numberLens = (_, key, { _step, _min, _max }) => ({ get: (parentState) => (Object.assign({}, parentState[`_${key}`], { _default: def, name: argName, value: rambda_1.pathOr(def, [`_${argName}`, 'value'], parentState) }, maybeObject('step', _step), maybeObject('min', _min), maybeObject('max', _max))),
+    set: (parentState, childState) => (Object.assign({}, parentState, { [`_${argName}`]: childState, value: Object.assign({}, parentState.value, { [argName]: childState.value }) }))
+});
+const compList = (childComponents) => ({ DOM, onion }) => {
+    const childComponentsSinks = rambda_1.map((component) => component({ DOM, onion }), childComponents);
+    const childComponentsDOM = rambda_1.map(rambda_1.path('DOM'), childComponentsSinks);
+    const childComponentsOnion = rambda_1.map(rambda_1.path('onion'), childComponentsSinks);
+    return ({ DOM: childComponentsDOM,
+        onion: childComponentsOnion
+    });
+};
+const inputTuple = (_subTypes) => ({ DOM, onion }) => {
+    const childComponents = rambda_1.compose(rambda_1.map(([index, makeComponent]) => makeComponent(null, index)), rambda_1.zip([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]), rambda_1.map(arg_1.Arg({ _default: defaultLens,
+        none: defaultLens,
+        boolean: defaultLens,
+        string: defaultLens,
+        number: defaultLens,
+        array: defaultLens,
+        tuple: defaultLens,
+        union: defaultLens
+    })))(_subTypes);
+    const childComponentsSinks = compList(childComponents)({ DOM, onion });
+    console.log(_subTypes);
+    console.log(childComponents);
+    console.log(childComponentsSinks);
+    return ({ DOM: view_1.view(onion.state$, childComponentsSinks.DOM),
+        onion: intent_1.intent(DOM, childComponentsSinks.onion)
+    });
+};
+exports.inputTuple = inputTuple;
+//# sourceMappingURL=index.js.map
+});
+___scope___.file("docSrc/src/components/input-tuple/intent.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// intent
+const xstream_1 = require("xstream");
+const defaultState = { name: '',
+    value: [],
+    _default: []
+};
+const intent = (DOM, childComponents) => {
+    const init$ = xstream_1.default
+        .of((prev) => (Object.assign({}, defaultState, prev)));
+    return xstream_1.default.merge(init$, ...childComponents);
+};
+exports.intent = intent;
+//# sourceMappingURL=intent.js.map
+});
+___scope___.file("docSrc/src/components/input-tuple/view.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// view
 const xstream_1 = require("xstream");
 const dom_1 = require("@cycle/dom");
-const isolate_1 = require("@cycle/isolate");
+const styles = require("./styles");
+const dom = ([{ name }, childComponents]) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.name}`, name),
+    dom_1.div(`.${styles.args}`, childComponents)
+]);
+const headTailPair = ([head, ...tail]) => [head, tail];
+const view = (state$, childComponents) => xstream_1.default.combine(state$, ...childComponents)
+    .map(headTailPair)
+    .map(dom);
+exports.view = view;
+//# sourceMappingURL=view.js.map
+});
+___scope___.file("docSrc/src/components/input-tuple/styles.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// styles
 const typestyle_1 = require("typestyle");
-const csstips = require("csstips");
+const csstips_1 = require("csstips");
+const container = typestyle_1.style({ borderStyle: 'solid',
+    padding: '.8rem'
+}, csstips_1.vertical);
+exports.container = container;
+const name = typestyle_1.style({ color: '#222'
+});
+exports.name = name;
+const args = typestyle_1.style({ color: '#444'
+});
+exports.args = args;
+//# sourceMappingURL=styles.js.map
+});
+___scope___.file("docSrc/src/components/input-tuple/types.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=types.js.map
+});
+___scope___.file("docSrc/src/components/input-union/index.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// index
+const isolate_1 = require("@cycle/isolate");
+const intent_1 = require("./intent");
+const view_1 = require("./view");
+const types_1 = require("./types");
+exports.State = types_1.State;
+const arg_1 = require("./../arg");
+const input_constant_1 = require("./../input-constant");
 const rambda_1 = require("rambda");
-const index_1 = require("./index");
-exports.defaultState = [];
-const subLens = (index) => ({ get: state => state[index],
-    set: (state, childState) => rambda_1.update(index, childState, state)
+const defaultLens = (def, index) => ({ get: (parentState) => parentState[`_${index}`],
+    set: (parentState, childState) => (Object.assign({}, parentState, { [`_${index}`]: childState }))
 });
-const subIsolate = (lens) => (component, name) => isolate_1.default(component, { onion: lens,
-    '*': name + ' sub'
+const constantComponentLens = (value, index) => ({ get: (parentState) => (Object.assign({}, parentState[index], { value: value, _default: value })),
+    set: (parentState, childState) => (Object.assign({}, parentState, { [index]: childState }))
 });
-const logIt = (val) => { console.log(val); return val; };
-exports.Tuple = (wrapFn) => (_subTypes) => (def, argName) => wrapFn(({ DOM, onion }) => {
-    const subArgs = rambda_1.compose(rambda_1.map((component) => component({ DOM, onion })), rambda_1.map(([index, wrappedComponent]) => wrappedComponent(def[index], index + '')), rambda_1.map(([index, _type]) => [index,
-        index_1.Arg(subIsolate(subLens(index)))(_type)
-    ]), rambda_1.zip([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]))(_subTypes);
-    return ({ DOM: view(argName)(onion.state$, rambda_1.map(rambda_1.path('DOM'), subArgs)
-        // , pluck('DOM', subArgs)
-        ),
-        onion: actions(def)(DOM, rambda_1.map(rambda_1.path('onion'), subArgs)
-        // , pluck('onion', subArgs)
-        )
+const constantIsolate = (value) => (_, index) => isolate_1.default(input_constant_1.inputConstant, { onion: constantComponentLens(value, index),
+    '*': index
+});
+const compList = (childComponents) => ({ DOM, onion }) => {
+    const childComponentsSinks = rambda_1.map((component) => component({ DOM, onion }), childComponents);
+    const childComponentsDOM = rambda_1.map(rambda_1.path('DOM'), childComponentsSinks);
+    const childComponentsOnion = rambda_1.map(rambda_1.path('onion'), childComponentsSinks);
+    return ({ DOM: childComponentsDOM,
+        onion: childComponentsOnion
     });
-}, argName);
-const actions = (_defaultValue) => (DOM, subArgs) => {
-    const init$ = xstream_1.default.of((prev) => prev ? prev
-        : _defaultValue ? _defaultValue
-            : exports.defaultState);
-    return xstream_1.default.merge(init$, ...subArgs);
 };
-const wrapperStyle = typestyle_1.style({ fontSize: '1em',
-    padding: '.4em'
-}, csstips.vertical);
-const nameStyle = typestyle_1.style();
-const inputStyle = typestyle_1.style();
-const styles = { wrapper: wrapperStyle,
-    name: nameStyle,
-    input: inputStyle
+const isDynamic = (value) => typeof value === 'object'
+    && value._name !== undefined;
+const toArray = (arr) => [...arr];
+const inputUnion = (_options) => ({ DOM, onion }) => {
+    const constantChildComponents = rambda_1.compose(toArray, rambda_1.map(constantIsolate), rambda_1.reject(isDynamic))(_options);
+    const dynamicChildComponents = rambda_1.compose(toArray, rambda_1.map(arg_1.Arg({ _default: defaultLens,
+        none: defaultLens,
+        boolean: defaultLens,
+        string: defaultLens,
+        number: defaultLens,
+        array: defaultLens,
+        tuple: defaultLens,
+        union: defaultLens
+    })), rambda_1.filter(isDynamic))(_options);
+    const logY = (val) => { console.log(val); return val; };
+    const childComponents = rambda_1.compose(rambda_1.map(([index, makeComponent]) => makeComponent(null, index)), logY, rambda_1.zip([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]))([...constantChildComponents, ...dynamicChildComponents]);
+    const childComponentsSinks = compList(childComponents)({ DOM, onion });
+    console.log('childSinks');
+    console.log(_options);
+    console.log(childComponentsSinks);
+    return ({ DOM: view_1.view(onion.state$, childComponentsSinks.DOM),
+        onion: intent_1.intent(DOM, childComponentsSinks.onion)
+    });
 };
-const view = (argName) => (state$, subArgs) => xstream_1.default.combine(state$, ...subArgs)
-    .map(([empty, ...subDoms]) => dom_1.div(`.${styles.wrapper}`, [dom_1.div(`.${styles.name}`, argName),
-    dom_1.div(`.${styles.input}`, subDoms)
-]));
-//# sourceMappingURL=tuple.js.map
+exports.inputUnion = inputUnion;
+//# sourceMappingURL=index.js.map
+});
+___scope___.file("docSrc/src/components/input-union/intent.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// intent
+const xstream_1 = require("xstream");
+const rambda_1 = require("rambda");
+const defaultState = { name: '',
+    value: '',
+    active: 0,
+    pickListOpen: false
+};
+const intent = (DOM, components) => {
+    const init$ = xstream_1.default
+        .of((prev) => (Object.assign({}, defaultState, prev)));
+    const pick$ = DOM
+        .select('div[data-pick]')
+        .events('click')
+        .map(rambda_1.path('target.dataset.pick'))
+        .map((newActive) => (prevState) => (Object.assign({}, prevState, { active: newActive })));
+    const openPickList$ = DOM
+        .select('div[data-pick-open]')
+        .events('click')
+        .mapTo((prevState) => (Object.assign({}, prevState, { pickListOpen: true })));
+    const closePickList$ = pick$
+        .mapTo((prevState) => (Object.assign({}, prevState, { pickListOpen: false })));
+    return xstream_1.default.merge(init$, pick$, openPickList$, closePickList$, ...components);
+};
+exports.intent = intent;
+//# sourceMappingURL=intent.js.map
+});
+___scope___.file("docSrc/src/components/input-union/view.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// view
+const xstream_1 = require("xstream");
+const dom_1 = require("@cycle/dom");
+const styles = require("./styles");
+const pickList = (n, acc = []) => n < 0
+    ? acc
+    : pickList(n - 1, [dom_1.div({ dataset: { pick: `${n}` } }, `${n}`),
+        ...acc
+    ]);
+const dom = ([{ name, active, pickListOpen }, childComponents]) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.name}`, name),
+    dom_1.div(`.${styles.childWrapper}`, [dom_1.div({ class: { [styles.hidden]: pickListOpen
+            },
+            dataset: { pickOpen: true }
+        }, 'Open'),
+        dom_1.div({ class: { [styles.pickListWrapper]: true,
+                [styles.hidden]: !pickListOpen
+            }
+        }, pickList(childComponents.length - 1)),
+        dom_1.div({ class: { [styles.hidden]: pickListOpen
+            }
+        }, childComponents[active])
+    ])
+]);
+const headTailPair = ([head, ...tail]) => [head, tail];
+const view = (state$, childComponents) => xstream_1.default.combine(state$, ...childComponents)
+    .map(headTailPair)
+    .map(dom);
+exports.view = view;
+//# sourceMappingURL=view.js.map
+});
+___scope___.file("docSrc/src/components/input-union/styles.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// styles
+const typestyle_1 = require("typestyle");
+const csstips_1 = require("csstips");
+const container = typestyle_1.style({ borderStyle: 'solid',
+    padding: '.8rem'
+}, csstips_1.vertical);
+exports.container = container;
+const name = typestyle_1.style({ color: '#222'
+});
+exports.name = name;
+const childWrapper = typestyle_1.style({ color: '#444'
+});
+exports.childWrapper = childWrapper;
+const pickListWrapper = typestyle_1.style({});
+exports.pickListWrapper = pickListWrapper;
+const hidden = typestyle_1.style({ display: 'none'
+});
+exports.hidden = hidden;
+//# sourceMappingURL=styles.js.map
+});
+___scope___.file("docSrc/src/components/input-union/types.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=types.js.map
+});
+___scope___.file("docSrc/src/components/input-constant/index.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// index
+const intent_1 = require("./intent");
+const view_1 = require("./view");
+const types_1 = require("./types");
+exports.State = types_1.State;
+const inputConstant = ({ DOM, onion }) => ({ DOM: view_1.view(onion.state$),
+    onion: intent_1.intent(DOM)
+});
+exports.inputConstant = inputConstant;
+//# sourceMappingURL=index.js.map
+});
+___scope___.file("docSrc/src/components/input-constant/intent.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// intent
+const xstream_1 = require("xstream");
+const defaultState = { name: '',
+    value: null,
+    _default: null
+};
+const intent = (DOM) => {
+    const init$ = xstream_1.default
+        .of((prev) => (Object.assign({}, defaultState, prev)));
+    return init$;
+};
+exports.intent = intent;
+//# sourceMappingURL=intent.js.map
+});
+___scope___.file("docSrc/src/components/input-constant/view.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const dom_1 = require("@cycle/dom");
+const styles = require("./styles");
+const dom = ({ name, value, _default }) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.title}`, name),
+    dom_1.div(`.${styles.paragraph}`, value)
+]);
+const view = (state$) => state$
+    .map(dom);
+exports.view = view;
+//# sourceMappingURL=view.js.map
+});
+___scope___.file("docSrc/src/components/input-constant/styles.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// styles
+const typestyle_1 = require("typestyle");
+const csstips_1 = require("csstips");
+const container = typestyle_1.style({ borderStyle: 'solid',
+    padding: '.8rem'
+}, csstips_1.vertical);
+exports.container = container;
+const title = typestyle_1.style({ color: '#222'
+});
+exports.title = title;
+const paragraph = typestyle_1.style({ color: '#444'
+});
+exports.paragraph = paragraph;
+//# sourceMappingURL=styles.js.map
+});
+___scope___.file("docSrc/src/components/input-constant/types.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=types.js.map
+});
+___scope___.file("docSrc/src/components/method/index.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// index
+const intent_1 = require("./intent");
+const view_1 = require("./view");
+const types_1 = require("./types");
+exports.State = types_1.State;
+const rambda_1 = require("rambda");
+const compList = (childComponents) => ({ DOM, onion }) => {
+    const childComponentsSinks = rambda_1.map((component) => component({ DOM, onion }), rambda_1.values(childComponents));
+    const childComponentsDOM = rambda_1.map(rambda_1.path('DOM'), childComponentsSinks);
+    const childComponentsOnion = rambda_1.map(rambda_1.path('onion'), childComponentsSinks);
+    return ({ DOM: childComponentsDOM,
+        onion: childComponentsOnion
+    });
+};
+const method = (childComponents = {}) => ({ DOM, onion }) => {
+    const childComponentsSinks = compList(childComponents)({ DOM, onion });
+    // const childComponentsSinks =
+    //   map
+    //   ( (component:Component) => component({DOM, onion})
+    //   , values(childComponents)
+    //   )
+    // const childComponentsDOM =
+    //   map<any, any>(path('DOM'), childComponentsSinks)
+    // const childComponentsOnion =
+    //   map(path('onion'), childComponentsSinks)
+    //
+    return ({ DOM: view_1.view(onion.state$, childComponentsSinks.DOM),
+        onion: intent_1.intent(DOM, childComponentsSinks.onion)
+    });
+};
+exports.method = method;
+//# sourceMappingURL=index.js.map
+});
+___scope___.file("docSrc/src/components/method/intent.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// intent
+const xstream_1 = require("xstream");
+const defaultState = { title: 'Template Component',
+    paragraph: 'This is am example component.'
+};
+const intent = (DOM, childComponentOnion) => {
+    const init$ = xstream_1.default
+        .of((prev) => (Object.assign({}, defaultState, prev)));
+    return xstream_1.default.merge(init$, ...childComponentOnion);
+};
+exports.intent = intent;
+//# sourceMappingURL=intent.js.map
+});
+___scope___.file("docSrc/src/components/method/view.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// view
+const xstream_1 = require("xstream");
+const dom_1 = require("@cycle/dom");
+const styles = require("./styles");
+const dom = ([{ title, paragraph }, childComponents]) => dom_1.div(`.${styles.container}`, [dom_1.h2(`.${styles.title}`, title),
+    dom_1.p(`.${styles.paragraph}`, paragraph),
+    dom_1.div(childComponents)
+]);
+const headTailPair = ([head, ...tail]) => [head, tail];
+const view = (state$, childComponentsDOM) => xstream_1.default.combine(state$, ...childComponentsDOM)
+    .map(headTailPair)
+    .map(dom);
+exports.view = view;
+//# sourceMappingURL=view.js.map
+});
+___scope___.file("docSrc/src/components/method/styles.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// styles
+const typestyle_1 = require("typestyle");
+const csstips_1 = require("csstips");
+const container = typestyle_1.style({ borderStyle: 'solid',
+    padding: '.8rem'
+}, csstips_1.vertical);
+exports.container = container;
+const title = typestyle_1.style({ color: '#222'
+});
+exports.title = title;
+const paragraph = typestyle_1.style({ color: '#444'
+});
+exports.paragraph = paragraph;
+//# sourceMappingURL=styles.js.map
+});
+___scope___.file("docSrc/src/components/method/types.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=types.js.map
 });
 return ___scope___.entry = "docSrc/src/index.js";
 });
@@ -10385,128 +10867,6 @@ function concat() {
 exports.default = concat;
 //# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29uY2F0LmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vc3JjL2V4dHJhL2NvbmNhdC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOztBQUFBLGtDQUErRTtBQUUvRTtJQUtFLHdCQUFtQixPQUF5QjtRQUF6QixZQUFPLEdBQVAsT0FBTyxDQUFrQjtRQUpyQyxTQUFJLEdBQUcsUUFBUSxDQUFDO1FBQ2hCLFFBQUcsR0FBYyxJQUFXLENBQUM7UUFDNUIsTUFBQyxHQUFXLENBQUMsQ0FBQztJQUd0QixDQUFDO0lBRUQsK0JBQU0sR0FBTixVQUFPLEdBQWM7UUFDbkIsSUFBSSxDQUFDLEdBQUcsR0FBRyxHQUFHLENBQUM7UUFDZixJQUFJLENBQUMsT0FBTyxDQUFDLElBQUksQ0FBQyxDQUFDLENBQUMsQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLENBQUM7SUFDbEMsQ0FBQztJQUVELDhCQUFLLEdBQUw7UUFDRSxJQUFNLE9BQU8sR0FBRyxJQUFJLENBQUMsT0FBTyxDQUFDO1FBQzdCLElBQUksSUFBSSxDQUFDLENBQUMsR0FBRyxPQUFPLENBQUMsTUFBTSxFQUFFO1lBQzNCLE9BQU8sQ0FBQyxJQUFJLENBQUMsQ0FBQyxDQUFDLENBQUMsT0FBTyxDQUFDLElBQUksQ0FBQyxDQUFDO1NBQy9CO1FBQ0QsSUFBSSxDQUFDLENBQUMsR0FBRyxDQUFDLENBQUM7UUFDWCxJQUFJLENBQUMsR0FBRyxHQUFHLElBQVcsQ0FBQztJQUN6QixDQUFDO0lBRUQsMkJBQUUsR0FBRixVQUFHLENBQUk7UUFDTCxJQUFNLENBQUMsR0FBRyxJQUFJLENBQUMsR0FBRyxDQUFDO1FBQ25CLElBQUksQ0FBQyxDQUFDO1lBQUUsT0FBTztRQUNmLENBQUMsQ0FBQyxFQUFFLENBQUMsQ0FBQyxDQUFDLENBQUM7SUFDVixDQUFDO0lBRUQsMkJBQUUsR0FBRixVQUFHLEdBQVE7UUFDVCxJQUFNLENBQUMsR0FBRyxJQUFJLENBQUMsR0FBRyxDQUFDO1FBQ25CLElBQUksQ0FBQyxDQUFDO1lBQUUsT0FBTztRQUNmLENBQUMsQ0FBQyxFQUFFLENBQUMsR0FBRyxDQUFDLENBQUM7SUFDWixDQUFDO0lBRUQsMkJBQUUsR0FBRjtRQUNFLElBQU0sQ0FBQyxHQUFHLElBQUksQ0FBQyxHQUFHLENBQUM7UUFDbkIsSUFBSSxDQUFDLENBQUM7WUFBRSxPQUFPO1FBQ2YsSUFBTSxPQUFPLEdBQUcsSUFBSSxDQUFDLE9BQU8sQ0FBQztRQUM3QixPQUFPLENBQUMsSUFBSSxDQUFDLENBQUMsQ0FBQyxDQUFDLE9BQU8sQ0FBQyxJQUFJLENBQUMsQ0FBQztRQUM5QixJQUFJLEVBQUUsSUFBSSxDQUFDLENBQUMsR0FBRyxPQUFPLENBQUMsTUFBTSxFQUFFO1lBQzdCLE9BQU8sQ0FBQyxJQUFJLENBQUMsQ0FBQyxDQUFDLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDO1NBQzVCO2FBQU07WUFDTCxDQUFDLENBQUMsRUFBRSxFQUFFLENBQUM7U0FDUjtJQUNILENBQUM7SUFDSCxxQkFBQztBQUFELENBQUMsQUE3Q0QsSUE2Q0M7QUFFRDs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztHQXFDRztBQUNIO0lBQWtDLGlCQUE0QjtTQUE1QixVQUE0QixFQUE1QixxQkFBNEIsRUFBNUIsSUFBNEI7UUFBNUIsNEJBQTRCOztJQUM1RCxPQUFPLElBQUksY0FBTSxDQUFJLElBQUksY0FBYyxDQUFDLE9BQU8sQ0FBQyxDQUFDLENBQUM7QUFDcEQsQ0FBQztBQUZELHlCQUVDIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHtTdHJlYW0sIEludGVybmFsUHJvZHVjZXIsIEludGVybmFsTGlzdGVuZXIsIE91dFNlbmRlcn0gZnJvbSAnLi4vaW5kZXgnO1xuXG5jbGFzcyBDb25jYXRQcm9kdWNlcjxUPiBpbXBsZW1lbnRzIEludGVybmFsUHJvZHVjZXI8VD4sIEludGVybmFsTGlzdGVuZXI8VD4sIE91dFNlbmRlcjxUPiB7XG4gIHB1YmxpYyB0eXBlID0gJ2NvbmNhdCc7XG4gIHB1YmxpYyBvdXQ6IFN0cmVhbTxUPiA9IG51bGwgYXMgYW55O1xuICBwcml2YXRlIGk6IG51bWJlciA9IDA7XG5cbiAgY29uc3RydWN0b3IocHVibGljIHN0cmVhbXM6IEFycmF5PFN0cmVhbTxUPj4pIHtcbiAgfVxuXG4gIF9zdGFydChvdXQ6IFN0cmVhbTxUPik6IHZvaWQge1xuICAgIHRoaXMub3V0ID0gb3V0O1xuICAgIHRoaXMuc3RyZWFtc1t0aGlzLmldLl9hZGQodGhpcyk7XG4gIH1cblxuICBfc3RvcCgpOiB2b2lkIHtcbiAgICBjb25zdCBzdHJlYW1zID0gdGhpcy5zdHJlYW1zO1xuICAgIGlmICh0aGlzLmkgPCBzdHJlYW1zLmxlbmd0aCkge1xuICAgICAgc3RyZWFtc1t0aGlzLmldLl9yZW1vdmUodGhpcyk7XG4gICAgfVxuICAgIHRoaXMuaSA9IDA7XG4gICAgdGhpcy5vdXQgPSBudWxsIGFzIGFueTtcbiAgfVxuXG4gIF9uKHQ6IFQpIHtcbiAgICBjb25zdCB1ID0gdGhpcy5vdXQ7XG4gICAgaWYgKCF1KSByZXR1cm47XG4gICAgdS5fbih0KTtcbiAgfVxuXG4gIF9lKGVycjogYW55KSB7XG4gICAgY29uc3QgdSA9IHRoaXMub3V0O1xuICAgIGlmICghdSkgcmV0dXJuO1xuICAgIHUuX2UoZXJyKTtcbiAgfVxuXG4gIF9jKCkge1xuICAgIGNvbnN0IHUgPSB0aGlzLm91dDtcbiAgICBpZiAoIXUpIHJldHVybjtcbiAgICBjb25zdCBzdHJlYW1zID0gdGhpcy5zdHJlYW1zO1xuICAgIHN0cmVhbXNbdGhpcy5pXS5fcmVtb3ZlKHRoaXMpO1xuICAgIGlmICgrK3RoaXMuaSA8IHN0cmVhbXMubGVuZ3RoKSB7XG4gICAgICBzdHJlYW1zW3RoaXMuaV0uX2FkZCh0aGlzKTtcbiAgICB9IGVsc2Uge1xuICAgICAgdS5fYygpO1xuICAgIH1cbiAgfVxufVxuXG4vKipcbiAqIFB1dHMgb25lIHN0cmVhbSBhZnRlciB0aGUgb3RoZXIuICpjb25jYXQqIGlzIGEgZmFjdG9yeSB0aGF0IHRha2VzIG11bHRpcGxlXG4gKiBzdHJlYW1zIGFzIGFyZ3VtZW50cywgYW5kIHN0YXJ0cyB0aGUgYG4rMWAtdGggc3RyZWFtIG9ubHkgd2hlbiB0aGUgYG5gLXRoXG4gKiBzdHJlYW0gaGFzIGNvbXBsZXRlZC4gSXQgY29uY2F0ZW5hdGVzIHRob3NlIHN0cmVhbXMgdG9nZXRoZXIuXG4gKlxuICogTWFyYmxlIGRpYWdyYW06XG4gKlxuICogYGBgdGV4dFxuICogLS0xLS0yLS0tMy0tLTQtfFxuICogLi4uLi4uLi4uLi4uLi4uLS1hLWItYy0tZC18XG4gKiAgICAgICAgICAgY29uY2F0XG4gKiAtLTEtLTItLS0zLS0tNC0tLWEtYi1jLS1kLXxcbiAqIGBgYFxuICpcbiAqIEV4YW1wbGU6XG4gKlxuICogYGBganNcbiAqIGltcG9ydCBjb25jYXQgZnJvbSAneHN0cmVhbS9leHRyYS9jb25jYXQnXG4gKlxuICogY29uc3Qgc3RyZWFtQSA9IHhzLm9mKCdhJywgJ2InLCAnYycpXG4gKiBjb25zdCBzdHJlYW1CID0geHMub2YoMTAsIDIwLCAzMClcbiAqIGNvbnN0IHN0cmVhbUMgPSB4cy5vZignWCcsICdZJywgJ1onKVxuICpcbiAqIGNvbnN0IG91dHB1dFN0cmVhbSA9IGNvbmNhdChzdHJlYW1BLCBzdHJlYW1CLCBzdHJlYW1DKVxuICpcbiAqIG91dHB1dFN0cmVhbS5hZGRMaXN0ZW5lcih7XG4gKiAgIG5leHQ6ICh4KSA9PiBjb25zb2xlLmxvZyh4KSxcbiAqICAgZXJyb3I6IChlcnIpID0+IGNvbnNvbGUuZXJyb3IoZXJyKSxcbiAqICAgY29tcGxldGU6ICgpID0+IGNvbnNvbGUubG9nKCdjb25jYXQgY29tcGxldGVkJyksXG4gKiB9KVxuICogYGBgXG4gKlxuICogQGZhY3RvcnkgdHJ1ZVxuICogQHBhcmFtIHtTdHJlYW19IHN0cmVhbTEgQSBzdHJlYW0gdG8gY29uY2F0ZW5hdGUgdG9nZXRoZXIgd2l0aCBvdGhlciBzdHJlYW1zLlxuICogQHBhcmFtIHtTdHJlYW19IHN0cmVhbTIgQSBzdHJlYW0gdG8gY29uY2F0ZW5hdGUgdG9nZXRoZXIgd2l0aCBvdGhlciBzdHJlYW1zLiBUd29cbiAqIG9yIG1vcmUgc3RyZWFtcyBtYXkgYmUgZ2l2ZW4gYXMgYXJndW1lbnRzLlxuICogQHJldHVybiB7U3RyZWFtfVxuICovXG5leHBvcnQgZGVmYXVsdCBmdW5jdGlvbiBjb25jYXQ8VD4oLi4uc3RyZWFtczogQXJyYXk8U3RyZWFtPFQ+Pik6IFN0cmVhbTxUPiB7XG4gIHJldHVybiBuZXcgU3RyZWFtPFQ+KG5ldyBDb25jYXRQcm9kdWNlcihzdHJlYW1zKSk7XG59XG4iXX0=
 });
-___scope___.file("extra/dropRepeats.js", function(exports, require, module, __filename, __dirname){
-
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var index_1 = require("../index");
-var empty = {};
-var DropRepeatsOperator = /** @class */ (function () {
-    function DropRepeatsOperator(ins, fn) {
-        this.ins = ins;
-        this.type = 'dropRepeats';
-        this.out = null;
-        this.v = empty;
-        this.isEq = fn ? fn : function (x, y) { return x === y; };
-    }
-    DropRepeatsOperator.prototype._start = function (out) {
-        this.out = out;
-        this.ins._add(this);
-    };
-    DropRepeatsOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.out = null;
-        this.v = empty;
-    };
-    DropRepeatsOperator.prototype._n = function (t) {
-        var u = this.out;
-        if (!u)
-            return;
-        var v = this.v;
-        if (v !== empty && this.isEq(t, v))
-            return;
-        this.v = t;
-        u._n(t);
-    };
-    DropRepeatsOperator.prototype._e = function (err) {
-        var u = this.out;
-        if (!u)
-            return;
-        u._e(err);
-    };
-    DropRepeatsOperator.prototype._c = function () {
-        var u = this.out;
-        if (!u)
-            return;
-        u._c();
-    };
-    return DropRepeatsOperator;
-}());
-exports.DropRepeatsOperator = DropRepeatsOperator;
-/**
- * Drops consecutive duplicate values in a stream.
- *
- * Marble diagram:
- *
- * ```text
- * --1--2--1--1--1--2--3--4--3--3|
- *     dropRepeats
- * --1--2--1--------2--3--4--3---|
- * ```
- *
- * Example:
- *
- * ```js
- * import dropRepeats from 'xstream/extra/dropRepeats'
- *
- * const stream = xs.of(1, 2, 1, 1, 1, 2, 3, 4, 3, 3)
- *   .compose(dropRepeats())
- *
- * stream.addListener({
- *   next: i => console.log(i),
- *   error: err => console.error(err),
- *   complete: () => console.log('completed')
- * })
- * ```
- *
- * ```text
- * > 1
- * > 2
- * > 1
- * > 2
- * > 3
- * > 4
- * > 3
- * > completed
- * ```
- *
- * Example with a custom isEqual function:
- *
- * ```js
- * import dropRepeats from 'xstream/extra/dropRepeats'
- *
- * const stream = xs.of('a', 'b', 'a', 'A', 'B', 'b')
- *   .compose(dropRepeats((x, y) => x.toLowerCase() === y.toLowerCase()))
- *
- * stream.addListener({
- *   next: i => console.log(i),
- *   error: err => console.error(err),
- *   complete: () => console.log('completed')
- * })
- * ```
- *
- * ```text
- * > a
- * > b
- * > a
- * > B
- * > completed
- * ```
- *
- * @param {Function} isEqual An optional function of type
- * `(x: T, y: T) => boolean` that takes an event from the input stream and
- * checks if it is equal to previous event, by returning a boolean.
- * @return {Stream}
- */
-function dropRepeats(isEqual) {
-    if (isEqual === void 0) { isEqual = void 0; }
-    return function dropRepeatsOperator(ins) {
-        return new index_1.Stream(new DropRepeatsOperator(ins, isEqual));
-    };
-}
-exports.default = dropRepeats;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZHJvcFJlcGVhdHMuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvZXh0cmEvZHJvcFJlcGVhdHMudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBQSxrQ0FBMEM7QUFDMUMsSUFBTSxLQUFLLEdBQUcsRUFBRSxDQUFDO0FBRWpCO0lBTUUsNkJBQW1CLEdBQWMsRUFDckIsRUFBeUM7UUFEbEMsUUFBRyxHQUFILEdBQUcsQ0FBVztRQUwxQixTQUFJLEdBQUcsYUFBYSxDQUFDO1FBQ3JCLFFBQUcsR0FBYyxJQUFXLENBQUM7UUFFNUIsTUFBQyxHQUFZLEtBQUssQ0FBQztRQUl6QixJQUFJLENBQUMsSUFBSSxHQUFHLEVBQUUsQ0FBQyxDQUFDLENBQUMsRUFBRSxDQUFDLENBQUMsQ0FBQyxVQUFDLENBQUMsRUFBRSxDQUFDLElBQUssT0FBQSxDQUFDLEtBQUssQ0FBQyxFQUFQLENBQU8sQ0FBQztJQUMxQyxDQUFDO0lBRUQsb0NBQU0sR0FBTixVQUFPLEdBQWM7UUFDbkIsSUFBSSxDQUFDLEdBQUcsR0FBRyxHQUFHLENBQUM7UUFDZixJQUFJLENBQUMsR0FBRyxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsQ0FBQztJQUN0QixDQUFDO0lBRUQsbUNBQUssR0FBTDtRQUNFLElBQUksQ0FBQyxHQUFHLENBQUMsT0FBTyxDQUFDLElBQUksQ0FBQyxDQUFDO1FBQ3ZCLElBQUksQ0FBQyxHQUFHLEdBQUcsSUFBVyxDQUFDO1FBQ3ZCLElBQUksQ0FBQyxDQUFDLEdBQUcsS0FBWSxDQUFDO0lBQ3hCLENBQUM7SUFFRCxnQ0FBRSxHQUFGLFVBQUcsQ0FBSTtRQUNMLElBQU0sQ0FBQyxHQUFHLElBQUksQ0FBQyxHQUFHLENBQUM7UUFDbkIsSUFBSSxDQUFDLENBQUM7WUFBRSxPQUFPO1FBQ2YsSUFBTSxDQUFDLEdBQUcsSUFBSSxDQUFDLENBQUMsQ0FBQztRQUNqQixJQUFJLENBQUMsS0FBSyxLQUFLLElBQUksSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDLEVBQUUsQ0FBQyxDQUFDO1lBQUUsT0FBTztRQUMzQyxJQUFJLENBQUMsQ0FBQyxHQUFHLENBQUMsQ0FBQztRQUNYLENBQUMsQ0FBQyxFQUFFLENBQUMsQ0FBQyxDQUFDLENBQUM7SUFDVixDQUFDO0lBRUQsZ0NBQUUsR0FBRixVQUFHLEdBQVE7UUFDVCxJQUFNLENBQUMsR0FBRyxJQUFJLENBQUMsR0FBRyxDQUFDO1FBQ25CLElBQUksQ0FBQyxDQUFDO1lBQUUsT0FBTztRQUNmLENBQUMsQ0FBQyxFQUFFLENBQUMsR0FBRyxDQUFDLENBQUM7SUFDWixDQUFDO0lBRUQsZ0NBQUUsR0FBRjtRQUNFLElBQU0sQ0FBQyxHQUFHLElBQUksQ0FBQyxHQUFHLENBQUM7UUFDbkIsSUFBSSxDQUFDLENBQUM7WUFBRSxPQUFPO1FBQ2YsQ0FBQyxDQUFDLEVBQUUsRUFBRSxDQUFDO0lBQ1QsQ0FBQztJQUNILDBCQUFDO0FBQUQsQ0FBQyxBQTFDRCxJQTBDQztBQTFDWSxrREFBbUI7QUE0Q2hDOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0dBZ0VHO0FBQ0gscUJBQXVDLE9BQXVEO0lBQXZELHdCQUFBLEVBQUEsZUFBc0QsQ0FBQztJQUM1RixPQUFPLDZCQUE2QixHQUFjO1FBQ2hELE9BQU8sSUFBSSxjQUFNLENBQUksSUFBSSxtQkFBbUIsQ0FBSSxHQUFHLEVBQUUsT0FBTyxDQUFDLENBQUMsQ0FBQztJQUNqRSxDQUFDLENBQUM7QUFDSixDQUFDO0FBSkQsOEJBSUMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQge09wZXJhdG9yLCBTdHJlYW19IGZyb20gJy4uL2luZGV4JztcbmNvbnN0IGVtcHR5ID0ge307XG5cbmV4cG9ydCBjbGFzcyBEcm9wUmVwZWF0c09wZXJhdG9yPFQ+IGltcGxlbWVudHMgT3BlcmF0b3I8VCwgVD4ge1xuICBwdWJsaWMgdHlwZSA9ICdkcm9wUmVwZWF0cyc7XG4gIHB1YmxpYyBvdXQ6IFN0cmVhbTxUPiA9IG51bGwgYXMgYW55O1xuICBwdWJsaWMgaXNFcTogKHg6IFQsIHk6IFQpID0+IGJvb2xlYW47XG4gIHByaXZhdGUgdjogVCA9IDxhbnk+IGVtcHR5O1xuXG4gIGNvbnN0cnVjdG9yKHB1YmxpYyBpbnM6IFN0cmVhbTxUPixcbiAgICAgICAgICAgICAgZm46ICgoeDogVCwgeTogVCkgPT4gYm9vbGVhbikgfCB1bmRlZmluZWQpIHtcbiAgICB0aGlzLmlzRXEgPSBmbiA/IGZuIDogKHgsIHkpID0+IHggPT09IHk7XG4gIH1cblxuICBfc3RhcnQob3V0OiBTdHJlYW08VD4pOiB2b2lkIHtcbiAgICB0aGlzLm91dCA9IG91dDtcbiAgICB0aGlzLmlucy5fYWRkKHRoaXMpO1xuICB9XG5cbiAgX3N0b3AoKTogdm9pZCB7XG4gICAgdGhpcy5pbnMuX3JlbW92ZSh0aGlzKTtcbiAgICB0aGlzLm91dCA9IG51bGwgYXMgYW55O1xuICAgIHRoaXMudiA9IGVtcHR5IGFzIGFueTtcbiAgfVxuXG4gIF9uKHQ6IFQpIHtcbiAgICBjb25zdCB1ID0gdGhpcy5vdXQ7XG4gICAgaWYgKCF1KSByZXR1cm47XG4gICAgY29uc3QgdiA9IHRoaXMudjtcbiAgICBpZiAodiAhPT0gZW1wdHkgJiYgdGhpcy5pc0VxKHQsIHYpKSByZXR1cm47XG4gICAgdGhpcy52ID0gdDtcbiAgICB1Ll9uKHQpO1xuICB9XG5cbiAgX2UoZXJyOiBhbnkpIHtcbiAgICBjb25zdCB1ID0gdGhpcy5vdXQ7XG4gICAgaWYgKCF1KSByZXR1cm47XG4gICAgdS5fZShlcnIpO1xuICB9XG5cbiAgX2MoKSB7XG4gICAgY29uc3QgdSA9IHRoaXMub3V0O1xuICAgIGlmICghdSkgcmV0dXJuO1xuICAgIHUuX2MoKTtcbiAgfVxufVxuXG4vKipcbiAqIERyb3BzIGNvbnNlY3V0aXZlIGR1cGxpY2F0ZSB2YWx1ZXMgaW4gYSBzdHJlYW0uXG4gKlxuICogTWFyYmxlIGRpYWdyYW06XG4gKlxuICogYGBgdGV4dFxuICogLS0xLS0yLS0xLS0xLS0xLS0yLS0zLS00LS0zLS0zfFxuICogICAgIGRyb3BSZXBlYXRzXG4gKiAtLTEtLTItLTEtLS0tLS0tLTItLTMtLTQtLTMtLS18XG4gKiBgYGBcbiAqXG4gKiBFeGFtcGxlOlxuICpcbiAqIGBgYGpzXG4gKiBpbXBvcnQgZHJvcFJlcGVhdHMgZnJvbSAneHN0cmVhbS9leHRyYS9kcm9wUmVwZWF0cydcbiAqXG4gKiBjb25zdCBzdHJlYW0gPSB4cy5vZigxLCAyLCAxLCAxLCAxLCAyLCAzLCA0LCAzLCAzKVxuICogICAuY29tcG9zZShkcm9wUmVwZWF0cygpKVxuICpcbiAqIHN0cmVhbS5hZGRMaXN0ZW5lcih7XG4gKiAgIG5leHQ6IGkgPT4gY29uc29sZS5sb2coaSksXG4gKiAgIGVycm9yOiBlcnIgPT4gY29uc29sZS5lcnJvcihlcnIpLFxuICogICBjb21wbGV0ZTogKCkgPT4gY29uc29sZS5sb2coJ2NvbXBsZXRlZCcpXG4gKiB9KVxuICogYGBgXG4gKlxuICogYGBgdGV4dFxuICogPiAxXG4gKiA+IDJcbiAqID4gMVxuICogPiAyXG4gKiA+IDNcbiAqID4gNFxuICogPiAzXG4gKiA+IGNvbXBsZXRlZFxuICogYGBgXG4gKlxuICogRXhhbXBsZSB3aXRoIGEgY3VzdG9tIGlzRXF1YWwgZnVuY3Rpb246XG4gKlxuICogYGBganNcbiAqIGltcG9ydCBkcm9wUmVwZWF0cyBmcm9tICd4c3RyZWFtL2V4dHJhL2Ryb3BSZXBlYXRzJ1xuICpcbiAqIGNvbnN0IHN0cmVhbSA9IHhzLm9mKCdhJywgJ2InLCAnYScsICdBJywgJ0InLCAnYicpXG4gKiAgIC5jb21wb3NlKGRyb3BSZXBlYXRzKCh4LCB5KSA9PiB4LnRvTG93ZXJDYXNlKCkgPT09IHkudG9Mb3dlckNhc2UoKSkpXG4gKlxuICogc3RyZWFtLmFkZExpc3RlbmVyKHtcbiAqICAgbmV4dDogaSA9PiBjb25zb2xlLmxvZyhpKSxcbiAqICAgZXJyb3I6IGVyciA9PiBjb25zb2xlLmVycm9yKGVyciksXG4gKiAgIGNvbXBsZXRlOiAoKSA9PiBjb25zb2xlLmxvZygnY29tcGxldGVkJylcbiAqIH0pXG4gKiBgYGBcbiAqXG4gKiBgYGB0ZXh0XG4gKiA+IGFcbiAqID4gYlxuICogPiBhXG4gKiA+IEJcbiAqID4gY29tcGxldGVkXG4gKiBgYGBcbiAqXG4gKiBAcGFyYW0ge0Z1bmN0aW9ufSBpc0VxdWFsIEFuIG9wdGlvbmFsIGZ1bmN0aW9uIG9mIHR5cGVcbiAqIGAoeDogVCwgeTogVCkgPT4gYm9vbGVhbmAgdGhhdCB0YWtlcyBhbiBldmVudCBmcm9tIHRoZSBpbnB1dCBzdHJlYW0gYW5kXG4gKiBjaGVja3MgaWYgaXQgaXMgZXF1YWwgdG8gcHJldmlvdXMgZXZlbnQsIGJ5IHJldHVybmluZyBhIGJvb2xlYW4uXG4gKiBAcmV0dXJuIHtTdHJlYW19XG4gKi9cbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIGRyb3BSZXBlYXRzPFQ+KGlzRXF1YWw6ICgoeDogVCwgeTogVCkgPT4gYm9vbGVhbikgfCB1bmRlZmluZWQgPSB2b2lkIDApOiAoaW5zOiBTdHJlYW08VD4pID0+IFN0cmVhbTxUPiB7XG4gIHJldHVybiBmdW5jdGlvbiBkcm9wUmVwZWF0c09wZXJhdG9yKGluczogU3RyZWFtPFQ+KTogU3RyZWFtPFQ+IHtcbiAgICByZXR1cm4gbmV3IFN0cmVhbTxUPihuZXcgRHJvcFJlcGVhdHNPcGVyYXRvcjxUPihpbnMsIGlzRXF1YWwpKTtcbiAgfTtcbn1cbiJdfQ==
-});
 ___scope___.file("extra/sampleCombine.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
@@ -10684,6 +11044,128 @@ sampleCombine = function sampleCombine() {
 };
 exports.default = sampleCombine;
 //# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic2FtcGxlQ29tYmluZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9leHRyYS9zYW1wbGVDb21iaW5lLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7O0FBQUEsa0NBQTREO0FBa0Q1RCxJQUFNLEVBQUUsR0FBRyxFQUFFLENBQUM7QUFFZDtJQUNFLCtCQUFvQixDQUFTLEVBQVUsQ0FBNkI7UUFBaEQsTUFBQyxHQUFELENBQUMsQ0FBUTtRQUFVLE1BQUMsR0FBRCxDQUFDLENBQTRCO1FBQ2xFLENBQUMsQ0FBQyxHQUFHLENBQUMsQ0FBQyxDQUFDLEdBQUcsSUFBSSxDQUFDO0lBQ2xCLENBQUM7SUFFRCxrQ0FBRSxHQUFGLFVBQUcsQ0FBSTtRQUNMLElBQU0sQ0FBQyxHQUFHLElBQUksQ0FBQyxDQUFDLENBQUM7UUFDakIsSUFBSSxDQUFDLENBQUMsR0FBRyxLQUFLLEVBQUU7WUFBRSxPQUFPO1FBQ3pCLENBQUMsQ0FBQyxFQUFFLENBQUMsQ0FBQyxFQUFFLElBQUksQ0FBQyxDQUFDLENBQUMsQ0FBQztJQUNsQixDQUFDO0lBRUQsa0NBQUUsR0FBRixVQUFHLEdBQVE7UUFDVCxJQUFJLENBQUMsQ0FBQyxDQUFDLEVBQUUsQ0FBQyxHQUFHLENBQUMsQ0FBQztJQUNqQixDQUFDO0lBRUQsa0NBQUUsR0FBRjtRQUNFLElBQUksQ0FBQyxDQUFDLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDLEVBQUUsSUFBSSxDQUFDLENBQUM7SUFDNUIsQ0FBQztJQUNILDRCQUFDO0FBQUQsQ0FBQyxBQWxCRCxJQWtCQztBQWxCWSxzREFBcUI7QUFvQmxDO0lBU0UsK0JBQVksR0FBYyxFQUFFLE9BQTJCO1FBUmhELFNBQUksR0FBRyxlQUFlLENBQUM7UUFTNUIsSUFBSSxDQUFDLEdBQUcsR0FBRyxHQUFHLENBQUM7UUFDZixJQUFJLENBQUMsTUFBTSxHQUFHLE9BQU8sQ0FBQztRQUN0QixJQUFJLENBQUMsR0FBRyxHQUFHLEVBQXdCLENBQUM7UUFDcEMsSUFBSSxDQUFDLEdBQUcsR0FBRyxFQUFFLENBQUM7UUFDZCxJQUFJLENBQUMsRUFBRSxHQUFHLENBQUMsQ0FBQztRQUNaLElBQUksQ0FBQyxJQUFJLEdBQUcsRUFBRSxDQUFDO0lBQ2pCLENBQUM7SUFFRCxzQ0FBTSxHQUFOLFVBQU8sR0FBdUI7UUFDNUIsSUFBSSxDQUFDLEdBQUcsR0FBRyxHQUFHLENBQUM7UUFDZixJQUFNLENBQUMsR0FBRyxJQUFJLENBQUMsTUFBTSxDQUFDO1FBQ3RCLElBQU0sQ0FBQyxHQUFHLElBQUksQ0FBQyxFQUFFLEdBQUcsQ0FBQyxDQUFDLE1BQU0sQ0FBQztRQUM3QixJQUFNLElBQUksR0FBRyxJQUFJLENBQUMsSUFBSSxHQUFHLElBQUksS0FBSyxDQUFDLENBQUMsQ0FBQyxDQUFDO1FBQ3RDLEtBQUssSUFBSSxDQUFDLEdBQUcsQ0FBQyxFQUFFLENBQUMsR0FBRyxDQUFDLEVBQUUsQ0FBQyxFQUFFLEVBQUU7WUFDMUIsSUFBSSxDQUFDLENBQUMsQ0FBQyxHQUFHLEVBQUUsQ0FBQztZQUNiLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxJQUFJLENBQUMsSUFBSSxxQkFBcUIsQ0FBTSxDQUFDLEVBQUUsSUFBSSxDQUFDLENBQUMsQ0FBQztTQUNwRDtRQUNELElBQUksQ0FBQyxHQUFHLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDO0lBQ3RCLENBQUM7SUFFRCxxQ0FBSyxHQUFMO1FBQ0UsSUFBTSxDQUFDLEdBQUcsSUFBSSxDQUFDLE1BQU0sQ0FBQztRQUN0QixJQUFNLENBQUMsR0FBRyxDQUFDLENBQUMsTUFBTSxDQUFDO1FBQ25CLElBQU0sR0FBRyxHQUFHLElBQUksQ0FBQyxHQUFHLENBQUM7UUFDckIsSUFBSSxDQUFDLEdBQUcsQ0FBQyxPQUFPLENBQUMsSUFBSSxDQUFDLENBQUM7UUFDdkIsS0FBSyxJQUFJLENBQUMsR0FBRyxDQUFDLEVBQUUsQ0FBQyxHQUFHLENBQUMsRUFBRSxDQUFDLEVBQUUsRUFBRTtZQUMxQixDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsT0FBTyxDQUFDLEdBQUcsQ0FBQyxDQUFDLENBQUMsQ0FBQyxDQUFDO1NBQ3RCO1FBQ0QsSUFBSSxDQUFDLEdBQUcsR0FBRyxFQUF3QixDQUFDO1FBQ3BDLElBQUksQ0FBQyxJQUFJLEdBQUcsRUFBRSxDQUFDO1FBQ2YsSUFBSSxDQUFDLEdBQUcsR0FBRyxFQUFFLENBQUM7SUFDaEIsQ0FBQztJQUVELGtDQUFFLEdBQUYsVUFBRyxDQUFJO1FBQ0wsSUFBTSxHQUFHLEdBQUcsSUFBSSxDQUFDLEdBQUcsQ0FBQztRQUNyQixJQUFJLEdBQUcsS0FBSyxFQUFFO1lBQUUsT0FBTztRQUN2QixJQUFJLElBQUksQ0FBQyxFQUFFLEdBQUcsQ0FBQztZQUFFLE9BQU87UUFDeEIsR0FBRyxDQUFDLEVBQUUsRUFBRSxDQUFDLFNBQUssSUFBSSxDQUFDLElBQUksRUFBRSxDQUFDO0lBQzVCLENBQUM7SUFFRCxrQ0FBRSxHQUFGLFVBQUcsR0FBUTtRQUNULElBQU0sR0FBRyxHQUFHLElBQUksQ0FBQyxHQUFHLENBQUM7UUFDckIsSUFBSSxHQUFHLEtBQUssRUFBRTtZQUFFLE9BQU87UUFDdkIsR0FBRyxDQUFDLEVBQUUsQ0FBQyxHQUFHLENBQUMsQ0FBQztJQUNkLENBQUM7SUFFRCxrQ0FBRSxHQUFGO1FBQ0UsSUFBTSxHQUFHLEdBQUcsSUFBSSxDQUFDLEdBQUcsQ0FBQztRQUNyQixJQUFJLEdBQUcsS0FBSyxFQUFFO1lBQUUsT0FBTztRQUN2QixHQUFHLENBQUMsRUFBRSxFQUFFLENBQUM7SUFDWCxDQUFDO0lBRUQsa0NBQUUsR0FBRixVQUFHLENBQU0sRUFBRSxDQUFTO1FBQ2xCLElBQU0sQ0FBQyxHQUFHLElBQUksQ0FBQyxJQUFJLENBQUMsQ0FBQyxDQUFDLENBQUM7UUFDdkIsSUFBSSxJQUFJLENBQUMsRUFBRSxHQUFHLENBQUMsSUFBSSxDQUFDLEtBQUssRUFBRSxFQUFFO1lBQzNCLElBQUksQ0FBQyxFQUFFLEVBQUUsQ0FBQztTQUNYO1FBQ0QsSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDLENBQUMsR0FBRyxDQUFDLENBQUM7SUFDbkIsQ0FBQztJQUVELG9DQUFJLEdBQUosVUFBSyxDQUFTLEVBQUUsQ0FBNkI7UUFDM0MsSUFBSSxDQUFDLE1BQU0sQ0FBQyxDQUFDLENBQUMsQ0FBQyxPQUFPLENBQUMsQ0FBQyxDQUFDLENBQUM7SUFDNUIsQ0FBQztJQUNILDRCQUFDO0FBQUQsQ0FBQyxBQXpFRCxJQXlFQztBQXpFWSxzREFBcUI7QUEyRWxDLElBQUksYUFBcUMsQ0FBQztBQUUxQzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7R0F1RUc7QUFDSCxhQUFhLEdBQUc7SUFBdUIsaUJBQThCO1NBQTlCLFVBQThCLEVBQTlCLHFCQUE4QixFQUE5QixJQUE4QjtRQUE5Qiw0QkFBOEI7O0lBQ25FLE9BQU8sK0JBQStCLE9BQW9CO1FBQ3hELE9BQU8sSUFBSSxjQUFNLENBQWEsSUFBSSxxQkFBcUIsQ0FBQyxPQUFPLEVBQUUsT0FBTyxDQUFDLENBQUMsQ0FBQztJQUM3RSxDQUFDLENBQUM7QUFDSixDQUEyQixDQUFDO0FBRTVCLGtCQUFlLGFBQWEsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7SW50ZXJuYWxMaXN0ZW5lciwgT3BlcmF0b3IsIFN0cmVhbX0gZnJvbSAnLi4vaW5kZXgnO1xuXG5leHBvcnQgaW50ZXJmYWNlIFNhbXBsZUNvbWJpbmVTaWduYXR1cmUge1xuICAoKTogPFQ+KHM6IFN0cmVhbTxUPikgPT4gU3RyZWFtPFtUXT47XG4gIDxUMT4oczE6IFN0cmVhbTxUMT4pOiA8VD4oczogU3RyZWFtPFQ+KSA9PiBTdHJlYW08W1QsIFQxXT47XG4gIDxUMSwgVDI+KFxuICAgIHMxOiBTdHJlYW08VDE+LFxuICAgIHMyOiBTdHJlYW08VDI+KTogPFQ+KHM6IFN0cmVhbTxUPikgPT4gU3RyZWFtPFtULCBUMSwgVDJdPjtcbiAgPFQxLCBUMiwgVDM+KFxuICAgIHMxOiBTdHJlYW08VDE+LFxuICAgIHMyOiBTdHJlYW08VDI+LFxuICAgIHMzOiBTdHJlYW08VDM+KTogPFQ+KHM6IFN0cmVhbTxUPikgPT4gU3RyZWFtPFtULCBUMSwgVDIsIFQzXT47XG4gIDxUMSwgVDIsIFQzLCBUND4oXG4gICAgczE6IFN0cmVhbTxUMT4sXG4gICAgczI6IFN0cmVhbTxUMj4sXG4gICAgczM6IFN0cmVhbTxUMz4sXG4gICAgczQ6IFN0cmVhbTxUND4pOiA8VD4oczogU3RyZWFtPFQ+KSA9PiBTdHJlYW08W1QsIFQxLCBUMiwgVDMsIFQ0XT47XG4gIDxUMSwgVDIsIFQzLCBUNCwgVDU+KFxuICAgIHMxOiBTdHJlYW08VDE+LFxuICAgIHMyOiBTdHJlYW08VDI+LFxuICAgIHMzOiBTdHJlYW08VDM+LFxuICAgIHM0OiBTdHJlYW08VDQ+LFxuICAgIHM1OiBTdHJlYW08VDU+KTogPFQ+KHM6IFN0cmVhbTxUPikgPT4gU3RyZWFtPFtULCBUMSwgVDIsIFQzLCBUNCwgVDVdPjtcbiAgPFQxLCBUMiwgVDMsIFQ0LCBUNSwgVDY+KFxuICAgIHMxOiBTdHJlYW08VDE+LFxuICAgIHMyOiBTdHJlYW08VDI+LFxuICAgIHMzOiBTdHJlYW08VDM+LFxuICAgIHM0OiBTdHJlYW08VDQ+LFxuICAgIHM1OiBTdHJlYW08VDU+LFxuICAgIHM2OiBTdHJlYW08VDY+KTogPFQ+KHM6IFN0cmVhbTxUPikgPT4gU3RyZWFtPFtULCBUMSwgVDIsIFQzLCBUNCwgVDUsIFQ2XT47XG4gIDxUMSwgVDIsIFQzLCBUNCwgVDUsIFQ2LCBUNz4oXG4gICAgczE6IFN0cmVhbTxUMT4sXG4gICAgczI6IFN0cmVhbTxUMj4sXG4gICAgczM6IFN0cmVhbTxUMz4sXG4gICAgczQ6IFN0cmVhbTxUND4sXG4gICAgczU6IFN0cmVhbTxUNT4sXG4gICAgczY6IFN0cmVhbTxUNj4sXG4gICAgczc6IFN0cmVhbTxUNz4pOiA8VD4oczogU3RyZWFtPFQ+KSA9PiBTdHJlYW08W1QsIFQxLCBUMiwgVDMsIFQ0LCBUNSwgVDYsIFQ3XT47XG4gIDxUMSwgVDIsIFQzLCBUNCwgVDUsIFQ2LCBUNywgVDg+KFxuICAgIHMxOiBTdHJlYW08VDE+LFxuICAgIHMyOiBTdHJlYW08VDI+LFxuICAgIHMzOiBTdHJlYW08VDM+LFxuICAgIHM0OiBTdHJlYW08VDQ+LFxuICAgIHM1OiBTdHJlYW08VDU+LFxuICAgIHM2OiBTdHJlYW08VDY+LFxuICAgIHM3OiBTdHJlYW08VDc+LFxuICAgIHM4OiBTdHJlYW08VDg+KTogPFQ+KHM6IFN0cmVhbTxUPikgPT4gU3RyZWFtPFtULCBUMSwgVDIsIFQzLCBUNCwgVDUsIFQ2LCBUNywgVDhdPjtcbiAgKC4uLnN0cmVhbXM6IEFycmF5PFN0cmVhbTxhbnk+Pik6IChzOiBTdHJlYW08YW55PikgPT4gU3RyZWFtPEFycmF5PGFueT4+O1xufVxuXG5jb25zdCBOTyA9IHt9O1xuXG5leHBvcnQgY2xhc3MgU2FtcGxlQ29tYmluZUxpc3RlbmVyPFQ+IGltcGxlbWVudHMgSW50ZXJuYWxMaXN0ZW5lcjxUPiB7XG4gIGNvbnN0cnVjdG9yKHByaXZhdGUgaTogbnVtYmVyLCBwcml2YXRlIHA6IFNhbXBsZUNvbWJpbmVPcGVyYXRvcjxhbnk+KSB7XG4gICAgcC5pbHNbaV0gPSB0aGlzO1xuICB9XG5cbiAgX24odDogVCk6IHZvaWQge1xuICAgIGNvbnN0IHAgPSB0aGlzLnA7XG4gICAgaWYgKHAub3V0ID09PSBOTykgcmV0dXJuO1xuICAgIHAudXAodCwgdGhpcy5pKTtcbiAgfVxuXG4gIF9lKGVycjogYW55KTogdm9pZCB7XG4gICAgdGhpcy5wLl9lKGVycik7XG4gIH1cblxuICBfYygpOiB2b2lkIHtcbiAgICB0aGlzLnAuZG93bih0aGlzLmksIHRoaXMpO1xuICB9XG59XG5cbmV4cG9ydCBjbGFzcyBTYW1wbGVDb21iaW5lT3BlcmF0b3I8VD4gaW1wbGVtZW50cyBPcGVyYXRvcjxULCBBcnJheTxhbnk+PiB7XG4gIHB1YmxpYyB0eXBlID0gJ3NhbXBsZUNvbWJpbmUnO1xuICBwdWJsaWMgaW5zOiBTdHJlYW08VD47XG4gIHB1YmxpYyBvdGhlcnM6IEFycmF5PFN0cmVhbTxhbnk+PjtcbiAgcHVibGljIG91dDogU3RyZWFtPEFycmF5PGFueT4+O1xuICBwdWJsaWMgaWxzOiBBcnJheTxTYW1wbGVDb21iaW5lTGlzdGVuZXI8YW55Pj47XG4gIHB1YmxpYyBObjogbnVtYmVyOyAvLyAqTip1bWJlciBvZiBzdHJlYW1zIHN0aWxsIHRvIHNlbmQgKm4qZXh0XG4gIHB1YmxpYyB2YWxzOiBBcnJheTxhbnk+O1xuXG4gIGNvbnN0cnVjdG9yKGluczogU3RyZWFtPFQ+LCBzdHJlYW1zOiBBcnJheTxTdHJlYW08YW55Pj4pIHtcbiAgICB0aGlzLmlucyA9IGlucztcbiAgICB0aGlzLm90aGVycyA9IHN0cmVhbXM7XG4gICAgdGhpcy5vdXQgPSBOTyBhcyBTdHJlYW08QXJyYXk8YW55Pj47XG4gICAgdGhpcy5pbHMgPSBbXTtcbiAgICB0aGlzLk5uID0gMDtcbiAgICB0aGlzLnZhbHMgPSBbXTtcbiAgfVxuXG4gIF9zdGFydChvdXQ6IFN0cmVhbTxBcnJheTxhbnk+Pik6IHZvaWQge1xuICAgIHRoaXMub3V0ID0gb3V0O1xuICAgIGNvbnN0IHMgPSB0aGlzLm90aGVycztcbiAgICBjb25zdCBuID0gdGhpcy5ObiA9IHMubGVuZ3RoO1xuICAgIGNvbnN0IHZhbHMgPSB0aGlzLnZhbHMgPSBuZXcgQXJyYXkobik7XG4gICAgZm9yIChsZXQgaSA9IDA7IGkgPCBuOyBpKyspIHtcbiAgICAgIHZhbHNbaV0gPSBOTztcbiAgICAgIHNbaV0uX2FkZChuZXcgU2FtcGxlQ29tYmluZUxpc3RlbmVyPGFueT4oaSwgdGhpcykpO1xuICAgIH1cbiAgICB0aGlzLmlucy5fYWRkKHRoaXMpO1xuICB9XG5cbiAgX3N0b3AoKTogdm9pZCB7XG4gICAgY29uc3QgcyA9IHRoaXMub3RoZXJzO1xuICAgIGNvbnN0IG4gPSBzLmxlbmd0aDtcbiAgICBjb25zdCBpbHMgPSB0aGlzLmlscztcbiAgICB0aGlzLmlucy5fcmVtb3ZlKHRoaXMpO1xuICAgIGZvciAobGV0IGkgPSAwOyBpIDwgbjsgaSsrKSB7XG4gICAgICBzW2ldLl9yZW1vdmUoaWxzW2ldKTtcbiAgICB9XG4gICAgdGhpcy5vdXQgPSBOTyBhcyBTdHJlYW08QXJyYXk8YW55Pj47XG4gICAgdGhpcy52YWxzID0gW107XG4gICAgdGhpcy5pbHMgPSBbXTtcbiAgfVxuXG4gIF9uKHQ6IFQpOiB2b2lkIHtcbiAgICBjb25zdCBvdXQgPSB0aGlzLm91dDtcbiAgICBpZiAob3V0ID09PSBOTykgcmV0dXJuO1xuICAgIGlmICh0aGlzLk5uID4gMCkgcmV0dXJuO1xuICAgIG91dC5fbihbdCwgLi4udGhpcy52YWxzXSk7XG4gIH1cblxuICBfZShlcnI6IGFueSk6IHZvaWQge1xuICAgIGNvbnN0IG91dCA9IHRoaXMub3V0O1xuICAgIGlmIChvdXQgPT09IE5PKSByZXR1cm47XG4gICAgb3V0Ll9lKGVycik7XG4gIH1cblxuICBfYygpOiB2b2lkIHtcbiAgICBjb25zdCBvdXQgPSB0aGlzLm91dDtcbiAgICBpZiAob3V0ID09PSBOTykgcmV0dXJuO1xuICAgIG91dC5fYygpO1xuICB9XG5cbiAgdXAodDogYW55LCBpOiBudW1iZXIpOiB2b2lkIHtcbiAgICBjb25zdCB2ID0gdGhpcy52YWxzW2ldO1xuICAgIGlmICh0aGlzLk5uID4gMCAmJiB2ID09PSBOTykge1xuICAgICAgdGhpcy5Obi0tO1xuICAgIH1cbiAgICB0aGlzLnZhbHNbaV0gPSB0O1xuICB9XG5cbiAgZG93bihpOiBudW1iZXIsIGw6IFNhbXBsZUNvbWJpbmVMaXN0ZW5lcjxhbnk+KTogdm9pZCB7XG4gICAgdGhpcy5vdGhlcnNbaV0uX3JlbW92ZShsKTtcbiAgfVxufVxuXG5sZXQgc2FtcGxlQ29tYmluZTogU2FtcGxlQ29tYmluZVNpZ25hdHVyZTtcblxuLyoqXG4gKlxuICogQ29tYmluZXMgYSBzb3VyY2Ugc3RyZWFtIHdpdGggbXVsdGlwbGUgb3RoZXIgc3RyZWFtcy4gVGhlIHJlc3VsdCBzdHJlYW1cbiAqIHdpbGwgZW1pdCB0aGUgbGF0ZXN0IGV2ZW50cyBmcm9tIGFsbCBpbnB1dCBzdHJlYW1zLCBidXQgb25seSB3aGVuIHRoZVxuICogc291cmNlIHN0cmVhbSBlbWl0cy5cbiAqXG4gKiBJZiB0aGUgc291cmNlLCBvciBhbnkgaW5wdXQgc3RyZWFtLCB0aHJvd3MgYW4gZXJyb3IsIHRoZSByZXN1bHQgc3RyZWFtXG4gKiB3aWxsIHByb3BhZ2F0ZSB0aGUgZXJyb3IuIElmIGFueSBpbnB1dCBzdHJlYW1zIGVuZCwgdGhlaXIgZmluYWwgZW1pdHRlZFxuICogdmFsdWUgd2lsbCByZW1haW4gaW4gdGhlIGFycmF5IG9mIGFueSBzdWJzZXF1ZW50IGV2ZW50cyBmcm9tIHRoZSByZXN1bHRcbiAqIHN0cmVhbS5cbiAqXG4gKiBUaGUgcmVzdWx0IHN0cmVhbSB3aWxsIG9ubHkgY29tcGxldGUgdXBvbiBjb21wbGV0aW9uIG9mIHRoZSBzb3VyY2Ugc3RyZWFtLlxuICpcbiAqIE1hcmJsZSBkaWFncmFtOlxuICpcbiAqIGBgYHRleHRcbiAqIC0tMS0tLS0yLS0tLS0zLS0tLS0tLS00LS0tIChzb3VyY2UpXG4gKiAtLS0tYS0tLS0tYi0tLS0tYy0tZC0tLS0tLSAob3RoZXIpXG4gKiAgICAgIHNhbXBsZUNvbWJpbmVcbiAqIC0tLS0tLS0yYS0tLS0zYi0tLS0tLS00ZC0tXG4gKiBgYGBcbiAqXG4gKiBFeGFtcGxlczpcbiAqXG4gKiBgYGBqc1xuICogaW1wb3J0IHNhbXBsZUNvbWJpbmUgZnJvbSAneHN0cmVhbS9leHRyYS9zYW1wbGVDb21iaW5lJ1xuICogaW1wb3J0IHhzIGZyb20gJ3hzdHJlYW0nXG4gKlxuICogY29uc3Qgc2FtcGxlciA9IHhzLnBlcmlvZGljKDEwMDApLnRha2UoMylcbiAqIGNvbnN0IG90aGVyID0geHMucGVyaW9kaWMoMTAwKVxuICpcbiAqIGNvbnN0IHN0cmVhbSA9IHNhbXBsZXIuY29tcG9zZShzYW1wbGVDb21iaW5lKG90aGVyKSlcbiAqXG4gKiBzdHJlYW0uYWRkTGlzdGVuZXIoe1xuICogICBuZXh0OiBpID0+IGNvbnNvbGUubG9nKGkpLFxuICogICBlcnJvcjogZXJyID0+IGNvbnNvbGUuZXJyb3IoZXJyKSxcbiAqICAgY29tcGxldGU6ICgpID0+IGNvbnNvbGUubG9nKCdjb21wbGV0ZWQnKVxuICogfSlcbiAqIGBgYFxuICpcbiAqIGBgYHRleHRcbiAqID4gWzAsIDhdXG4gKiA+IFsxLCAxOF1cbiAqID4gWzIsIDI4XVxuICogYGBgXG4gKlxuICogYGBganNcbiAqIGltcG9ydCBzYW1wbGVDb21iaW5lIGZyb20gJ3hzdHJlYW0vZXh0cmEvc2FtcGxlQ29tYmluZSdcbiAqIGltcG9ydCB4cyBmcm9tICd4c3RyZWFtJ1xuICpcbiAqIGNvbnN0IHNhbXBsZXIgPSB4cy5wZXJpb2RpYygxMDAwKS50YWtlKDMpXG4gKiBjb25zdCBvdGhlciA9IHhzLnBlcmlvZGljKDEwMCkudGFrZSgyKVxuICpcbiAqIGNvbnN0IHN0cmVhbSA9IHNhbXBsZXIuY29tcG9zZShzYW1wbGVDb21iaW5lKG90aGVyKSlcbiAqXG4gKiBzdHJlYW0uYWRkTGlzdGVuZXIoe1xuICogICBuZXh0OiBpID0+IGNvbnNvbGUubG9nKGkpLFxuICogICBlcnJvcjogZXJyID0+IGNvbnNvbGUuZXJyb3IoZXJyKSxcbiAqICAgY29tcGxldGU6ICgpID0+IGNvbnNvbGUubG9nKCdjb21wbGV0ZWQnKVxuICogfSlcbiAqIGBgYFxuICpcbiAqIGBgYHRleHRcbiAqID4gWzAsIDFdXG4gKiA+IFsxLCAxXVxuICogPiBbMiwgMV1cbiAqIGBgYFxuICpcbiAqIEBwYXJhbSB7Li4uU3RyZWFtfSBzdHJlYW1zIE9uZSBvciBtb3JlIHN0cmVhbXMgdG8gY29tYmluZSB3aXRoIHRoZSBzYW1wbGVyXG4gKiBzdHJlYW0uXG4gKiBAcmV0dXJuIHtTdHJlYW19XG4gKi9cbnNhbXBsZUNvbWJpbmUgPSBmdW5jdGlvbiBzYW1wbGVDb21iaW5lKC4uLnN0cmVhbXM6IEFycmF5PFN0cmVhbTxhbnk+Pikge1xuICByZXR1cm4gZnVuY3Rpb24gc2FtcGxlQ29tYmluZU9wZXJhdG9yKHNhbXBsZXI6IFN0cmVhbTxhbnk+KTogU3RyZWFtPEFycmF5PGFueT4+IHtcbiAgICByZXR1cm4gbmV3IFN0cmVhbTxBcnJheTxhbnk+PihuZXcgU2FtcGxlQ29tYmluZU9wZXJhdG9yKHNhbXBsZXIsIHN0cmVhbXMpKTtcbiAgfTtcbn0gYXMgU2FtcGxlQ29tYmluZVNpZ25hdHVyZTtcblxuZXhwb3J0IGRlZmF1bHQgc2FtcGxlQ29tYmluZTsiXX0=
+});
+___scope___.file("extra/dropRepeats.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var index_1 = require("../index");
+var empty = {};
+var DropRepeatsOperator = /** @class */ (function () {
+    function DropRepeatsOperator(ins, fn) {
+        this.ins = ins;
+        this.type = 'dropRepeats';
+        this.out = null;
+        this.v = empty;
+        this.isEq = fn ? fn : function (x, y) { return x === y; };
+    }
+    DropRepeatsOperator.prototype._start = function (out) {
+        this.out = out;
+        this.ins._add(this);
+    };
+    DropRepeatsOperator.prototype._stop = function () {
+        this.ins._remove(this);
+        this.out = null;
+        this.v = empty;
+    };
+    DropRepeatsOperator.prototype._n = function (t) {
+        var u = this.out;
+        if (!u)
+            return;
+        var v = this.v;
+        if (v !== empty && this.isEq(t, v))
+            return;
+        this.v = t;
+        u._n(t);
+    };
+    DropRepeatsOperator.prototype._e = function (err) {
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
+    };
+    DropRepeatsOperator.prototype._c = function () {
+        var u = this.out;
+        if (!u)
+            return;
+        u._c();
+    };
+    return DropRepeatsOperator;
+}());
+exports.DropRepeatsOperator = DropRepeatsOperator;
+/**
+ * Drops consecutive duplicate values in a stream.
+ *
+ * Marble diagram:
+ *
+ * ```text
+ * --1--2--1--1--1--2--3--4--3--3|
+ *     dropRepeats
+ * --1--2--1--------2--3--4--3---|
+ * ```
+ *
+ * Example:
+ *
+ * ```js
+ * import dropRepeats from 'xstream/extra/dropRepeats'
+ *
+ * const stream = xs.of(1, 2, 1, 1, 1, 2, 3, 4, 3, 3)
+ *   .compose(dropRepeats())
+ *
+ * stream.addListener({
+ *   next: i => console.log(i),
+ *   error: err => console.error(err),
+ *   complete: () => console.log('completed')
+ * })
+ * ```
+ *
+ * ```text
+ * > 1
+ * > 2
+ * > 1
+ * > 2
+ * > 3
+ * > 4
+ * > 3
+ * > completed
+ * ```
+ *
+ * Example with a custom isEqual function:
+ *
+ * ```js
+ * import dropRepeats from 'xstream/extra/dropRepeats'
+ *
+ * const stream = xs.of('a', 'b', 'a', 'A', 'B', 'b')
+ *   .compose(dropRepeats((x, y) => x.toLowerCase() === y.toLowerCase()))
+ *
+ * stream.addListener({
+ *   next: i => console.log(i),
+ *   error: err => console.error(err),
+ *   complete: () => console.log('completed')
+ * })
+ * ```
+ *
+ * ```text
+ * > a
+ * > b
+ * > a
+ * > B
+ * > completed
+ * ```
+ *
+ * @param {Function} isEqual An optional function of type
+ * `(x: T, y: T) => boolean` that takes an event from the input stream and
+ * checks if it is equal to previous event, by returning a boolean.
+ * @return {Stream}
+ */
+function dropRepeats(isEqual) {
+    if (isEqual === void 0) { isEqual = void 0; }
+    return function dropRepeatsOperator(ins) {
+        return new index_1.Stream(new DropRepeatsOperator(ins, isEqual));
+    };
+}
+exports.default = dropRepeats;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZHJvcFJlcGVhdHMuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvZXh0cmEvZHJvcFJlcGVhdHMudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7QUFBQSxrQ0FBMEM7QUFDMUMsSUFBTSxLQUFLLEdBQUcsRUFBRSxDQUFDO0FBRWpCO0lBTUUsNkJBQW1CLEdBQWMsRUFDckIsRUFBeUM7UUFEbEMsUUFBRyxHQUFILEdBQUcsQ0FBVztRQUwxQixTQUFJLEdBQUcsYUFBYSxDQUFDO1FBQ3JCLFFBQUcsR0FBYyxJQUFXLENBQUM7UUFFNUIsTUFBQyxHQUFZLEtBQUssQ0FBQztRQUl6QixJQUFJLENBQUMsSUFBSSxHQUFHLEVBQUUsQ0FBQyxDQUFDLENBQUMsRUFBRSxDQUFDLENBQUMsQ0FBQyxVQUFDLENBQUMsRUFBRSxDQUFDLElBQUssT0FBQSxDQUFDLEtBQUssQ0FBQyxFQUFQLENBQU8sQ0FBQztJQUMxQyxDQUFDO0lBRUQsb0NBQU0sR0FBTixVQUFPLEdBQWM7UUFDbkIsSUFBSSxDQUFDLEdBQUcsR0FBRyxHQUFHLENBQUM7UUFDZixJQUFJLENBQUMsR0FBRyxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsQ0FBQztJQUN0QixDQUFDO0lBRUQsbUNBQUssR0FBTDtRQUNFLElBQUksQ0FBQyxHQUFHLENBQUMsT0FBTyxDQUFDLElBQUksQ0FBQyxDQUFDO1FBQ3ZCLElBQUksQ0FBQyxHQUFHLEdBQUcsSUFBVyxDQUFDO1FBQ3ZCLElBQUksQ0FBQyxDQUFDLEdBQUcsS0FBWSxDQUFDO0lBQ3hCLENBQUM7SUFFRCxnQ0FBRSxHQUFGLFVBQUcsQ0FBSTtRQUNMLElBQU0sQ0FBQyxHQUFHLElBQUksQ0FBQyxHQUFHLENBQUM7UUFDbkIsSUFBSSxDQUFDLENBQUM7WUFBRSxPQUFPO1FBQ2YsSUFBTSxDQUFDLEdBQUcsSUFBSSxDQUFDLENBQUMsQ0FBQztRQUNqQixJQUFJLENBQUMsS0FBSyxLQUFLLElBQUksSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDLEVBQUUsQ0FBQyxDQUFDO1lBQUUsT0FBTztRQUMzQyxJQUFJLENBQUMsQ0FBQyxHQUFHLENBQUMsQ0FBQztRQUNYLENBQUMsQ0FBQyxFQUFFLENBQUMsQ0FBQyxDQUFDLENBQUM7SUFDVixDQUFDO0lBRUQsZ0NBQUUsR0FBRixVQUFHLEdBQVE7UUFDVCxJQUFNLENBQUMsR0FBRyxJQUFJLENBQUMsR0FBRyxDQUFDO1FBQ25CLElBQUksQ0FBQyxDQUFDO1lBQUUsT0FBTztRQUNmLENBQUMsQ0FBQyxFQUFFLENBQUMsR0FBRyxDQUFDLENBQUM7SUFDWixDQUFDO0lBRUQsZ0NBQUUsR0FBRjtRQUNFLElBQU0sQ0FBQyxHQUFHLElBQUksQ0FBQyxHQUFHLENBQUM7UUFDbkIsSUFBSSxDQUFDLENBQUM7WUFBRSxPQUFPO1FBQ2YsQ0FBQyxDQUFDLEVBQUUsRUFBRSxDQUFDO0lBQ1QsQ0FBQztJQUNILDBCQUFDO0FBQUQsQ0FBQyxBQTFDRCxJQTBDQztBQTFDWSxrREFBbUI7QUE0Q2hDOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0dBZ0VHO0FBQ0gscUJBQXVDLE9BQXVEO0lBQXZELHdCQUFBLEVBQUEsZUFBc0QsQ0FBQztJQUM1RixPQUFPLDZCQUE2QixHQUFjO1FBQ2hELE9BQU8sSUFBSSxjQUFNLENBQUksSUFBSSxtQkFBbUIsQ0FBSSxHQUFHLEVBQUUsT0FBTyxDQUFDLENBQUMsQ0FBQztJQUNqRSxDQUFDLENBQUM7QUFDSixDQUFDO0FBSkQsOEJBSUMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQge09wZXJhdG9yLCBTdHJlYW19IGZyb20gJy4uL2luZGV4JztcbmNvbnN0IGVtcHR5ID0ge307XG5cbmV4cG9ydCBjbGFzcyBEcm9wUmVwZWF0c09wZXJhdG9yPFQ+IGltcGxlbWVudHMgT3BlcmF0b3I8VCwgVD4ge1xuICBwdWJsaWMgdHlwZSA9ICdkcm9wUmVwZWF0cyc7XG4gIHB1YmxpYyBvdXQ6IFN0cmVhbTxUPiA9IG51bGwgYXMgYW55O1xuICBwdWJsaWMgaXNFcTogKHg6IFQsIHk6IFQpID0+IGJvb2xlYW47XG4gIHByaXZhdGUgdjogVCA9IDxhbnk+IGVtcHR5O1xuXG4gIGNvbnN0cnVjdG9yKHB1YmxpYyBpbnM6IFN0cmVhbTxUPixcbiAgICAgICAgICAgICAgZm46ICgoeDogVCwgeTogVCkgPT4gYm9vbGVhbikgfCB1bmRlZmluZWQpIHtcbiAgICB0aGlzLmlzRXEgPSBmbiA/IGZuIDogKHgsIHkpID0+IHggPT09IHk7XG4gIH1cblxuICBfc3RhcnQob3V0OiBTdHJlYW08VD4pOiB2b2lkIHtcbiAgICB0aGlzLm91dCA9IG91dDtcbiAgICB0aGlzLmlucy5fYWRkKHRoaXMpO1xuICB9XG5cbiAgX3N0b3AoKTogdm9pZCB7XG4gICAgdGhpcy5pbnMuX3JlbW92ZSh0aGlzKTtcbiAgICB0aGlzLm91dCA9IG51bGwgYXMgYW55O1xuICAgIHRoaXMudiA9IGVtcHR5IGFzIGFueTtcbiAgfVxuXG4gIF9uKHQ6IFQpIHtcbiAgICBjb25zdCB1ID0gdGhpcy5vdXQ7XG4gICAgaWYgKCF1KSByZXR1cm47XG4gICAgY29uc3QgdiA9IHRoaXMudjtcbiAgICBpZiAodiAhPT0gZW1wdHkgJiYgdGhpcy5pc0VxKHQsIHYpKSByZXR1cm47XG4gICAgdGhpcy52ID0gdDtcbiAgICB1Ll9uKHQpO1xuICB9XG5cbiAgX2UoZXJyOiBhbnkpIHtcbiAgICBjb25zdCB1ID0gdGhpcy5vdXQ7XG4gICAgaWYgKCF1KSByZXR1cm47XG4gICAgdS5fZShlcnIpO1xuICB9XG5cbiAgX2MoKSB7XG4gICAgY29uc3QgdSA9IHRoaXMub3V0O1xuICAgIGlmICghdSkgcmV0dXJuO1xuICAgIHUuX2MoKTtcbiAgfVxufVxuXG4vKipcbiAqIERyb3BzIGNvbnNlY3V0aXZlIGR1cGxpY2F0ZSB2YWx1ZXMgaW4gYSBzdHJlYW0uXG4gKlxuICogTWFyYmxlIGRpYWdyYW06XG4gKlxuICogYGBgdGV4dFxuICogLS0xLS0yLS0xLS0xLS0xLS0yLS0zLS00LS0zLS0zfFxuICogICAgIGRyb3BSZXBlYXRzXG4gKiAtLTEtLTItLTEtLS0tLS0tLTItLTMtLTQtLTMtLS18XG4gKiBgYGBcbiAqXG4gKiBFeGFtcGxlOlxuICpcbiAqIGBgYGpzXG4gKiBpbXBvcnQgZHJvcFJlcGVhdHMgZnJvbSAneHN0cmVhbS9leHRyYS9kcm9wUmVwZWF0cydcbiAqXG4gKiBjb25zdCBzdHJlYW0gPSB4cy5vZigxLCAyLCAxLCAxLCAxLCAyLCAzLCA0LCAzLCAzKVxuICogICAuY29tcG9zZShkcm9wUmVwZWF0cygpKVxuICpcbiAqIHN0cmVhbS5hZGRMaXN0ZW5lcih7XG4gKiAgIG5leHQ6IGkgPT4gY29uc29sZS5sb2coaSksXG4gKiAgIGVycm9yOiBlcnIgPT4gY29uc29sZS5lcnJvcihlcnIpLFxuICogICBjb21wbGV0ZTogKCkgPT4gY29uc29sZS5sb2coJ2NvbXBsZXRlZCcpXG4gKiB9KVxuICogYGBgXG4gKlxuICogYGBgdGV4dFxuICogPiAxXG4gKiA+IDJcbiAqID4gMVxuICogPiAyXG4gKiA+IDNcbiAqID4gNFxuICogPiAzXG4gKiA+IGNvbXBsZXRlZFxuICogYGBgXG4gKlxuICogRXhhbXBsZSB3aXRoIGEgY3VzdG9tIGlzRXF1YWwgZnVuY3Rpb246XG4gKlxuICogYGBganNcbiAqIGltcG9ydCBkcm9wUmVwZWF0cyBmcm9tICd4c3RyZWFtL2V4dHJhL2Ryb3BSZXBlYXRzJ1xuICpcbiAqIGNvbnN0IHN0cmVhbSA9IHhzLm9mKCdhJywgJ2InLCAnYScsICdBJywgJ0InLCAnYicpXG4gKiAgIC5jb21wb3NlKGRyb3BSZXBlYXRzKCh4LCB5KSA9PiB4LnRvTG93ZXJDYXNlKCkgPT09IHkudG9Mb3dlckNhc2UoKSkpXG4gKlxuICogc3RyZWFtLmFkZExpc3RlbmVyKHtcbiAqICAgbmV4dDogaSA9PiBjb25zb2xlLmxvZyhpKSxcbiAqICAgZXJyb3I6IGVyciA9PiBjb25zb2xlLmVycm9yKGVyciksXG4gKiAgIGNvbXBsZXRlOiAoKSA9PiBjb25zb2xlLmxvZygnY29tcGxldGVkJylcbiAqIH0pXG4gKiBgYGBcbiAqXG4gKiBgYGB0ZXh0XG4gKiA+IGFcbiAqID4gYlxuICogPiBhXG4gKiA+IEJcbiAqID4gY29tcGxldGVkXG4gKiBgYGBcbiAqXG4gKiBAcGFyYW0ge0Z1bmN0aW9ufSBpc0VxdWFsIEFuIG9wdGlvbmFsIGZ1bmN0aW9uIG9mIHR5cGVcbiAqIGAoeDogVCwgeTogVCkgPT4gYm9vbGVhbmAgdGhhdCB0YWtlcyBhbiBldmVudCBmcm9tIHRoZSBpbnB1dCBzdHJlYW0gYW5kXG4gKiBjaGVja3MgaWYgaXQgaXMgZXF1YWwgdG8gcHJldmlvdXMgZXZlbnQsIGJ5IHJldHVybmluZyBhIGJvb2xlYW4uXG4gKiBAcmV0dXJuIHtTdHJlYW19XG4gKi9cbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIGRyb3BSZXBlYXRzPFQ+KGlzRXF1YWw6ICgoeDogVCwgeTogVCkgPT4gYm9vbGVhbikgfCB1bmRlZmluZWQgPSB2b2lkIDApOiAoaW5zOiBTdHJlYW08VD4pID0+IFN0cmVhbTxUPiB7XG4gIHJldHVybiBmdW5jdGlvbiBkcm9wUmVwZWF0c09wZXJhdG9yKGluczogU3RyZWFtPFQ+KTogU3RyZWFtPFQ+IHtcbiAgICByZXR1cm4gbmV3IFN0cmVhbTxUPihuZXcgRHJvcFJlcGVhdHNPcGVyYXRvcjxUPihpbnMsIGlzRXF1YWwpKTtcbiAgfTtcbn1cbiJdfQ==
 });
 return ___scope___.entry = "index.js";
 });

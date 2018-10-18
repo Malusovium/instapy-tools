@@ -50,7 +50,7 @@ export const Method =
         return (
           { DOM:
               view
-              (methodName)
+              ( methodName )
               ( onion.state$
                   .debug('component?')
               , map(path('DOM'), argsList)

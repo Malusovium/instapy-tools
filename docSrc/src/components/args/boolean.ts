@@ -18,6 +18,8 @@ import { values
        , Dictionary
        } from 'rambda'
 
+import { initReducer } from './../../utils/comp-isolate'
+
 export interface Sources extends BaseSources {
   onion: StateSource<State>
 }
@@ -26,8 +28,10 @@ export interface Sinks extends BaseSinks {
 }
 
 // State
-export type State = boolean
-export const defaultState: State = false
+export type State =
+  { value: boolean }
+export const defaultState: State =
+  { value: false }
 export type Reducer = (prev: State) => State;
 
 export const Boolean =
@@ -55,22 +59,23 @@ export const Boolean =
       )
 
 const actions =
-  (_defaultValue: boolean) =>
+  (defaultValue) =>
     (DOM: DOMSource) => {
       const init$ =
         xs.of<Reducer>
-           ( (prev) =>
-               prev ? prev
-               : _defaultValue ? _defaultValue
-               : defaultState
-           )
+           ( initReducer(defaultValue, defaultState) )
 
       const flip$ =
         DOM
           .select('.flip')
           .events('click')
           .mapTo<Reducer>
-           ( (prev) => !prev )
+           ( (prev) => (
+               { ...prev
+               , value: !prev.value
+               }
+             )
+           )
 
       return xs.merge
                 ( init$
@@ -119,9 +124,8 @@ const view =
   (argName) =>
     (state$) =>
       state$
-        .debug('Boolean value:')
         .map
-         ( (value) =>
+         ( ({value}) =>
              div
              ( `.${styles.wrapper}`
              , [ div(`.${styles.name}`, argName)
