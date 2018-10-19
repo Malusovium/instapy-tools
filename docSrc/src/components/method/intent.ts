@@ -5,8 +5,7 @@ import { DOMSource } from '@cycle/dom'
 import { State, Reducer } from './types'
 
 const defaultState: State =
-  { title: 'Template Component'
-  , paragraph: 'This is am example component.'
+  { name: 'Method'
   }
 
 const intent =

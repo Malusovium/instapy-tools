@@ -9,16 +9,14 @@ import { State } from './types'
 import * as styles from './styles'
 
 const dom =
-  ( [ { title
-      , paragraph
+  ( [ { name
       }
     , childComponents
     ]
   ) =>
     div
     ( `.${styles.container}`
-    , [ h2(`.${styles.title}`, title)
-      , p(`.${styles.paragraph}`, paragraph)
+    , [ h2(`.${styles.title}`, name)
       , div(childComponents)
       ]
     )

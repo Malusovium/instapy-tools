@@ -6,6 +6,8 @@ import { div
 import { State } from './types'
 import * as styles from './styles'
 
+import { mustArray } from './../../utils/must'
+
 const dom =
   ( { name
     , value
@@ -14,7 +16,10 @@ const dom =
   ) =>
     div
     ( `.${styles.container}`
-    , [ h4(`.${styles.title}`, name)
+    , [ ...mustArray
+        ( name !== ''
+        , h4(`.${styles.title}`, name)
+        )
       , div(`.${styles.paragraph}`, value)
       ]
     )

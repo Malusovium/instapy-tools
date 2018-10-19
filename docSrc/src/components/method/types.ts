@@ -3,8 +3,7 @@ import { DOMSource, VNode } from '@cycle/dom'
 import { StateSource } from 'cycle-onionify'
 
 type State =
-  { title: string
-  , paragraph: string
+  { name: string
   }
 
 type Reducer =

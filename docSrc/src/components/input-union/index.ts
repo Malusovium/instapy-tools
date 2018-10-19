@@ -42,21 +42,21 @@ const defaultLens =
 
 const constantComponentLens =
   (value: any, index:number) => (
-      { get:
-          (parentState) => (
-            { ...parentState[index]
-            , value: value
-            , _default: value
-            }
-          )
-      , set:
-          (parentState, childState) => (
-            { ...parentState
-            , [index]: childState
-            }
-          )
-      }
-    )
+    { get:
+        (parentState) => (
+          { ...parentState[index]
+          , value: value
+          , _default: value
+          }
+        )
+    , set:
+        (parentState, childState) => (
+          { ...parentState
+          , [index]: childState
+          }
+        )
+    }
+  )
 
 const constantIsolate =
   (value:any) =>

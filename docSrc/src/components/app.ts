@@ -23,9 +23,9 @@ import { api
        , ArgComponentType
        } from '../../../src'
 
-import { compIsolate } from './../utils/comp-isolate'
+// import { compIsolate } from './../utils/comp-isolate'
 
-import { Method } from './method-old-old'
+// import { Method } from './method-old-old'
 import { Arg } from './arg'
 
 import { method } from './method'
@@ -38,12 +38,16 @@ export interface Sinks extends BaseSinks {
 }
 
 // State
-export interface State {
-  count: number
-}
-export const defaultState: State = {
-  count: 5
-};
+export type State =
+  { _methods: object
+  , methods: object
+  }
+
+export const defaultState =
+  { _methods: {}
+  , methods: {}
+  }
+
 export type Reducer = (prev: State) => State;
 
 const { raw, setupInterface, setupArgComponent } = api
@@ -68,16 +72,16 @@ const lY =
 //       )
 //     }
 //   )
-const methodLens =
-  (name: string) => (
-    { get: (state) => state[name]
-    , set: (state, childState) => (
-        { ...state
-        , [name]: childState
-        }
-      )
-    }
-  )
+// const methodLens =
+//   (name: string) => (
+//     { get: (state) => state[name]
+//     , set: (state, childState) => (
+//         { ...state
+//         , [name]: childState
+//         }
+//       )
+//     }
+//   )
 
 const tempComponent =
   ({DOM, onion}) => (
@@ -101,11 +105,34 @@ const tempMethodComponentList =
     )
   ]
 
+const methodLens =
+  (methodName) => (
+    { get: (parentState) => (
+        { ...parentState._methods[methodName]
+        , name: methodName
+        }
+      )
+    , set: (parentState, childState) => (
+        { ...parentState
+        , _methods:
+          { ...parentState.methods
+          , [methodName]: childState
+          }
+        , methods:
+          { [methodName]: childState.value
+          }
+        }
+      )
+    }
+  )
+
 const isolatedMethod =
   (args, methodName) =>
     isolate
     ( method(args)
-    , methodName
+    , { onion: methodLens(methodName)
+      , '*': methodName
+      }
     )
 
 export const App =

@@ -33,10 +33,50 @@ const hidden =
     }
   )
 
+const pickWrapper =
+  style
+  ( { position: 'relative'
+    }
+  )
+
+const pick =
+  style
+  ( { position: 'absolute'
+    , top: 0
+    , bottom: 0
+    , left: 0
+    , right: 0
+    , background: '#ccc2'
+    , $nest:
+      { '&:hover':
+        { background: '#ccc8'
+        }
+      }
+    }
+  )
+
+const open =
+  style
+  ( { transform: 'rotateX(180deg)'
+    , padding: '.4em'
+    , textAlign: 'center'
+    , background: '#555'
+    , color: 'white'
+    , $nest:
+      { '&:hover':
+        { background: '#bbb'
+        }
+      }
+    }
+  )
+
 export
   { container
   , name
   , childWrapper
   , pickListWrapper
   , hidden
+  , pick
+  , pickWrapper
+  , open
   }

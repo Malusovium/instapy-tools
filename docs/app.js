@@ -27,10 +27,12 @@ const csstips_1 = require("csstips");
 csstips_1.normalize();
 csstips_1.setupPage('#app');
 const src_1 = require("../../../src");
+// import { compIsolate } from './../utils/comp-isolate'
+// import { Method } from './method-old-old'
 const arg_1 = require("./arg");
 const method_1 = require("./method");
-exports.defaultState = {
-    count: 5
+exports.defaultState = { _methods: {},
+    methods: {}
 };
 const { raw, setupInterface, setupArgComponent } = src_1.api;
 const lY = (value) => { console.log(value); return value; };
@@ -49,9 +51,16 @@ const lY = (value) => { console.log(value); return value; };
 //       )
 //     }
 //   )
-const methodLens = (name) => ({ get: (state) => state[name],
-    set: (state, childState) => (Object.assign({}, state, { [name]: childState }))
-});
+// const methodLens =
+//   (name: string) => (
+//     { get: (state) => state[name]
+//     , set: (state, childState) => (
+//         { ...state
+//         , [name]: childState
+//         }
+//       )
+//     }
+//   )
 const tempComponent = ({ DOM, onion }) => ({ DOM: onion.state$.map(({ count }) => dom_1.div(`The counter is at: ${count}`)),
     onion: xstream_1.default.of((prev => prev ? prev : { count: 1 }))
 });
@@ -59,7 +68,13 @@ const tempMethodComponentList = [isolate_1.default(tempComponent, 'first'),
     isolate_1.default(tempComponent, 'second'),
     isolate_1.default(tempComponent, 'third')
 ];
-const isolatedMethod = (args, methodName) => isolate_1.default(method_1.method(args), methodName);
+const methodLens = (methodName) => ({ get: (parentState) => (Object.assign({}, parentState._methods[methodName], { name: methodName })),
+    set: (parentState, childState) => (Object.assign({}, parentState, { _methods: Object.assign({}, parentState.methods, { [methodName]: childState }), methods: { [methodName]: childState.value
+        } }))
+});
+const isolatedMethod = (args, methodName) => isolate_1.default(method_1.method(args), { onion: methodLens(methodName),
+    '*': methodName
+});
 exports.App = ({ DOM, onion }) => {
     const interfaceApi = setupInterface(raw, isolatedMethod, arg_1.Arg({}));
     const setUserInteract = 
@@ -1554,6 +1569,7 @@ ___scope___.file("docSrc/src/components/arg.js", function(exports, require, modu
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const isolate_1 = require("@cycle/isolate");
 const src_1 = require("../../../src");
 const rambda_1 = require("rambda");
 const input_none_1 = require("./input-none");
@@ -1563,18 +1579,7 @@ const input_number_1 = require("./input-number");
 const input_array_1 = require("./input-array");
 const input_tuple_1 = require("./input-tuple");
 const input_union_1 = require("./input-union");
-// <START to-remove
-const xstream_1 = require("xstream");
-const dom_1 = require("@cycle/dom");
-const isolate_1 = require("@cycle/isolate");
-// END>
 const { setupArgComponent } = src_1.api;
-const minimalArgComponent = ({ DOM, onion }) => ({ DOM: onion
-        .state$
-        .map(({ value, _default }) => dom_1.div(`value: ${value}, default: ${_default}`)),
-    onion: xstream_1.default.of((prev) => (Object.assign({ value: '', _default: '' }, prev)))
-});
-const logY = (value) => { console.log(value); return value; };
 const defaultLens = (def, argName, _) => ({ get: (parentState) => (Object.assign({}, parentState[`_${argName}`], { _default: def, name: argName, value: rambda_1.pathOr(def, [`_${argName}`, 'value'], parentState) })),
     set: (parentState, childState) => (Object.assign({}, parentState, { [`_${argName}`]: childState, value: Object.assign({}, parentState.value, { [argName]: childState.value }) }))
 });
@@ -1592,7 +1597,7 @@ const unionLens = (def, argName) => ({ get: (parentState) => (Object.assign({}, 
 const argIsolate = (component, lens, _sub = undefined) => (def, argName) => isolate_1.default(component, { onion: lens(def, argName, _sub),
     '*': argName
 });
-exports.Arg = ({ _default = defaultLens, none = defaultLens, boolean = defaultLens, string = defaultLens, number = numberLens, array = defaultLens, tuple = defaultLens, union = unionLens }) => setupArgComponent({ _default: argIsolate(minimalArgComponent, _default),
+exports.Arg = ({ _default = defaultLens, none = defaultLens, boolean = defaultLens, string = defaultLens, number = numberLens, array = defaultLens, tuple = defaultLens, union = unionLens }) => setupArgComponent({ _default: argIsolate(input_none_1.inputNone, _default),
     none: argIsolate(input_none_1.inputNone, none),
     boolean: argIsolate(input_boolean_1.inputBoolean, boolean),
     string: argIsolate(input_string_1.inputString, string),
@@ -1642,7 +1647,8 @@ ___scope___.file("docSrc/src/components/input-none/view.js", function(exports, r
 Object.defineProperty(exports, "__esModule", { value: true });
 const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
-const dom = ({ name, value, _default }) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.title}`, name),
+const must_1 = require("./../../utils/must");
+const dom = ({ name, value, _default }) => dom_1.div(`.${styles.container}`, [...must_1.mustArray(name !== '', dom_1.h4(`.${styles.title}`, name)),
     dom_1.div(`.${styles.paragraph}`, 'None')
 ]);
 const view = (state$) => state$
@@ -1668,6 +1674,20 @@ const paragraph = typestyle_1.style({ color: '#444'
 });
 exports.paragraph = paragraph;
 //# sourceMappingURL=styles.js.map
+});
+___scope___.file("docSrc/src/utils/must.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const mustObject = (condition, [key, value]) => condition
+    ? { [key]: value }
+    : {};
+exports.mustObject = mustObject;
+const mustArray = (condition, val) => condition
+    ? [val]
+    : [];
+exports.mustArray = mustArray;
+//# sourceMappingURL=must.js.map
 });
 ___scope___.file("docSrc/src/components/input-none/types.js", function(exports, require, module, __filename, __dirname){
 
@@ -1718,7 +1738,8 @@ ___scope___.file("docSrc/src/components/input-boolean/view.js", function(exports
 Object.defineProperty(exports, "__esModule", { value: true });
 const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
-const dom = ({ name, value }) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.name}`, name),
+const must_1 = require("./../../utils/must");
+const dom = ({ name, value }) => dom_1.div(`.${styles.container}`, [...must_1.mustArray(name !== '', dom_1.h4(`.${styles.name}`, name)),
     dom_1.div(`.${styles.bool}.${(value ? styles.on : styles.off)}`, { dataset: { flip: true
         }
     }, value ? 'True' : 'False')
@@ -1806,7 +1827,8 @@ ___scope___.file("docSrc/src/components/input-string/view.js", function(exports,
 Object.defineProperty(exports, "__esModule", { value: true });
 const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
-const dom = ({ name, value }) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.name}`, name),
+const must_1 = require("./../../utils/must");
+const dom = ({ name, value }) => dom_1.div(`.${styles.container}`, [...must_1.mustArray(name !== '', dom_1.h4(`.${styles.name}`, name)),
     dom_1.input(`.${styles.input}`, { props: { value: value } })
 ]);
 const view = (state$) => state$
@@ -1895,7 +1917,8 @@ ___scope___.file("docSrc/src/components/input-number/view.js", function(exports,
 Object.defineProperty(exports, "__esModule", { value: true });
 const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
-const dom = ({ name, value, step }) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.name}`, name),
+const must_1 = require("./../../utils/must");
+const dom = ({ name, value, step }) => dom_1.div(`.${styles.container}`, [...must_1.mustArray(name !== '', dom_1.h4(`.${styles.name}`, name)),
     dom_1.div(`.${styles.wrapper}`, [dom_1.input(`.${styles.input}`, { props: { value: value,
                 type: 'number',
                 step: step
@@ -1990,7 +2013,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
 const rambda_1 = require("rambda");
-const dom = ({ name, value }) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.name}`, name),
+const must_1 = require("./../../utils/must");
+const dom = ({ name, value }) => dom_1.div(`.${styles.container}`, [...must_1.mustArray(name !== '', dom_1.h4(`.${styles.name}`, name)),
     dom_1.textarea(`.${styles.textarea}`, { props: { value: value } })
 ]);
 const view = (state$) => state$
@@ -2096,7 +2120,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const xstream_1 = require("xstream");
 const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
-const dom = ([{ name }, childComponents]) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.name}`, name),
+const must_1 = require("./../../utils/must");
+const dom = ([{ name }, childComponents]) => dom_1.div(`.${styles.container}`, [...must_1.mustArray(name !== '', dom_1.h4(`.${styles.name}`, name)),
     dom_1.div(`.${styles.args}`, childComponents)
 ]);
 const headTailPair = ([head, ...tail]) => [head, tail];
@@ -2227,20 +2252,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const xstream_1 = require("xstream");
 const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
-const pickList = (n, acc = []) => n < 0
+const rambda_1 = require("rambda");
+const must_1 = require("./../../utils/must");
+const pickList = (childComponents, acc = []) => childComponents.length < 1
     ? acc
-    : pickList(n - 1, [dom_1.div({ dataset: { pick: `${n}` } }, `${n}`),
+    : pickList(rambda_1.dropLast(1, childComponents), [dom_1.div(`.${styles.pickWrapper}`, [childComponents[childComponents.length - 1],
+            dom_1.div(`.${styles.pick}`, { dataset: { pick: `${childComponents.length - 1}` } })
+        ]),
         ...acc
     ]);
-const dom = ([{ name, active, pickListOpen }, childComponents]) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.name}`, name),
-    dom_1.div(`.${styles.childWrapper}`, [dom_1.div({ class: { [styles.hidden]: pickListOpen
+const dom = ([{ name, active, pickListOpen }, childComponents]) => dom_1.div(`.${styles.container}`, [...must_1.mustArray(name !== '', dom_1.h4(`.${styles.name}`, name)),
+    dom_1.div(`.${styles.childWrapper}`, [dom_1.div({ class: { [styles.hidden]: pickListOpen,
+                [styles.open]: true
             },
             dataset: { pickOpen: true }
-        }, 'Open'),
+        }, '^'),
         dom_1.div({ class: { [styles.pickListWrapper]: true,
                 [styles.hidden]: !pickListOpen
             }
-        }, pickList(childComponents.length - 1)),
+        }, pickList(childComponents)),
         dom_1.div({ class: { [styles.hidden]: pickListOpen
             }
         }, childComponents[active])
@@ -2275,6 +2305,30 @@ exports.pickListWrapper = pickListWrapper;
 const hidden = typestyle_1.style({ display: 'none'
 });
 exports.hidden = hidden;
+const pickWrapper = typestyle_1.style({ position: 'relative'
+});
+exports.pickWrapper = pickWrapper;
+const pick = typestyle_1.style({ position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    background: '#ccc2',
+    $nest: { '&:hover': { background: '#ccc8'
+        }
+    }
+});
+exports.pick = pick;
+const open = typestyle_1.style({ transform: 'rotateX(180deg)',
+    padding: '.4em',
+    textAlign: 'center',
+    background: '#555',
+    color: 'white',
+    $nest: { '&:hover': { background: '#bbb'
+        }
+    }
+});
+exports.open = open;
 //# sourceMappingURL=styles.js.map
 });
 ___scope___.file("docSrc/src/components/input-union/types.js", function(exports, require, module, __filename, __dirname){
@@ -2322,7 +2376,8 @@ ___scope___.file("docSrc/src/components/input-constant/view.js", function(export
 Object.defineProperty(exports, "__esModule", { value: true });
 const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
-const dom = ({ name, value, _default }) => dom_1.div(`.${styles.container}`, [dom_1.h4(`.${styles.title}`, name),
+const must_1 = require("./../../utils/must");
+const dom = ({ name, value, _default }) => dom_1.div(`.${styles.container}`, [...must_1.mustArray(name !== '', dom_1.h4(`.${styles.title}`, name)),
     dom_1.div(`.${styles.paragraph}`, value)
 ]);
 const view = (state$) => state$
@@ -2398,8 +2453,7 @@ ___scope___.file("docSrc/src/components/method/intent.js", function(exports, req
 Object.defineProperty(exports, "__esModule", { value: true });
 // intent
 const xstream_1 = require("xstream");
-const defaultState = { title: 'Template Component',
-    paragraph: 'This is am example component.'
+const defaultState = { name: 'Method'
 };
 const intent = (DOM, childComponentOnion) => {
     const init$ = xstream_1.default
@@ -2417,8 +2471,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const xstream_1 = require("xstream");
 const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
-const dom = ([{ title, paragraph }, childComponents]) => dom_1.div(`.${styles.container}`, [dom_1.h2(`.${styles.title}`, title),
-    dom_1.p(`.${styles.paragraph}`, paragraph),
+const dom = ([{ name }, childComponents]) => dom_1.div(`.${styles.container}`, [dom_1.h2(`.${styles.title}`, name),
     dom_1.div(childComponents)
 ]);
 const headTailPair = ([head, ...tail]) => [head, tail];

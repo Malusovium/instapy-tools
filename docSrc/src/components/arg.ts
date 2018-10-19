@@ -1,3 +1,4 @@
+import isolate from '@cycle/isolate'
 import { api
        , ArgComponentType
        } from '../../../src'
@@ -14,33 +15,7 @@ import { inputArray } from './input-array'
 import { inputTuple } from './input-tuple'
 import { inputUnion } from './input-union'
 
-// <START to-remove
-import xs, { Stream } from 'xstream'
-import { div
-       , VNode
-       , DOMSource 
-       } from '@cycle/dom'
-import { StateSource } from 'cycle-onionify'
-import isolate from '@cycle/isolate'
-// END>
-
 const { setupArgComponent } = api
-
-const minimalArgComponent =
-  ({DOM, onion}) => (
-    { DOM:
-        onion
-          .state$
-          .map
-           ( ({value, _default}) => 
-               div(`value: ${value}, default: ${_default}`)
-           )
-    , onion: xs.of( (prev) =>({ value: '', _default: '', ...prev}))
-    }
-  )
-
-const logY =
-  (value:any) => {console.log(value); return value}
 
 const defaultLens =
   (def, argName, _) => (
@@ -160,7 +135,7 @@ export const Arg=
     }
   ): ArgComponentType =>
     setupArgComponent
-    ( { _default: argIsolate(minimalArgComponent, _default)
+    ( { _default: argIsolate(inputNone, _default)
       , none: argIsolate(inputNone, none)
       , boolean: argIsolate(inputBoolean, boolean)
       , string: argIsolate(inputString, string)
