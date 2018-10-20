@@ -1,6 +1,6 @@
 // styles
 import { style} from 'typestyle'
-import { vertical } from 'csstips'
+import { vertical, horizontal } from 'csstips'
 
 const container =
   style
@@ -10,20 +10,21 @@ const container =
   , vertical
   )
 
-const title =
+const name =
   style
-  ( { color: '#222'
+  ( { color: 'white'
+    , background: '#ccc'
+    , padding: '.4em'
     }
   )
 
-const paragraph =
+const includeTrue =
   style
-  ( { color: '#444'
-    }
+  ( { background: '#3c3' }
   )
 
 export
   { container
-  , title
-  , paragraph
+  , name
+  , includeTrue
   }

@@ -124,19 +124,13 @@ const inputUnion =
         , filter(isDynamic)
         )(_options)
 
-      const logY = (val:any) => {console.log(val); return val}
       const childComponents =
         compose
         ( map( ([index, makeComponent]) => makeComponent(null, index))
-        , logY
         , zip([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19])
         )([...constantChildComponents, ...dynamicChildComponents])
       const childComponentsSinks =
         compList(childComponents)({DOM, onion})
-
-      console.log('childSinks')
-      console.log(_options)
-      console.log(childComponentsSinks)
 
       return (
         { DOM:

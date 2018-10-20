@@ -64,7 +64,7 @@ const getDocConfig =
        ( { homeDir: '.'
          , target: 'browser@es6'
          , output: 'docs/$name.js'
-         , modulesFolder: ['node_modules', 'docSrc/node_modules']
+         , modulesFolder: ['node-modules', 'docSrc/node_modules']
          , plugins:
            [ WebIndexPlugin({ template: './docSrc/src/index.html'})
            , isProduction

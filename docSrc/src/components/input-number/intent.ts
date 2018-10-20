@@ -34,11 +34,7 @@ const keepInRange =
     compose
     ( maxRange(max)
     , minRange(min)
-    , logY
     )
-
-const logY =
-  (val:any) => { console.log(val); return val }
 
 const keepValidNumber =
   ( min: number
@@ -69,7 +65,6 @@ const intent =
         .events('input')
         .map(path('target.value'))
         .map(Number)
-        .debug('in')
         .map
          ( (newValue) =>
              (prevState) => (
@@ -81,7 +76,6 @@ const intent =
                }
              )
          )
-        .debug('out')
 
     return xs.merge(init$, input$)
   }

@@ -10,30 +10,20 @@ const container =
   , vertical
   )
 
-const name =
+const title =
   style
   ( { color: '#222'
     }
   )
 
-const bool =
+const paragraph =
   style
-  ( { color: '#fff'
-    , textAlign: 'center'
-    , padding: '.4em'
-    , background: '#777'
-    }
-  )
-
-const on =
-  style
-  ( { background: '#3c3'
+  ( { color: '#444'
     }
   )
 
 export
   { container
-  , name
-  , bool
-  , on
+  , title
+  , paragraph
   }

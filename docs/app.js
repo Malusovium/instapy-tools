@@ -20,20 +20,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const xstream_1 = require("xstream");
 const dom_1 = require("@cycle/dom");
 const isolate_1 = require("@cycle/isolate");
-// Typestyle setup
+const rambda_1 = require("rambda");
 const typestyle_1 = require("typestyle");
 const csstips = require("csstips");
 const csstips_1 = require("csstips");
-csstips_1.normalize();
-csstips_1.setupPage('#app');
 const src_1 = require("../../../src");
-// import { compIsolate } from './../utils/comp-isolate'
-// import { Method } from './method-old-old'
 const arg_1 = require("./arg");
 const method_1 = require("./method");
 exports.defaultState = { _methods: {},
     methods: {}
 };
+csstips_1.normalize();
+csstips_1.setupPage('#app');
 const { raw, setupInterface, setupArgComponent } = src_1.api;
 const lY = (value) => { console.log(value); return value; };
 // const methodLens =
@@ -69,25 +67,45 @@ const tempMethodComponentList = [isolate_1.default(tempComponent, 'first'),
     isolate_1.default(tempComponent, 'third')
 ];
 const methodLens = (methodName) => ({ get: (parentState) => (Object.assign({}, parentState._methods[methodName], { name: methodName })),
-    set: (parentState, childState) => (Object.assign({}, parentState, { _methods: Object.assign({}, parentState.methods, { [methodName]: childState }), methods: { [methodName]: childState.value
+    set: (parentState, childState) => (Object.assign({}, parentState, { _methods: Object.assign({}, parentState._methods, { [methodName]: childState }), methods: { [methodName]: childState.value
         } }))
 });
 const isolatedMethod = (args, methodName) => isolate_1.default(method_1.method(args), { onion: methodLens(methodName),
     '*': methodName
 });
+const compList = (childComponents) => ({ DOM, onion }) => {
+    const childComponentsSinks = rambda_1.compose(rambda_1.map((component) => component({ DOM, onion })), rambda_1.values)(childComponents);
+    const childComponentsDOM = rambda_1.map(rambda_1.path('DOM'), childComponentsSinks);
+    const childComponentsOnion = rambda_1.map(rambda_1.path('onion'), childComponentsSinks);
+    return ({ DOM: childComponentsDOM,
+        onion: childComponentsOnion
+    });
+};
+const toArray = (arr) => [...arr];
 exports.App = ({ DOM, onion }) => {
     const interfaceApi = setupInterface(raw, isolatedMethod, arg_1.Arg({}));
-    const setUserInteract = 
+    const methods = compList(interfaceApi)({ DOM, onion });
+    // const methods =
+    //   { DOM: take<any>(3, methodsPre.DOM)
+    //   , onion: take<any>(3, methodsPre.onion)
+    //   }
+    const setUserInteract = interfaceApi['set_sleep_reduce']({ DOM, onion });
+    // interfaceApi['__init__']({DOM, onion})
     // interfaceApi['end']({DOM, onion})
-    interfaceApi['unfollow_users']({ DOM, onion });
+    // interfaceApi['unfollow_users']({DOM, onion})
     // interfaceApi['interact_by_URL']({DOM, onion})
     // interfaceApi['set_user_interact']({DOM, onion})
     // interfaceApi['set_selenium_remote_session']({DOM, onion})
     // const template =
     //   isolate(component, 'template')({DOM, onion})
     return ({ DOM: view(onion.state$
-            .debug('well?'), [setUserInteract.DOM]),
-        onion: actions(DOM, [setUserInteract.onion])
+        // .debug('well?')
+        , methods.DOM
+        // , [ setUserInteract.DOM ]
+        ),
+        onion: actions(DOM, methods.onion
+        // , [ setUserInteract.onion.debug('onion') ]
+        )
     });
 };
 const actions = (DOM, components) => {
@@ -433,7 +451,9 @@ const tupleTypes = rambda_1.pipe(replaceTypes('customList', [types_1.createType
         types_1.createType.union(['all', 'nonfollowers'])
     ])
 ]));
-const numberTypes = longPipe(concatTypes('potency_ratio', [types_1.createType.number({ step: 0.01, min: 0 })]), concatTypes('unfollow_after', [types_1.createType.number({ step: 1, min: 0 })]), concatTypes('min', [types_1.createType.number({ step: 1, min: 0 })]), concatTypes('min_followers', [types_1.createType.number({ step: 1, min: 0 })]), concatTypes('min_following', [types_1.createType.number({ step: 1, min: 0 })]), concatTypes('max', [types_1.createType.number({ step: 1, min: 1 })]), concatTypes('max_followers', [types_1.createType.number({ step: 1, min: 1 })]), concatTypes('max_following', [types_1.createType.number({ step: 1, min: 1 })]), replaceTypes('page_delay', [types_1.createType.number({ step: 1, min: 0 })]), replaceTypes('daysold', [types_1.createType.number({ step: 1, min: 0 })]), replaceTypes('sleep_delay', [types_1.createType.number({ step: 1, min: 0 })]), replaceTypes('follow_likers_per_photo', [types_1.createType.number({ step: 1, min: 0 })]), replaceTypes('times', [types_1.createType.number({ step: 1, min: 1 })]), replaceTypes('limit', [types_1.createType.number({ step: 1, min: 1 })]), replaceTypes('max_pic', [types_1.createType.number({ step: 1, min: 1 })]), replaceTypes('photos_grab_amount', [types_1.createType.number({ step: 1, min: 1 })]), replaceTypes('posts', [types_1.createType.number({ step: 1, min: 1 })]), replaceTypes('proxy_port', [types_1.createType.number({ step: 1, min: 1, max: 65535 })]), replaceTypes('percentage', [types_1.createType.number({ step: 1, min: 0, max: 100 })]), replaceTypes('amount', [types_1.createType.number({ step: 1, min: 1 }),
+const numberTypes = longPipe(concatTypes('potency_ratio', [types_1.createType.number({ step: 0.01, min: 0 })]), concatTypes('unfollow_after', [types_1.createType.number({ step: 1, min: 0 })]), concatTypes('min', [types_1.createType.number({ step: 1, min: 0 })]), concatTypes('min_followers', [types_1.createType.number({ step: 1, min: 0 })]), concatTypes('min_following', [types_1.createType.number({ step: 1, min: 0 })]), concatTypes('max', [types_1.createType.number({ step: 1, min: 1 })]), concatTypes('max_followers', [types_1.createType.number({ step: 1, min: 1 })]), concatTypes('max_following', [types_1.createType.number({ step: 1, min: 1 })]), replaceTypes('page_delay', [types_1.createType.number({ step: 1, min: 0 })]), replaceTypes('daysold', [types_1.createType.number({ step: 1, min: 0 })]), replaceTypes('sleep_delay', [types_1.createType.number({ step: 1, min: 0 })]), replaceTypes('follow_likers_per_photo', [types_1.createType.number({ step: 1, min: 0 })]), replaceTypes('times', [types_1.createType.number({ step: 1, min: 1 })]), replaceTypes('limit', [types_1.createType.number({ step: 1, min: 1 })]), replaceTypes('max_pic', [types_1.createType.number({ step: 1, min: 1 })]), replaceTypes('photos_grab_amount', [types_1.createType.number({ step: 1, min: 1 })]), replaceTypes('posts', [types_1.createType.number({ step: 1, min: 1 })]), concatTypes('proxy_port', [types_1.createType.number({ step: 1, min: 1, max: 65535 })]), replaceTypes('percentage', [types_1.createType.number({ step: 1, min: 0, max: 100 }),
+    types_1.createType.none()
+]), replaceTypes('amount', [types_1.createType.number({ step: 1, min: 1 }),
     types_1.createType.none()
 ]));
 const suplementTypes = longPipe(stringTypes, arrayTypes, unionTypes, booleanTypes, numberTypes, tupleTypes);
@@ -757,12 +777,20 @@ exports.raw = {
             "_name": "None"
         },
         "proxy_port": {
-            "_name": "Number",
-            "_constraints": {
-                "_step": 1,
-                "_min": 1,
-                "_max": 65535
-            }
+            "_name": "Union",
+            "_options": [
+                {
+                    "_name": "None"
+                },
+                {
+                    "_name": "Number",
+                    "_constraints": {
+                        "_step": 1,
+                        "_min": 1,
+                        "_max": 65535
+                    }
+                }
+            ]
         },
         "bypass_suspicious_attempt": {
             "_name": "Boolean"
@@ -774,12 +802,20 @@ exports.raw = {
             "_name": "String"
         },
         "percentage": {
-            "_name": "Number",
-            "_constraints": {
-                "_step": 1,
-                "_min": 0,
-                "_max": 100
-            }
+            "_name": "Union",
+            "_options": [
+                {
+                    "_name": "Number",
+                    "_constraints": {
+                        "_step": 1,
+                        "_min": 0,
+                        "_max": 100
+                    }
+                },
+                {
+                    "_name": "None"
+                }
+            ]
         },
         "enabled": {
             "_name": "Union",
@@ -1740,7 +1776,10 @@ const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
 const must_1 = require("./../../utils/must");
 const dom = ({ name, value }) => dom_1.div(`.${styles.container}`, [...must_1.mustArray(name !== '', dom_1.h4(`.${styles.name}`, name)),
-    dom_1.div(`.${styles.bool}.${(value ? styles.on : styles.off)}`, { dataset: { flip: true
+    dom_1.div({ class: { [styles.bool]: true,
+            [styles.on]: value
+        },
+        dataset: { flip: true
         }
     }, value ? 'True' : 'False')
 ]);
@@ -1765,15 +1804,13 @@ const name = typestyle_1.style({ color: '#222'
 exports.name = name;
 const bool = typestyle_1.style({ color: '#fff',
     textAlign: 'center',
-    padding: '.4em'
+    padding: '.4em',
+    background: '#777'
 });
 exports.bool = bool;
 const on = typestyle_1.style({ background: '#3c3'
 });
 exports.on = on;
-const off = typestyle_1.style({ background: '#777'
-});
-exports.off = off;
 //# sourceMappingURL=styles.js.map
 });
 ___scope___.file("docSrc/src/components/input-boolean/types.js", function(exports, require, module, __filename, __dirname){
@@ -1892,8 +1929,7 @@ const defaultState = { name: '',
 };
 const maxRange = (max) => (value) => value > max ? max : value;
 const minRange = (min) => (value) => value < min ? min : value;
-const keepInRange = (min, max) => rambda_1.compose(maxRange(max), minRange(min), logY);
-const logY = (val) => { console.log(val); return val; };
+const keepInRange = (min, max) => rambda_1.compose(maxRange(max), minRange(min));
 const keepValidNumber = (min, max, _default) => rambda_1.ifElse(isNaN, () => _default, keepInRange(min, max));
 const intent = (DOM) => {
     const init$ = xstream_1.default
@@ -1903,9 +1939,7 @@ const intent = (DOM) => {
         .events('input')
         .map(rambda_1.path('target.value'))
         .map(Number)
-        .debug('in')
-        .map((newValue) => (prevState) => (Object.assign({}, prevState, { value: keepValidNumber(prevState.min, prevState.max, prevState._default)(newValue) })))
-        .debug('out');
+        .map((newValue) => (prevState) => (Object.assign({}, prevState, { value: keepValidNumber(prevState.min, prevState.max, prevState._default)(newValue) })));
     return xstream_1.default.merge(init$, input$);
 };
 exports.intent = intent;
@@ -2059,11 +2093,17 @@ const types_1 = require("./types");
 exports.State = types_1.State;
 const rambda_1 = require("rambda");
 const arg_1 = require("./../arg");
+const must_1 = require("./../../utils/must");
 const defaultLens = (_0, key, _1) => ({ get: (parentState) => (Object.assign({}, parentState[`_${key}`], { _default: parentState._default[key], value: rambda_1.pathOr(parentState._default[key], [`_${key}`, 'value'], parentState) })),
     set: (parentState, childState) => (Object.assign({}, parentState, { [`_${key}`]: childState, value: rambda_1.update(key, childState.value, parentState.value) }))
 });
-const numberLens = (_, key, { _step, _min, _max }) => ({ get: (parentState) => (Object.assign({}, parentState[`_${key}`], { _default: def, name: argName, value: rambda_1.pathOr(def, [`_${argName}`, 'value'], parentState) }, maybeObject('step', _step), maybeObject('min', _min), maybeObject('max', _max))),
-    set: (parentState, childState) => (Object.assign({}, parentState, { [`_${argName}`]: childState, value: Object.assign({}, parentState.value, { [argName]: childState.value }) }))
+const numberLens = (_, key, { _step, _min, _max }) => ({ get: (parentState) => (Object.assign({}, parentState[`_${key}`], { _default: parentState._default[key], value: rambda_1.pathOr(parentState._default[key], [`_${key}`, 'value'], parentState) }, must_1.mustObject(_step === undefined, ['step', _step]), must_1.mustObject(_min === undefined, ['min', _min]), must_1.mustObject(_max === undefined, ['max', _max]))),
+    set: (parentState, childState) => (Object.assign({}, parentState, { [`_${key}`]: childState, value: rambda_1.update(key, childState.value, parentState.value) }))
+});
+const unionLens = (_, key) => ({ get: (parentState) => (Object.assign({}, parentState[`_${key}`], { _default: parentState._default[key], value: rambda_1.pathOr(parentState._default[key], [`_${key}`, 'value'], parentState) })),
+    set: (parentState, childState) => (Object.assign({}, parentState, { [`_${key}`]: childState, value: rambda_1.update(key, childState[`_${childState.active}`] === undefined
+            ? parentState._default[key]
+            : childState[`_${childState.active}`].value, parentState.value) }))
 });
 const compList = (childComponents) => ({ DOM, onion }) => {
     const childComponentsSinks = rambda_1.map((component) => component({ DOM, onion }), childComponents);
@@ -2078,15 +2118,12 @@ const inputTuple = (_subTypes) => ({ DOM, onion }) => {
         none: defaultLens,
         boolean: defaultLens,
         string: defaultLens,
-        number: defaultLens,
+        number: numberLens,
         array: defaultLens,
         tuple: defaultLens,
-        union: defaultLens
+        union: unionLens
     })))(_subTypes);
     const childComponentsSinks = compList(childComponents)({ DOM, onion });
-    console.log(_subTypes);
-    console.log(childComponents);
-    console.log(childComponentsSinks);
     return ({ DOM: view_1.view(onion.state$, childComponentsSinks.DOM),
         onion: intent_1.intent(DOM, childComponentsSinks.onion)
     });
@@ -2200,12 +2237,8 @@ const inputUnion = (_options) => ({ DOM, onion }) => {
         tuple: defaultLens,
         union: defaultLens
     })), rambda_1.filter(isDynamic))(_options);
-    const logY = (val) => { console.log(val); return val; };
-    const childComponents = rambda_1.compose(rambda_1.map(([index, makeComponent]) => makeComponent(null, index)), logY, rambda_1.zip([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]))([...constantChildComponents, ...dynamicChildComponents]);
+    const childComponents = rambda_1.compose(rambda_1.map(([index, makeComponent]) => makeComponent(null, index)), rambda_1.zip([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]))([...constantChildComponents, ...dynamicChildComponents]);
     const childComponentsSinks = compList(childComponents)({ DOM, onion });
-    console.log('childSinks');
-    console.log(_options);
-    console.log(childComponentsSinks);
     return ({ DOM: view_1.view(onion.state$, childComponentsSinks.DOM),
         onion: intent_1.intent(DOM, childComponentsSinks.onion)
     });
@@ -2254,15 +2287,18 @@ const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
 const rambda_1 = require("rambda");
 const must_1 = require("./../../utils/must");
-const pickList = (childComponents, acc = []) => childComponents.length < 1
-    ? acc
-    : pickList(rambda_1.dropLast(1, childComponents), [dom_1.div(`.${styles.pickWrapper}`, [childComponents[childComponents.length - 1],
-            dom_1.div(`.${styles.pick}`, { dataset: { pick: `${childComponents.length - 1}` } })
-        ]),
-        ...acc
-    ]);
-const dom = ([{ name, active, pickListOpen }, childComponents]) => dom_1.div(`.${styles.container}`, [...must_1.mustArray(name !== '', dom_1.h4(`.${styles.name}`, name)),
-    dom_1.div(`.${styles.childWrapper}`, [dom_1.div({ class: { [styles.hidden]: pickListOpen,
+const iMap = rambda_1.addIndex(rambda_1.map);
+const pickList = (childComponents) => iMap((childComponent, index) => dom_1.div({ class: { [styles.pickWrapper]: true } }, [childComponent,
+    dom_1.div({ class: { [styles.pick]: true },
+        dataset: { pick: `${index}` }
+    })
+]), childComponents);
+const showOnlyActive = (childComponents, active) => iMap((childComponent, index) => dom_1.div({ class: { [styles.hidden]: `${active}` !== `${index}` }
+}, childComponent), childComponents);
+const dom = ([{ name, active, pickListOpen }, childComponents]) => dom_1.div({ class: { [styles.container]: true
+    }
+}, [...must_1.mustArray(name !== '', dom_1.h4({ class: { [styles.name]: true } }, name)),
+    dom_1.div({ class: { [styles.childWrapper]: true } }, [dom_1.div({ class: { [styles.hidden]: pickListOpen,
                 [styles.open]: true
             },
             dataset: { pickOpen: true }
@@ -2273,7 +2309,7 @@ const dom = ([{ name, active, pickListOpen }, childComponents]) => dom_1.div(`.$
         }, pickList(childComponents)),
         dom_1.div({ class: { [styles.hidden]: pickListOpen
             }
-        }, childComponents[active])
+        }, showOnlyActive(childComponents, active))
     ])
 ]);
 const headTailPair = ([head, ...tail]) => [head, tail];
@@ -2377,8 +2413,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
 const must_1 = require("./../../utils/must");
-const dom = ({ name, value, _default }) => dom_1.div(`.${styles.container}`, [...must_1.mustArray(name !== '', dom_1.h4(`.${styles.title}`, name)),
-    dom_1.div(`.${styles.paragraph}`, value)
+const dom = ({ name, value, _default }) => dom_1.div({ class: { [styles.container]: true
+    }
+}, [...must_1.mustArray(name !== '', dom_1.h4({ class: { [styles.title]: true }
+    }, name)),
+    dom_1.div({ class: { [styles.paragraph]: true }
+    }, value)
 ]);
 const view = (state$) => state$
     .map(dom);
@@ -2430,16 +2470,6 @@ const compList = (childComponents) => ({ DOM, onion }) => {
 };
 const method = (childComponents = {}) => ({ DOM, onion }) => {
     const childComponentsSinks = compList(childComponents)({ DOM, onion });
-    // const childComponentsSinks =
-    //   map
-    //   ( (component:Component) => component({DOM, onion})
-    //   , values(childComponents)
-    //   )
-    // const childComponentsDOM =
-    //   map<any, any>(path('DOM'), childComponentsSinks)
-    // const childComponentsOnion =
-    //   map(path('onion'), childComponentsSinks)
-    //
     return ({ DOM: view_1.view(onion.state$, childComponentsSinks.DOM),
         onion: intent_1.intent(DOM, childComponentsSinks.onion)
     });
@@ -2453,12 +2483,17 @@ ___scope___.file("docSrc/src/components/method/intent.js", function(exports, req
 Object.defineProperty(exports, "__esModule", { value: true });
 // intent
 const xstream_1 = require("xstream");
-const defaultState = { name: 'Method'
+const defaultState = { name: 'Method',
+    isIncluded: false
 };
 const intent = (DOM, childComponentOnion) => {
     const init$ = xstream_1.default
         .of((prev) => (Object.assign({}, defaultState, prev)));
-    return xstream_1.default.merge(init$, ...childComponentOnion);
+    const flip$ = DOM
+        .select('[data-flip]')
+        .events('click')
+        .mapTo((prevState) => (Object.assign({}, prevState, { isIncluded: !prevState.isIncluded })));
+    return xstream_1.default.merge(init$, flip$, ...childComponentOnion);
 };
 exports.intent = intent;
 //# sourceMappingURL=intent.js.map
@@ -2471,8 +2506,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const xstream_1 = require("xstream");
 const dom_1 = require("@cycle/dom");
 const styles = require("./styles");
-const dom = ([{ name }, childComponents]) => dom_1.div(`.${styles.container}`, [dom_1.h2(`.${styles.title}`, name),
-    dom_1.div(childComponents)
+const must_1 = require("./../../utils/must");
+const dom = ([{ name, isIncluded }, childComponents]) => dom_1.div(`.${styles.container}`, [dom_1.h2({ dataset: { flip: true },
+        class: { [styles.name]: true,
+            [styles.includeTrue]: isIncluded
+        }
+    }, name),
+    ...must_1.mustArray(isIncluded, dom_1.div(childComponents))
 ]);
 const headTailPair = ([head, ...tail]) => [head, tail];
 const view = (state$, childComponentsDOM) => xstream_1.default.combine(state$, ...childComponentsDOM)
@@ -2492,12 +2532,13 @@ const container = typestyle_1.style({ borderStyle: 'solid',
     padding: '.8rem'
 }, csstips_1.vertical);
 exports.container = container;
-const title = typestyle_1.style({ color: '#222'
+const name = typestyle_1.style({ color: 'white',
+    background: '#ccc',
+    padding: '.4em'
 });
-exports.title = title;
-const paragraph = typestyle_1.style({ color: '#444'
-});
-exports.paragraph = paragraph;
+exports.name = name;
+const includeTrue = typestyle_1.style({ background: '#3c3' });
+exports.includeTrue = includeTrue;
 //# sourceMappingURL=styles.js.map
 });
 ___scope___.file("docSrc/src/components/method/types.js", function(exports, require, module, __filename, __dirname){
@@ -7162,7 +7203,7 @@ return ___scope___.entry = "index.js";
 FuseBox.pkg("rambda", {}, function(___scope___){
 ___scope___.file("dist/rambda.js", function(exports, require, module, __filename, __dirname){
 
-function n(n){return function(r){for(var t=[],e=arguments.length-1;e-- >0;)t[e]=arguments[e+1];var o=0;return n.apply(null,[function(){for(var n=[],t=arguments.length;t--;)n[t]=arguments[t];return r.apply(null,n.concat([o++]))}].concat(t))}}function r(n,t){if(void 0===t)return function(t){return r(n,t)};if(void 0===t.length)return function(n,r){var t={};for(var e in r)n(r[e],e)&&(t[e]=r[e]);return t}(n,t);for(var e=-1,o=0,u=t.length,i=[];++e<u;){var f=t[e];n(f)&&(i[o++]=f)}return i}function t(n,r){if(void 0===r)return function(r){return t(n,r)};for(var e=0;e<r.length;){if(n(r[e]))return!0;e++}return!1}function e(){for(var n=[],r=arguments.length;r--;)n[r]=arguments[r];return function(){for(var r=[],t=arguments.length;t--;)r[t]=arguments[t];var e=n.slice();if(e.length>0){for(var o=e.pop().apply(void 0,r);e.length>0;)o=e.pop()(o);return o}}}function o(n){var r=typeof n;if(null===n)return"Null";if(void 0===n)return"Undefined";if("boolean"===r)return"Boolean";if("number"===r)return"Number";if("string"===r)return"String";if(Array.isArray(n))return"Array";if(n instanceof RegExp)return"RegExp";var t=n.toString();return t.startsWith("async")?"Async":"[object Promise]"===t?"Promise":t.includes("function")||t.includes("=>")?"Function":"Object"}function u(n,r){if(1===arguments.length)return function(r){return u(n,r)};if(n===r)return!0;var t=o(n);if(t!==o(r))return!1;if("Array"===t){var e=Array.from(n),i=Array.from(r);if(e.toString()!==i.toString())return!1;var f=!0;return e.forEach(function(n,r){f&&(n===i[r]||u(n,i[r])||(f=!1))}),f}if("Object"===t){var c=Object.keys(n);if(c.length!==Object.keys(r).length)return!1;var s=!0;return c.forEach(function(t){if(s){var e=n[t],o=r[t];e===o||u(e,o)||(s=!1)}}),s}return!1}function i(n,r){if(void 0===r)return function(r){return i(n,r)};for(var t=-1,e=!1;++t<r.length&&!e;)u(r[t],n)&&(e=!0);return e}function f(n,r){return void 0===r&&(r=[]),function(){for(var t,e=[],o=arguments.length;o--;)e[o]=arguments[o];return(t=r.concat(e)).length>=n.length?n.apply(void 0,t):f(n,t)}}function c(n,r){return 1===arguments.length?function(r){return c(n,r)}:void 0===r||null===r||!0===Number.isNaN(r)?n:r}function s(n,r){return void 0===r?function(r){return s(n,r)}:r.slice(n)}function p(n,r){if(void 0===r)return function(r){return p(n,r)};if(void 0===r.length)return function(n,r){var t={};for(var e in r)t[e]=n(r[e],e);return t}(n,r);for(var t=-1,e=r.length,o=Array(e);++t<e;)o[t]=n(r[t]);return o}function a(n,r,t){var e=-1,o=n.length;(t=t>o?o:t)<0&&(t+=o),o=r>t?0:t-r>>>0,r>>>=0;for(var u=Array(o);++e<o;)u[e]=n[e+r];return u}function v(n,r){return void 0===r?function(r){return v(n,r)}:Object.assign({},n,r)}function l(n,r){if(1===arguments.length)return function(r){return l(n,r)};if(null!==r&&void 0!==r){for(var t=r,e=0,o="string"==typeof n?n.split("."):n;e<o.length;){if(null===t||void 0===t)return;t=t[o[e]],e++}return t}}var d=f(function(n,r,t){return c(n,l(r,t))});function x(n,r){if(void 0===r)return function(r){return x(n,r)};for(var t=[],e=n;e<r;e++)t.push(e);return t}function h(n,r,t){return void 0===r?function(r,t){return h(n,r,t)}:void 0===t?function(t){return h(n,r,t)}:t.reduce(n,r)}exports.add=function n(r,t){return void 0===t?function(t){return n(r,t)}:r+t},exports.addIndex=n,exports.adjust=function n(r,t,e){return void 0===t?function(t,e){return n(r,t,e)}:void 0===e?function(e){return n(r,t,e)}:e.concat().map(function(n,o){return o===t?r(e[t]):n})},exports.all=function n(t,e){return void 0===e?function(r){return n(t,r)}:r(t,e).length===e.length},exports.allPass=function n(r,e){return 1===arguments.length?function(t){return n(r,t)}:!t(function(n){return!n(e)},r)},exports.always=function(n){return function(){return n}},exports.any=t,exports.anyPass=function n(r,e){return 1===arguments.length?function(t){return n(r,t)}:t(function(n){return n(e)})(r)},exports.append=function n(r,t){if(void 0===t)return function(t){return n(r,t)};if("string"==typeof t)return""+t+r;var e=t.concat();return e.push(r),e},exports.both=function n(r,t){return void 0===t?function(t){return n(r,t)}:function(n){return r(n)&&t(n)}},exports.complement=function(n){return function(r){return!n(r)}},exports.compose=e,exports.concat=function n(r,t){return void 0===t?function(t){return n(r,t)}:"string"==typeof r?""+r+t:r.concat(t)},exports.contains=i,exports.curry=f,exports.dec=function(n){return n-1},exports.defaultTo=c,exports.dissoc=function n(r,t){if(1===arguments.length)return function(t){return n(r,t)};if(null!==t&&void 0!==t){var e={};for(var o in t)o!==""+r&&(e[o]=t[o]);return e}},exports.divide=function n(r,t){return void 0===t?function(t){return n(r,t)}:r/t},exports.drop=s,exports.dropLast=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.slice(0,-r)},exports.either=function n(r,t){return void 0===t?function(t){return n(r,t)}:function(n){return r(n)||t(n)}},exports.endsWith=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.endsWith(r)},exports.equals=u,exports.F=function(){return!1},exports.filter=r,exports.find=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.find(r)},exports.findIndex=function n(r,t){if(void 0===t)return function(t){return n(r,t)};for(var e=t.length,o=-1;++o<e;)if(r(t[o]))return o;return-1},exports.flatten=function n(r,t){t=void 0===t?[]:t;for(var e=0;e<r.length;e++)Array.isArray(r[e])?n(r[e],t):t.push(r[e]);return t},exports.flip=function(n){for(var r=[],t=arguments.length-1;t-- >0;)r[t]=arguments[t+1];return function(n){return function(){for(var r=[],t=arguments.length;t--;)r[t]=arguments[t];return 1===r.length?function(t){return n(t,r[0])}:2===r.length?n(r[1],r[0]):void 0}}(n)},exports.forEach=function n(r,t){return void 0===t?function(t){return n(r,t)}:(p(r,t),t)},exports.groupBy=function n(r,t){if(void 0===t)return function(t){return n(r,t)};for(var e={},o=0;o<t.length;o++){var u=t[o],i=r(u);e[i]||(e[i]=[]),e[i].push(u)}return e},exports.has=function n(r,t){return void 0===t?function(t){return n(r,t)}:void 0!==t[r]},exports.head=function(n){return"string"==typeof n?n[0]||"":n[0]},exports.identity=function(n){return n},exports.ifElse=function n(r,t,e){return void 0===t?function(t,e){return n(r,t,e)}:void 0===e?function(e){return n(r,t,e)}:function(n){return!0===("boolean"==typeof r?r:r(n))?t(n):e(n)}},exports.inc=function(n){return n+1},exports.includes=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.includes(r)},exports.indexBy=function n(r,t){if(void 0===t)return function(t){return n(r,t)};for(var e={},o=0;o<t.length;o++){var u=t[o];e[r(u)]=u}return e},exports.indexOf=function n(r,t){if(void 0===t)return function(t){return n(r,t)};for(var e=-1,o=t.length;++e<o;)if(t[e]===r)return e;return-1},exports.init=function(n){return"string"==typeof n?n.slice(0,-1):n.length?a(n,0,-1):[]},exports.is=function n(r,t){return void 0===t?function(t){return n(r,t)}:t instanceof r||t.constructor===r},exports.isNil=function(n){return void 0===n||null===n},exports.join=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.join(r)},exports.last=function(n){return"string"==typeof n?n[n.length-1]||"":n[n.length-1]},exports.lastIndexOf=function n(r,t){if(void 0===t)return function(t){return n(r,t)};var e=-1;return t.map(function(n,t){u(n,r)&&(e=t)}),e},exports.length=function(n){return n.length},exports.map=p,exports.match=function n(r,t){if(void 0===t)return function(t){return n(r,t)};var e=t.match(r);return null===e?[]:e},exports.merge=v,exports.modulo=function n(r,t){return void 0===t?function(t){return n(r,t)}:r%t},exports.multiply=function n(r,t){return void 0===t?function(t){return n(r,t)}:r*t},exports.none=function n(r,t){return void 0===t?function(t){return n(r,t)}:0===t.filter(r).length},exports.not=function(n){return!n},exports.omit=function n(r,t){if(1===arguments.length)return function(t){return n(r,t)};if(null!==t&&void 0!==t){var e="string"==typeof r?r=r.split(","):r,o={};for(var u in t)e.includes(u)||(o[u]=t[u]);return o}},exports.partialCurry=function(n,r){return void 0===r&&(r={}),function(t){return"Async"===o(n)||"Promise"===o(n)?new Promise(function(e,o){n(v(t,r)).then(e).catch(o)}):n(v(t,r))}},exports.path=l,exports.pathOr=d,exports.pick=function n(r,t){if(1===arguments.length)return function(t){return n(r,t)};if(null!==t&&void 0!==t){for(var e="string"==typeof r?r.split(","):r,o={},u=0;u<e.length;)e[u]in t&&(o[e[u]]=t[e[u]]),u++;return o}},exports.pickAll=function n(r,t){if(1===arguments.length)return function(t){return n(r,t)};if(null!==t&&void 0!==t){for(var e="string"==typeof r?r.split(","):r,o={},u=0;u<e.length;)o[e[u]]=e[u]in t?t[e[u]]:void 0,u++;return o}},exports.pipe=function(){for(var n=[],r=arguments.length;r--;)n[r]=arguments[r];return e.apply(void 0,n.reverse())},exports.pluck=function n(r,t){if(void 0===t)return function(t){return n(r,t)};var e=[];return p(function(n){void 0!==n[r]&&e.push(n[r])},t),e},exports.prepend=function n(r,t){if(void 0===t)return function(t){return n(r,t)};if("string"==typeof t)return""+r+t;var e=t.concat();return e.unshift(r),e},exports.prop=function n(r,t){return void 0===t?function(t){return n(r,t)}:t[r]},exports.propEq=function n(r,t,e){return void 0===t?function(t,e){return n(r,t,e)}:void 0===e?function(e){return n(r,t,e)}:e[r]===t},exports.range=x,exports.reduce=h,exports.reject=function n(t,e){return void 0===e?function(r){return n(t,r)}:r(function(n){return!t(n)},e)},exports.repeat=function n(r,t){return void 0===t?function(t){return n(r,t)}:Array(t).fill(r)},exports.replace=function n(r,t,e){return void 0===t?function(t,e){return n(r,t,e)}:void 0===e?function(e){return n(r,t,e)}:e.replace(r,t)},exports.reverse=function(n){return n.concat().reverse()},exports.sort=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.concat().sort(r)},exports.sortBy=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.concat().sort(function(n,t){var e=r(n),o=r(t);return e<o?-1:e>o?1:0})},exports.split=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.split(r)},exports.splitEvery=function n(r,t){if(void 0===t)return function(t){return n(r,t)};for(var e=r>1?r:1,o=[],u=0;u<t.length;)o.push(t.slice(u,u+=e));return o},exports.startsWith=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.startsWith(r)},exports.subtract=function n(r,t){return void 0===t?function(t){return n(r,t)}:r-t},exports.T=function(){return!0},exports.tail=function(n){return s(1,n)},exports.take=function n(r,t){return void 0===t?function(t){return n(r,t)}:"string"==typeof t?t.slice(0,r):a(t,0,r)},exports.takeLast=function n(r,t){if(void 0===t)return function(t){return n(r,t)};var e=t.length,o=r>e?e:r;return"string"==typeof t?t.slice(e-o):a(t,o=e-o,e)},exports.tap=function n(r,t){return void 0===t?function(t){return n(r,t)}:(r(t),t)},exports.test=function n(r,t){return void 0===t?function(t){return n(r,t)}:-1!==t.search(r)},exports.times=function n(r,t){return void 0===t?function(t){return n(r,t)}:p(r,x(0,t))},exports.toLower=function(n){return n.toLowerCase()},exports.toString=function(n){return n.toString()},exports.toUpper=function(n){return n.toUpperCase()},exports.trim=function(n){return n.trim()},exports.type=o,exports.uniq=function(n){for(var r=-1,t=[];++r<n.length;){var e=n[r];i(e,t)||t.push(e)}return t},exports.uniqWith=function n(r,e){if(1===arguments.length)return function(t){return n(r,t)};for(var o=-1,u=[],i=function(){var n=e[o];t(function(t){return r(n,t)},u)||u.push(n)};++o<e.length;)i();return u},exports.update=function n(r,t,e){return void 0===t?function(t,e){return n(r,t,e)}:void 0===e?function(e){return n(r,t,e)}:e.concat().fill(t,r,r+1)},exports.values=function(n){var r=[];for(var t in n)r.push(n[t]);return r},exports.without=function(n,r){return h(function(r,t){return i(t,n)?r:r.concat(t)},[],r)},exports.zip=function r(t,e){return void 0===e?function(n){return r(t,n)}:n(h)(function(n,r,t){return e[t]?n.concat([[r,e[t]]]):n},[],t)},exports.zipObj=function n(r,t){return void 0===t?function(t){return n(r,t)}:r.reduce(function(n,r,e){return n[r]=t[e],n},{})};
+function n(n){return function(r){for(var t=[],e=arguments.length-1;e-- >0;)t[e]=arguments[e+1];var o=0;return n.apply(null,[function(){for(var n=[],t=arguments.length;t--;)n[t]=arguments[t];return r.apply(null,n.concat([o++]))}].concat(t))}}function r(n,t){if(void 0===t)return function(t){return r(n,t)};if(void 0===t.length)return function(n,r){var t={};for(var e in r)n(r[e],e)&&(t[e]=r[e]);return t}(n,t);for(var e=-1,o=0,u=t.length,i=[];++e<u;){var f=t[e];n(f)&&(i[o++]=f)}return i}function t(n,r){if(void 0===r)return function(r){return t(n,r)};for(var e=0;e<r.length;){if(n(r[e]))return!0;e++}return!1}function e(){for(var n=[],r=arguments.length;r--;)n[r]=arguments[r];return function(){for(var r=[],t=arguments.length;t--;)r[t]=arguments[t];var e=n.slice();if(e.length>0){for(var o=e.pop().apply(void 0,r);e.length>0;)o=e.pop()(o);return o}}}function o(n){var r=typeof n;if(null===n)return"Null";if(void 0===n)return"Undefined";if("boolean"===r)return"Boolean";if("number"===r)return"Number";if("string"===r)return"String";if(Array.isArray(n))return"Array";if(n instanceof RegExp)return"RegExp";var t=n.toString();return t.startsWith("async")?"Async":"[object Promise]"===t?"Promise":t.includes("function")||t.includes("=>")?"Function":"Object"}function u(n,r){if(1===arguments.length)return function(r){return u(n,r)};if(n===r)return!0;var t=o(n);if(t!==o(r))return!1;if("Array"===t){var e=Array.from(n),i=Array.from(r);if(e.toString()!==i.toString())return!1;var f=!0;return e.forEach(function(n,r){f&&(n===i[r]||u(n,i[r])||(f=!1))}),f}if("Object"===t){var c=Object.keys(n);if(c.length!==Object.keys(r).length)return!1;var s=!0;return c.forEach(function(t){if(s){var e=n[t],o=r[t];e===o||u(e,o)||(s=!1)}}),s}return!1}function i(n,r){if(void 0===r)return function(r){return i(n,r)};for(var t=-1,e=!1;++t<r.length&&!e;)u(r[t],n)&&(e=!0);return e}function f(n,r){return void 0===r&&(r=[]),function(){for(var t,e=[],o=arguments.length;o--;)e[o]=arguments[o];return(t=r.concat(e)).length>=n.length?n.apply(void 0,t):f(n,t)}}function c(n,r){return 1===arguments.length?function(r){return c(n,r)}:void 0===r||null===r||!0===Number.isNaN(r)?n:r}function s(n,r){return void 0===r?function(r){return s(n,r)}:r.slice(n)}function p(n,r){if(void 0===r)return function(r){return p(n,r)};if(void 0===r.length)return function(n,r){var t={};for(var e in r)t[e]=n(r[e],e);return t}(n,r);for(var t=-1,e=r.length,o=Array(e);++t<e;)o[t]=n(r[t]);return o}function a(n,r,t){var e=-1,o=n.length;(t=t>o?o:t)<0&&(t+=o),o=r>t?0:t-r>>>0,r>>>=0;for(var u=Array(o);++e<o;)u[e]=n[e+r];return u}function l(n,r){return void 0===r?function(r){return l(n,r)}:Object.assign({},n,r)}function v(n,r){if(1===arguments.length)return function(r){return v(n,r)};if(null!==r&&void 0!==r){for(var t=r,e=0,o="string"==typeof n?n.split("."):n;e<o.length;){if(null===t||void 0===t)return;t=t[o[e]],e++}return t}}var d=f(function(n,r,t){return c(n,v(r,t))});function x(n,r){if(void 0===r)return function(r){return x(n,r)};for(var t=[],e=n;e<r;e++)t.push(e);return t}function h(n,r,t){return void 0===r?function(r,t){return h(n,r,t)}:void 0===t?function(t){return h(n,r,t)}:t.reduce(n,r)}exports.add=function n(r,t){return void 0===t?function(t){return n(r,t)}:r+t},exports.addIndex=n,exports.adjust=function n(r,t,e){return void 0===t?function(t,e){return n(r,t,e)}:void 0===e?function(e){return n(r,t,e)}:e.concat().map(function(n,o){return o===t?r(e[t]):n})},exports.all=function n(t,e){return void 0===e?function(r){return n(t,r)}:r(t,e).length===e.length},exports.allPass=function n(r,e){return 1===arguments.length?function(t){return n(r,t)}:!t(function(n){return!n(e)},r)},exports.always=function(n){return function(){return n}},exports.any=t,exports.anyPass=function n(r,e){return 1===arguments.length?function(t){return n(r,t)}:t(function(n){return n(e)})(r)},exports.append=function n(r,t){if(void 0===t)return function(t){return n(r,t)};if("string"==typeof t)return""+t+r;var e=t.concat();return e.push(r),e},exports.both=function n(r,t){return void 0===t?function(t){return n(r,t)}:function(n){return r(n)&&t(n)}},exports.complement=function(n){return function(r){return!n(r)}},exports.compose=e,exports.concat=function n(r,t){return void 0===t?function(t){return n(r,t)}:"string"==typeof r?""+r+t:r.concat(t)},exports.contains=i,exports.curry=f,exports.dec=function(n){return n-1},exports.defaultTo=c,exports.dissoc=function n(r,t){if(1===arguments.length)return function(t){return n(r,t)};if(null!==t&&void 0!==t){var e={};for(var o in t)o!==""+r&&(e[o]=t[o]);return e}},exports.divide=function n(r,t){return void 0===t?function(t){return n(r,t)}:r/t},exports.drop=s,exports.dropLast=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.slice(0,-r)},exports.either=function n(r,t){return void 0===t?function(t){return n(r,t)}:function(n){return r(n)||t(n)}},exports.endsWith=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.endsWith(r)},exports.equals=u,exports.F=function(){return!1},exports.filter=r,exports.find=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.find(r)},exports.findIndex=function n(r,t){if(void 0===t)return function(t){return n(r,t)};for(var e=t.length,o=-1;++o<e;)if(r(t[o]))return o;return-1},exports.flatten=function n(r,t){t=void 0===t?[]:t;for(var e=0;e<r.length;e++)Array.isArray(r[e])?n(r[e],t):t.push(r[e]);return t},exports.flip=function(n){for(var r=[],t=arguments.length-1;t-- >0;)r[t]=arguments[t+1];return function(n){return function(){for(var r=[],t=arguments.length;t--;)r[t]=arguments[t];return 1===r.length?function(t){return n(t,r[0])}:2===r.length?n(r[1],r[0]):void 0}}(n)},exports.forEach=function n(r,t){return void 0===t?function(t){return n(r,t)}:(p(r,t),t)},exports.groupBy=function n(r,t){if(void 0===t)return function(t){return n(r,t)};for(var e={},o=0;o<t.length;o++){var u=t[o],i=r(u);e[i]||(e[i]=[]),e[i].push(u)}return e},exports.has=function n(r,t){return void 0===t?function(t){return n(r,t)}:void 0!==t[r]},exports.head=function(n){return"string"==typeof n?n[0]||"":n[0]},exports.identity=function(n){return n},exports.ifElse=function n(r,t,e){return void 0===t?function(t,e){return n(r,t,e)}:void 0===e?function(e){return n(r,t,e)}:function(n){return!0===("boolean"==typeof r?r:r(n))?t(n):e(n)}},exports.inc=function(n){return n+1},exports.includes=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.includes(r)},exports.indexBy=function n(r,t){if(void 0===t)return function(t){return n(r,t)};for(var e={},o=0;o<t.length;o++){var u=t[o];e[r(u)]=u}return e},exports.indexOf=function n(r,t){if(void 0===t)return function(t){return n(r,t)};for(var e=-1,o=t.length;++e<o;)if(t[e]===r)return e;return-1},exports.init=function(n){return"string"==typeof n?n.slice(0,-1):n.length?a(n,0,-1):[]},exports.is=function n(r,t){return 1===arguments.length?function(t){return n(r,t)}:null!=t&&t.constructor===r||t instanceof r},exports.isNil=function(n){return void 0===n||null===n},exports.join=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.join(r)},exports.keys=function(n){return Object.keys(n)},exports.last=function(n){return"string"==typeof n?n[n.length-1]||"":n[n.length-1]},exports.lastIndexOf=function n(r,t){if(void 0===t)return function(t){return n(r,t)};var e=-1;return t.map(function(n,t){u(n,r)&&(e=t)}),e},exports.length=function(n){return n.length},exports.map=p,exports.match=function n(r,t){if(void 0===t)return function(t){return n(r,t)};var e=t.match(r);return null===e?[]:e},exports.merge=l,exports.max=function n(r,t){return 1===arguments.length?function(t){return n(r,t)}:t>r?t:r},exports.maxBy=function n(r,t,e){return 2===arguments.length?function(e){return n(r,t,e)}:1===arguments.length?function(t,e){return n(r,t,e)}:r(e)>r(t)?e:t},exports.min=function n(r,t){return 1===arguments.length?function(t){return n(r,t)}:t<r?t:r},exports.minBy=function n(r,t,e){return 2===arguments.length?function(e){return n(r,t,e)}:1===arguments.length?function(t,e){return n(r,t,e)}:r(e)<r(t)?e:t},exports.modulo=function n(r,t){return void 0===t?function(t){return n(r,t)}:r%t},exports.multiply=function n(r,t){return void 0===t?function(t){return n(r,t)}:r*t},exports.none=function n(r,t){return void 0===t?function(t){return n(r,t)}:0===t.filter(r).length},exports.not=function(n){return!n},exports.nth=function n(r,t){if(void 0===t)return function(t){return n(r,t)};var e=r<0?t.length+r:r;return"[object String]"===Object.prototype.toString.call(t)?t.charAt(e):t[e]},exports.omit=function n(r,t){if(1===arguments.length)return function(t){return n(r,t)};if(null!==t&&void 0!==t){var e="string"==typeof r?r=r.split(","):r,o={};for(var u in t)e.includes(u)||(o[u]=t[u]);return o}},exports.partialCurry=function(n,r){return void 0===r&&(r={}),function(t){return"Async"===o(n)||"Promise"===o(n)?new Promise(function(e,o){n(l(t,r)).then(e).catch(o)}):n(l(t,r))}},exports.path=v,exports.pathOr=d,exports.pick=function n(r,t){if(1===arguments.length)return function(t){return n(r,t)};if(null!==t&&void 0!==t){for(var e="string"==typeof r?r.split(","):r,o={},u=0;u<e.length;)e[u]in t&&(o[e[u]]=t[e[u]]),u++;return o}},exports.pickAll=function n(r,t){if(1===arguments.length)return function(t){return n(r,t)};if(null!==t&&void 0!==t){for(var e="string"==typeof r?r.split(","):r,o={},u=0;u<e.length;)o[e[u]]=e[u]in t?t[e[u]]:void 0,u++;return o}},exports.pipe=function(){for(var n=[],r=arguments.length;r--;)n[r]=arguments[r];return e.apply(void 0,n.reverse())},exports.pluck=function n(r,t){if(void 0===t)return function(t){return n(r,t)};var e=[];return p(function(n){void 0!==n[r]&&e.push(n[r])},t),e},exports.prepend=function n(r,t){if(void 0===t)return function(t){return n(r,t)};if("string"==typeof t)return""+r+t;var e=t.concat();return e.unshift(r),e},exports.prop=function n(r,t){return void 0===t?function(t){return n(r,t)}:t[r]},exports.propEq=function n(r,t,e){return void 0===t?function(t,e){return n(r,t,e)}:void 0===e?function(e){return n(r,t,e)}:e[r]===t},exports.range=x,exports.reduce=h,exports.reject=function n(t,e){return void 0===e?function(r){return n(t,r)}:r(function(n){return!t(n)},e)},exports.repeat=function n(r,t){return void 0===t?function(t){return n(r,t)}:Array(t).fill(r)},exports.replace=function n(r,t,e){return void 0===t?function(t,e){return n(r,t,e)}:void 0===e?function(e){return n(r,t,e)}:e.replace(r,t)},exports.reverse=function(n){return n.concat().reverse()},exports.sort=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.concat().sort(r)},exports.sortBy=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.concat().sort(function(n,t){var e=r(n),o=r(t);return e<o?-1:e>o?1:0})},exports.split=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.split(r)},exports.splitEvery=function n(r,t){if(void 0===t)return function(t){return n(r,t)};for(var e=r>1?r:1,o=[],u=0;u<t.length;)o.push(t.slice(u,u+=e));return o},exports.startsWith=function n(r,t){return void 0===t?function(t){return n(r,t)}:t.startsWith(r)},exports.subtract=function n(r,t){return void 0===t?function(t){return n(r,t)}:r-t},exports.T=function(){return!0},exports.tail=function(n){return s(1,n)},exports.take=function n(r,t){return void 0===t?function(t){return n(r,t)}:"string"==typeof t?t.slice(0,r):a(t,0,r)},exports.takeLast=function n(r,t){if(void 0===t)return function(t){return n(r,t)};var e=t.length,o=r>e?e:r;return"string"==typeof t?t.slice(e-o):a(t,o=e-o,e)},exports.tap=function n(r,t){return void 0===t?function(t){return n(r,t)}:(r(t),t)},exports.test=function n(r,t){return void 0===t?function(t){return n(r,t)}:-1!==t.search(r)},exports.times=function n(r,t){return void 0===t?function(t){return n(r,t)}:p(r,x(0,t))},exports.toLower=function(n){return n.toLowerCase()},exports.toString=function(n){return n.toString()},exports.toUpper=function(n){return n.toUpperCase()},exports.trim=function(n){return n.trim()},exports.type=o,exports.uniq=function(n){for(var r=-1,t=[];++r<n.length;){var e=n[r];i(e,t)||t.push(e)}return t},exports.uniqWith=function n(r,e){if(1===arguments.length)return function(t){return n(r,t)};for(var o=-1,u=[],i=function(){var n=e[o];t(function(t){return r(n,t)},u)||u.push(n)};++o<e.length;)i();return u},exports.update=function n(r,t,e){return void 0===t?function(t,e){return n(r,t,e)}:void 0===e?function(e){return n(r,t,e)}:e.concat().fill(t,r,r+1)},exports.values=function(n){var r=[];for(var t in n)r.push(n[t]);return r},exports.without=function(n,r){return h(function(r,t){return i(t,n)?r:r.concat(t)},[],r)},exports.zip=function r(t,e){return void 0===e?function(n){return r(t,n)}:n(h)(function(n,r,t){return e[t]?n.concat([[r,e[t]]]):n},[],t)},exports.zipObj=function n(r,t){return void 0===t?function(t){return n(r,t)}:r.reduce(function(n,r,e){return n[r]=t[e],n},{})};
 //# sourceMappingURL=rambda.js.map
 
 });

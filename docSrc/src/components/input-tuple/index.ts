@@ -22,6 +22,8 @@ import
   { Arg
   } from './../arg'
 
+import { mustObject } from './../../utils/must'
+
 const defaultLens =
   (_0, key, _1) => (
     { get: (parentState) => (
@@ -54,27 +56,59 @@ const numberLens =
     { get:
         (parentState) => (
           { ...parentState[`_${key}`]
-          , _default: def
-          , name: argName
+          , _default: parentState._default[key]
           , value:
               pathOr
-              ( def
-              , [ `_${argName}`, 'value' ]
+              ( parentState._default[key]
+              , [ `_${key}`, 'value' ]
               , parentState
               )
-          , ...maybeObject('step', _step)
-          , ...maybeObject('min', _min)
-          , ...maybeObject('max', _max)
+          , ...mustObject(_step === undefined, ['step', _step])
+          , ...mustObject(_min === undefined, ['min', _min])
+          , ...mustObject(_max === undefined, ['max', _max])
           }
         )
     , set:
         (parentState, childState) => (
           { ...parentState
-          , [`_${argName}`]: childState
+          , [`_${key}`]: childState
           , value:
-              { ...parentState.value
-              , [argName]: childState.value
-              }
+              update
+              ( key
+              , childState.value
+              , parentState.value
+              )
+          }
+        )
+    }
+  )
+
+const unionLens =
+  (_, key) => (
+    { get:
+        (parentState) => (
+          { ...parentState[`_${key}`]
+          , _default: parentState._default[key]
+          , value:
+              pathOr
+              ( parentState._default[key]
+              , [ `_${key}`, 'value' ]
+              , parentState
+              )
+          }
+        )
+    , set:
+        (parentState, childState) => (
+          { ...parentState
+          , [`_${key}`]: childState
+          , value:
+              update
+              ( key
+              , childState[`_${childState.active}`] === undefined
+                  ? parentState._default[key]
+                  : childState[`_${childState.active}`].value
+              , parentState.value
+              )
           }
         )
     }
@@ -113,20 +147,16 @@ const inputTuple =
               , none: defaultLens
               , boolean: defaultLens
               , string: defaultLens
-              , number: defaultLens
+              , number: numberLens
               , array: defaultLens
               , tuple: defaultLens
-              , union: defaultLens
+              , union: unionLens
               }
             )
           )
         )(_subTypes)
       const childComponentsSinks =
         compList(childComponents)({DOM, onion})
-
-      console.log(_subTypes)
-      console.log(childComponents)
-      console.log(childComponentsSinks)
 
       return (
         { DOM:

@@ -8,25 +8,42 @@ import * as styles from './styles'
 
 import
   { dropLast
+  , map
+  , addIndex
   } from 'rambda'
 
 import { mustArray } from './../../utils/must'
 
+const iMap = addIndex(map)
+
 const pickList =
-  (childComponents, acc: any[] = []) =>
-    childComponents.length < 1
-      ? acc
-      : pickList
-        ( dropLast(1, childComponents)
-        , [ div
-            ( `.${styles.pickWrapper}`
-            , [ childComponents[childComponents.length - 1]
-              , div(`.${styles.pick}`,  { dataset: { pick: `${childComponents.length - 1}`} })
-              ]
+  (childComponents) =>
+    iMap
+    ( (childComponent, index) =>
+        div
+        ( { class: { [styles.pickWrapper]: true } }
+        , [ childComponent
+          , div
+            ( { class: { [styles.pick]: true }
+              , dataset: { pick: `${index}`} 
+              }
             )
-          , ...acc
           ]
         )
+    , childComponents
+    )
+
+const showOnlyActive =
+  (childComponents, active) =>
+    iMap
+    ( (childComponent, index) =>
+        div
+        ( { class: { [styles.hidden]: `${active}` !== `${index}` }
+          }
+        , childComponent
+        )
+    , childComponents
+    )
 
 const dom =
   ( [ { name
@@ -37,13 +54,16 @@ const dom =
     ]
   ) =>
     div
-    ( `.${styles.container}`
+    ( { class:
+        { [styles.container]: true
+        }
+      }
     , [ ...mustArray
         ( name !== ''
-        , h4(`.${styles.name}`, name)
+        , h4({ class: { [styles.name]: true } }, name)
         )
       , div
-        ( `.${styles.childWrapper}`
+        ( { class: { [styles.childWrapper]: true} }
         , [ div
             ( { class:
                 { [styles.hidden]: pickListOpen
@@ -66,7 +86,7 @@ const dom =
                 { [styles.hidden]: pickListOpen
                 }
               }
-            , childComponents[active]
+            , showOnlyActive(childComponents, active)
             )
           ]
         )

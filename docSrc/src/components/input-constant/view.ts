@@ -15,12 +15,23 @@ const dom =
     }
   ) =>
     div
-    ( `.${styles.container}`
+    ( { class:
+        { [styles.container]: true
+        }
+      }
     , [ ...mustArray
         ( name !== ''
-        , h4(`.${styles.title}`, name)
+        , h4
+          ( { class: { [styles.title]: true }
+            }
+          , name
+          )
         )
-      , div(`.${styles.paragraph}`, value)
+      , div
+        ( { class: { [styles.paragraph]: true }
+          }
+        , value
+        )
       ]
     )
 

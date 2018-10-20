@@ -293,13 +293,15 @@ const numberTypes =
     ( 'posts'
     , [ createType.number({ step: 1, min: 1}) ]
     )
-  , replaceTypes
+  , concatTypes
     ( 'proxy_port'
     , [ createType.number({ step: 1, min: 1, max: 65535}) ]
     )
   , replaceTypes
     ( 'percentage'
-    , [ createType.number({ step: 1, min: 0, max: 100}) ]
+    , [ createType.number({ step: 1, min: 0, max: 100})
+      , createType.none()
+      ]
     )
   , replaceTypes
     ( 'amount'

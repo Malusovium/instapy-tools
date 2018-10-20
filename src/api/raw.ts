@@ -80,12 +80,20 @@ export const raw =
       "_name": "None"
     },
     "proxy_port": {
-      "_name": "Number",
-      "_constraints": {
-        "_step": 1,
-        "_min": 1,
-        "_max": 65535
-      }
+      "_name": "Union",
+      "_options": [
+        {
+          "_name": "None"
+        },
+        {
+          "_name": "Number",
+          "_constraints": {
+            "_step": 1,
+            "_min": 1,
+            "_max": 65535
+          }
+        }
+      ]
     },
     "bypass_suspicious_attempt": {
       "_name": "Boolean"
@@ -97,12 +105,20 @@ export const raw =
       "_name": "String"
     },
     "percentage": {
-      "_name": "Number",
-      "_constraints": {
-        "_step": 1,
-        "_min": 0,
-        "_max": 100
-      }
+      "_name": "Union",
+      "_options": [
+        {
+          "_name": "Number",
+          "_constraints": {
+            "_step": 1,
+            "_min": 0,
+            "_max": 100
+          }
+        },
+        {
+          "_name": "None"
+        }
+      ]
     },
     "enabled": {
       "_name": "Union",

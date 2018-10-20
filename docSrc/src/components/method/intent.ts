@@ -6,6 +6,7 @@ import { State, Reducer } from './types'
 
 const defaultState: State =
   { name: 'Method'
+  , isIncluded: false
   }
 
 const intent =
@@ -20,7 +21,23 @@ const intent =
            )
          )
 
-    return xs.merge(init$, ...childComponentOnion)
+    const flip$ =
+      DOM
+        .select('[data-flip]')
+        .events('click')
+        .mapTo
+         ( (prevState) => (
+             { ...prevState
+             , isIncluded: !prevState.isIncluded
+             }
+           )
+         )
+
+    return xs.merge
+              ( init$
+              , flip$
+              , ...childComponentOnion
+              )
   }
 
 export

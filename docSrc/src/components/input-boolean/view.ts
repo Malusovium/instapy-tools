@@ -20,8 +20,11 @@ const dom =
         , h4(`.${styles.name}`, name)
         )
       , div
-        ( `.${styles.bool}.${(value ? styles.on : styles.off)}`
-        , { dataset:
+        ( { class:
+            { [styles.bool]: true
+            , [styles.on]: value
+            }
+          , dataset:
             { flip: true
             }
           }

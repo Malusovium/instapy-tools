@@ -8,24 +8,23 @@ import isolate from '@cycle/isolate'
 
 import { BaseSources, BaseSinks } from '../interfaces'
 
-import { map, values, compose } from 'rambda'
-
-// Typestyle setup
+import
+  { map
+  , path
+  , values
+  , compose
+  , take // redact
+  } from 'rambda'
 
 import { style } from 'typestyle'
 import * as csstips from 'csstips'
 import { setupPage, normalize } from 'csstips'
-normalize()
-setupPage('#app')
 
 import { api
        , MethodComponentType
        , ArgComponentType
        } from '../../../src'
 
-// import { compIsolate } from './../utils/comp-isolate'
-
-// import { Method } from './method-old-old'
 import { Arg } from './arg'
 
 import { method } from './method'
@@ -50,9 +49,10 @@ export const defaultState =
 
 export type Reducer = (prev: State) => State;
 
-const { raw, setupInterface, setupArgComponent } = api
+normalize()
+setupPage('#app')
 
-import { component } from './../template'
+const { raw, setupInterface, setupArgComponent } = api
 
 const lY =
   (value: any) => {console.log(value); return value}
@@ -115,7 +115,7 @@ const methodLens =
     , set: (parentState, childState) => (
         { ...parentState
         , _methods:
-          { ...parentState.methods
+          { ...parentState._methods
           , [methodName]: childState
           }
         , methods:
@@ -135,6 +135,30 @@ const isolatedMethod =
       }
     )
 
+const compList =
+  (childComponents) =>
+    ({DOM, onion}) => {
+      const childComponentsSinks =
+        compose
+        ( map
+          ( (component:any) => component({DOM, onion}) )
+        , values
+        )(childComponents)
+      const childComponentsDOM =
+        map(path('DOM'), childComponentsSinks)
+      const childComponentsOnion =
+        map(path('onion'), childComponentsSinks)
+
+      return (
+        { DOM: childComponentsDOM
+        , onion: childComponentsOnion
+        }
+      )
+    }
+
+const toArray =
+  (arr) => [...arr]
+
 export const App =
   ({DOM, onion}: Sources): Sinks => {
     const interfaceApi =
@@ -144,9 +168,19 @@ export const App =
       , Arg({})
       )
 
+    const methods =
+      compList(interfaceApi)({DOM, onion})
+
+    // const methods =
+    //   { DOM: take<any>(3, methodsPre.DOM)
+    //   , onion: take<any>(3, methodsPre.onion)
+    //   }
+
     const setUserInteract =
+      interfaceApi['set_sleep_reduce']({DOM, onion})
+      // interfaceApi['__init__']({DOM, onion})
       // interfaceApi['end']({DOM, onion})
-      interfaceApi['unfollow_users']({DOM, onion})
+      // interfaceApi['unfollow_users']({DOM, onion})
       // interfaceApi['interact_by_URL']({DOM, onion})
       // interfaceApi['set_user_interact']({DOM, onion})
       // interfaceApi['set_selenium_remote_session']({DOM, onion})
@@ -158,13 +192,15 @@ export const App =
       { DOM:
           view
           ( onion.state$
-              .debug('well?')
-          , [ setUserInteract.DOM ]
+              // .debug('well?')
+          , methods.DOM
+          // , [ setUserInteract.DOM ]
           )
       , onion:
           actions
           ( DOM
-          , [ setUserInteract.onion ]
+          , methods.onion
+          // , [ setUserInteract.onion.debug('onion') ]
           )
       }
     )

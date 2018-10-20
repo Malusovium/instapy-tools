@@ -3,8 +3,8 @@ import { DOMSource, VNode } from '@cycle/dom'
 import { StateSource } from 'cycle-onionify'
 
 type State =
-  { name: string
-  , isIncluded: boolean
+  { title: string
+  , config: string
   }
 
 type Reducer =
@@ -24,7 +24,7 @@ type Component =
   (sources: Sources) => Sinks
 
 export
-  { Component
-  , State
+  { State
   , Reducer
+  , Component
   }

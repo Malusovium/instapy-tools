@@ -13,6 +13,7 @@ import
   , compose
   , values
   , path
+  , take
   } from 'rambda'
 
 type ChildComponents =
@@ -30,6 +31,7 @@ const compList =
         map<any, any>(path('DOM'), childComponentsSinks)
       const childComponentsOnion =
         map(path('onion'), childComponentsSinks)
+
       return (
         { DOM: childComponentsDOM
         , onion: childComponentsOnion
@@ -42,16 +44,6 @@ const method =
     ({DOM, onion}) => {
       const childComponentsSinks =
         compList(childComponents)({DOM, onion})
-      // const childComponentsSinks =
-      //   map
-      //   ( (component:Component) => component({DOM, onion})
-      //   , values(childComponents)
-      //   )
-      // const childComponentsDOM =
-      //   map<any, any>(path('DOM'), childComponentsSinks)
-      // const childComponentsOnion =
-      //   map(path('onion'), childComponentsSinks)
-      //
 
       return (
         { DOM:

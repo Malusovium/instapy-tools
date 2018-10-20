@@ -2,22 +2,35 @@
 import xs, { Stream } from 'xstream'
 import { div
        , h2
-       , p
        , VNode
        } from '@cycle/dom'
 import { State } from './types'
 import * as styles from './styles'
 
+import { mustArray } from './../../utils/must'
+
 const dom =
   ( [ { name
+      , isIncluded
       }
     , childComponents
     ]
   ) =>
     div
     ( `.${styles.container}`
-    , [ h2(`.${styles.title}`, name)
-      , div(childComponents)
+    , [ h2
+        ( { dataset: { flip: true }
+          , class:
+            { [styles.name]: true
+            , [styles.includeTrue]: isIncluded
+            }
+          }
+        , name
+        )
+      , ...mustArray
+        ( isIncluded
+        , div(childComponents)
+        )
       ]
     )
 
