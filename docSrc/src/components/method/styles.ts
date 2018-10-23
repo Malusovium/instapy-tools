@@ -5,7 +5,8 @@ import { vertical, horizontal } from 'csstips'
 const container =
   style
   ( { borderStyle: 'solid'
-    , padding: '.8rem'
+    , padding: '.4em'
+    , fontSize: '.8em'
     }
   , vertical
   )

@@ -6,22 +6,77 @@ import { div
        } from '@cycle/dom'
 import { State } from './types'
 import * as styles from './styles'
+import
+  { compose
+  , ifElse
+  , equals
+  , map
+  , join
+  , values
+  , Dictionary
+  } from 'rambda'
+
+import { api } from './../../../../src'
+
+const { raw, setupMethod } = api
+
+const pyMethod = setupMethod(raw)
 
 const dom =
-  ( { title
-    , paragraph
+  ( { name
+    , config
     }
   ) =>
     div
     ( `.${styles.container}`
-    , [ h2(`.${styles.title}`, title)
-      , p(`.${styles.paragraph}`, paragraph)
+    , [ h2(`.${styles.title}`, name)
+      , div(`.${styles.paragraph}`, config)
       ]
     )
+
+const lY =
+  (prefix: any) =>
+    (val:any) => {
+      console.log(prefix)
+      console.log(val)
+      return val
+    }
+
+type methodsToConfig =
+  (methods: {[index:string]: {} }) => string
+
+const methodsToConfig =
+  compose
+  ( join('\n')
+  , map<any, any>(pyMethod)
+  , values
+  , map<any, any>
+    ( (args, methodName) => (
+        { name: methodName
+        , args: args
+        }
+      )
+    )
+  )
+
+const toConfigReducer =
+  (fromState:State) => (
+    { ...fromState
+    , config:
+        ifElse
+        ( equals({})
+        , (_) => 'Please check a method'
+        , methodsToConfig
+        )(fromState.methods)
+    }
+  )
 
 const view =
   (state$: Stream<State>) =>
     state$
+      .debug('config-state')
+      .map(toConfigReducer)
+      .debug('post-state')
       .map(dom)
 
 export

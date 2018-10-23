@@ -27,6 +27,7 @@ const csstips_1 = require("csstips");
 const src_1 = require("../../../src");
 const arg_1 = require("./arg");
 const method_1 = require("./method");
+const config_out_1 = require("./config-out");
 exports.defaultState = { _methods: {},
     methods: {}
 };
@@ -67,8 +68,7 @@ const tempMethodComponentList = [isolate_1.default(tempComponent, 'first'),
     isolate_1.default(tempComponent, 'third')
 ];
 const methodLens = (methodName) => ({ get: (parentState) => (Object.assign({}, parentState._methods[methodName], { name: methodName })),
-    set: (parentState, childState) => (Object.assign({}, parentState, { _methods: Object.assign({}, parentState._methods, { [methodName]: childState }), methods: { [methodName]: childState.value
-        } }))
+    set: (parentState, childState) => (Object.assign({}, parentState, { _methods: Object.assign({}, parentState._methods, { [methodName]: childState }), methods: Object.assign({}, parentState.methods, { [methodName]: childState.value }) }))
 });
 const isolatedMethod = (args, methodName) => isolate_1.default(method_1.method(args), { onion: methodLens(methodName),
     '*': methodName
@@ -82,14 +82,28 @@ const compList = (childComponents) => ({ DOM, onion }) => {
     });
 };
 const toArray = (arr) => [...arr];
+const filterIncludedMethods = (methods, _methods) => {
+    const includedMethodNames = rambda_1.compose(rambda_1.join(','), rambda_1.values, rambda_1.map((_, methodName) => methodName), rambda_1.filter(({ isIncluded }) => isIncluded))(_methods);
+    const includedMethods = rambda_1.pick(includedMethodNames, methods);
+    console.log(includedMethodNames);
+    return includedMethods;
+};
+const configLens = (key) => ({ get: (parentState) => (Object.assign({}, parentState[key], { methods: filterIncludedMethods(parentState.methods, parentState._methods) //parentState.methods
+     })),
+    set: (parentState, childState) => (Object.assign({}, parentState, { [key]: childState }))
+});
 exports.App = ({ DOM, onion }) => {
     const interfaceApi = setupInterface(raw, isolatedMethod, arg_1.Arg({}));
     const methods = compList(interfaceApi)({ DOM, onion });
+    const config = isolate_1.default(config_out_1.configOut, { onion: configLens('config'),
+        '*': 'config'
+    })({ DOM, onion });
     // const methods =
     //   { DOM: take<any>(3, methodsPre.DOM)
     //   , onion: take<any>(3, methodsPre.onion)
     //   }
-    const setUserInteract = interfaceApi['set_sleep_reduce']({ DOM, onion });
+    // const setUserInteract =
+    //   interfaceApi['set_sleep_reduce']({DOM, onion})
     // interfaceApi['__init__']({DOM, onion})
     // interfaceApi['end']({DOM, onion})
     // interfaceApi['unfollow_users']({DOM, onion})
@@ -99,18 +113,17 @@ exports.App = ({ DOM, onion }) => {
     // const template =
     //   isolate(component, 'template')({DOM, onion})
     return ({ DOM: view(onion.state$
-        // .debug('well?')
-        , methods.DOM
+            .debug('well?'), config.DOM, methods.DOM
         // , [ setUserInteract.DOM ]
         ),
-        onion: actions(DOM, methods.onion
+        onion: actions(DOM, methods.onion, config.onion
         // , [ setUserInteract.onion.debug('onion') ]
         )
     });
 };
-const actions = (DOM, components) => {
+const actions = (DOM, methods, config) => {
     const init$ = xstream_1.default.of((prev) => prev ? prev : exports.defaultState);
-    return xstream_1.default.merge(init$, ...components);
+    return xstream_1.default.merge(init$, ...methods, config);
 };
 const wrapperStyle = typestyle_1.style({ fontSize: '1em',
     padding: '2em',
@@ -118,14 +131,20 @@ const wrapperStyle = typestyle_1.style({ fontSize: '1em',
 }, csstips.vertical);
 const titleStyle = typestyle_1.style({ fontSize: '3em'
 });
-const componentsStyle = typestyle_1.style();
+const componentsStyle = typestyle_1.style(csstips.horizontal);
 const styles = { wrapper: wrapperStyle,
     title: titleStyle,
-    components: componentsStyle
+    body: componentsStyle,
+    methodsWrapper: typestyle_1.style({ flex: 1
+    }),
+    configWrapper: typestyle_1.style({ flex: 1
+    })
 };
-const view = (state$, components) => xstream_1.default.combine(state$, ...components)
-    .map(([{ count }, ...components]) => dom_1.div(`.${styles.wrapper}`, [dom_1.div(`.${styles.title}`, 'Instapy Tools GUI'),
-    dom_1.div(`.${styles.components}`, components)
+const view = (state$, config, methods) => xstream_1.default.combine(state$, config, ...methods)
+    .map(([{ count }, config, ...methods]) => dom_1.div(`.${styles.wrapper}`, [dom_1.div(`.${styles.title}`, 'Instapy Tools GUI'),
+    dom_1.div(`.${styles.body}`, [dom_1.div(`.${styles.methodsWrapper}`, methods),
+        dom_1.div(`.${styles.configWrapper}`, config)
+    ])
 ]));
 //# sourceMappingURL=app.js.map
 });
@@ -1700,7 +1719,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typestyle_1 = require("typestyle");
 const csstips_1 = require("csstips");
 const container = typestyle_1.style({ borderStyle: 'solid',
-    padding: '.8rem'
+    padding: '.4em'
 }, csstips_1.vertical);
 exports.container = container;
 const title = typestyle_1.style({ color: '#222'
@@ -1796,7 +1815,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typestyle_1 = require("typestyle");
 const csstips_1 = require("csstips");
 const container = typestyle_1.style({ borderStyle: 'solid',
-    padding: '.8rem'
+    padding: '.4em'
 }, csstips_1.vertical);
 exports.container = container;
 const name = typestyle_1.style({ color: '#222'
@@ -1881,7 +1900,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typestyle_1 = require("typestyle");
 const csstips_1 = require("csstips");
 const container = typestyle_1.style({ borderStyle: 'solid',
-    padding: '.8rem'
+    padding: '.4em'
 }, csstips_1.vertical);
 exports.container = container;
 const name = typestyle_1.style({ color: '#222'
@@ -1974,7 +1993,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typestyle_1 = require("typestyle");
 const csstips_1 = require("csstips");
 const container = typestyle_1.style({ borderStyle: 'solid',
-    padding: '.8rem'
+    padding: '.4em'
 }, csstips_1.vertical);
 exports.container = container;
 const name = typestyle_1.style({ color: '#222'
@@ -2065,7 +2084,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typestyle_1 = require("typestyle");
 const csstips_1 = require("csstips");
 const container = typestyle_1.style({ borderStyle: 'solid',
-    padding: '.8rem'
+    padding: '.4em'
 }, csstips_1.vertical);
 exports.container = container;
 const name = typestyle_1.style({ color: '#222'
@@ -2176,7 +2195,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typestyle_1 = require("typestyle");
 const csstips_1 = require("csstips");
 const container = typestyle_1.style({ borderStyle: 'solid',
-    padding: '.8rem'
+    padding: '.4em'
 }, csstips_1.vertical);
 exports.container = container;
 const name = typestyle_1.style({ color: '#222'
@@ -2327,7 +2346,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typestyle_1 = require("typestyle");
 const csstips_1 = require("csstips");
 const container = typestyle_1.style({ borderStyle: 'solid',
-    padding: '.8rem'
+    padding: '.4em'
 }, csstips_1.vertical);
 exports.container = container;
 const name = typestyle_1.style({ color: '#222'
@@ -2433,7 +2452,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typestyle_1 = require("typestyle");
 const csstips_1 = require("csstips");
 const container = typestyle_1.style({ borderStyle: 'solid',
-    padding: '.8rem'
+    padding: '.4em'
 }, csstips_1.vertical);
 exports.container = container;
 const title = typestyle_1.style({ color: '#222'
@@ -2529,7 +2548,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const typestyle_1 = require("typestyle");
 const csstips_1 = require("csstips");
 const container = typestyle_1.style({ borderStyle: 'solid',
-    padding: '.8rem'
+    padding: '.4em',
+    fontSize: '.8em'
 }, csstips_1.vertical);
 exports.container = container;
 const name = typestyle_1.style({ color: 'white',
@@ -2542,6 +2562,93 @@ exports.includeTrue = includeTrue;
 //# sourceMappingURL=styles.js.map
 });
 ___scope___.file("docSrc/src/components/method/types.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+//# sourceMappingURL=types.js.map
+});
+___scope___.file("docSrc/src/components/config-out/index.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// index
+const intent_1 = require("./intent");
+const view_1 = require("./view");
+const types_1 = require("./types");
+exports.State = types_1.State;
+const configOut = ({ DOM, onion }) => ({ DOM: view_1.view(onion.state$),
+    onion: intent_1.intent(DOM)
+});
+exports.configOut = configOut;
+//# sourceMappingURL=index.js.map
+});
+___scope___.file("docSrc/src/components/config-out/intent.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// intent
+const xstream_1 = require("xstream");
+const defaultState = { name: 'Python conf',
+    methods: {}
+};
+const intent = (DOM) => {
+    const init$ = xstream_1.default
+        .of((prev) => (Object.assign({}, defaultState, prev)));
+    return init$;
+};
+exports.intent = intent;
+//# sourceMappingURL=intent.js.map
+});
+___scope___.file("docSrc/src/components/config-out/view.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const dom_1 = require("@cycle/dom");
+const styles = require("./styles");
+const rambda_1 = require("rambda");
+const src_1 = require("./../../../../src");
+const { raw, setupMethod } = src_1.api;
+const pyMethod = setupMethod(raw);
+const dom = ({ name, config }) => dom_1.div(`.${styles.container}`, [dom_1.h2(`.${styles.title}`, name),
+    dom_1.div(`.${styles.paragraph}`, config)
+]);
+const lY = (prefix) => (val) => {
+    console.log(prefix);
+    console.log(val);
+    return val;
+};
+const methodsToConfig = rambda_1.compose(rambda_1.join('\n'), rambda_1.map(pyMethod), rambda_1.values, rambda_1.map((args, methodName) => ({ name: methodName,
+    args: args
+})));
+const toConfigReducer = (fromState) => (Object.assign({}, fromState, { config: rambda_1.ifElse(rambda_1.equals({}), (_) => 'Please check a method', methodsToConfig)(fromState.methods) }));
+const view = (state$) => state$
+    .debug('config-state')
+    .map(toConfigReducer)
+    .debug('post-state')
+    .map(dom);
+exports.view = view;
+//# sourceMappingURL=view.js.map
+});
+___scope___.file("docSrc/src/components/config-out/styles.js", function(exports, require, module, __filename, __dirname){
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// styles
+const typestyle_1 = require("typestyle");
+const csstips_1 = require("csstips");
+const container = typestyle_1.style({ borderStyle: 'solid',
+    padding: '.4em'
+}, csstips_1.vertical);
+exports.container = container;
+const title = typestyle_1.style({ color: '#222'
+});
+exports.title = title;
+const paragraph = typestyle_1.style({ color: '#444'
+});
+exports.paragraph = paragraph;
+//# sourceMappingURL=styles.js.map
+});
+___scope___.file("docSrc/src/components/config-out/types.js", function(exports, require, module, __filename, __dirname){
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });

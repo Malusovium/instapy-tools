@@ -10,6 +10,9 @@ import { BaseSources, BaseSinks } from '../interfaces'
 
 import
   { map
+  , filter
+  , join
+  , pick
   , path
   , values
   , compose
@@ -26,8 +29,9 @@ import { api
        } from '../../../src'
 
 import { Arg } from './arg'
-
 import { method } from './method'
+
+import { configOut } from './config-out'
 
 export interface Sources extends BaseSources {
   onion: StateSource<State>
@@ -119,7 +123,8 @@ const methodLens =
           , [methodName]: childState
           }
         , methods:
-          { [methodName]: childState.value
+          { ...parentState.methods
+          , [methodName]: childState.value
           }
         }
       )
@@ -159,6 +164,48 @@ const compList =
 const toArray =
   (arr) => [...arr]
 
+const filterIncludedMethods =
+  (methods, _methods) => {
+    const includedMethodNames =
+      compose
+      ( join(',')
+      , values
+      , map
+        ( (_, methodName) => methodName )
+      , filter
+        ( ({ isIncluded }: any) => isIncluded )
+      )(_methods)
+    const includedMethods =
+      pick
+      ( includedMethodNames
+      , methods
+      )
+
+    console.log(includedMethodNames)
+
+    return includedMethods
+  }
+
+const configLens =
+  (key: string) =>
+    ( { get: (parentState) => (
+          { ...parentState[key]
+          , methods:
+              filterIncludedMethods
+              ( parentState.methods
+              , parentState._methods
+              )//parentState.methods
+
+          }
+        )
+      , set: (parentState, childState) => (
+          { ...parentState
+          , [key]: childState
+          }
+        )
+      }
+    )
+
 export const App =
   ({DOM, onion}: Sources): Sinks => {
     const interfaceApi =
@@ -171,13 +218,21 @@ export const App =
     const methods =
       compList(interfaceApi)({DOM, onion})
 
+    const config =
+      isolate
+      ( configOut
+      , { onion: configLens('config')
+        , '*': 'config'
+        }
+      )({DOM, onion})
+
     // const methods =
     //   { DOM: take<any>(3, methodsPre.DOM)
     //   , onion: take<any>(3, methodsPre.onion)
     //   }
 
-    const setUserInteract =
-      interfaceApi['set_sleep_reduce']({DOM, onion})
+    // const setUserInteract =
+    //   interfaceApi['set_sleep_reduce']({DOM, onion})
       // interfaceApi['__init__']({DOM, onion})
       // interfaceApi['end']({DOM, onion})
       // interfaceApi['unfollow_users']({DOM, onion})
@@ -192,7 +247,8 @@ export const App =
       { DOM:
           view
           ( onion.state$
-              // .debug('well?')
+              .debug('well?')
+          , config.DOM
           , methods.DOM
           // , [ setUserInteract.DOM ]
           )
@@ -200,6 +256,7 @@ export const App =
           actions
           ( DOM
           , methods.onion
+          , config.onion
           // , [ setUserInteract.onion.debug('onion') ]
           )
       }
@@ -207,14 +264,15 @@ export const App =
   }
 
 const actions =
-  (DOM: DOMSource, components) => {
+  (DOM: DOMSource, methods, config) => {
     const init$ =
       xs.of<Reducer>
          ( (prev) => prev ? prev : defaultState )
 
     return xs.merge
               ( init$
-              , ...components
+              , ...methods
+              , config
               )
   }
 
@@ -235,23 +293,39 @@ const titleStyle =
 
 const componentsStyle =
   style
-  ()
+  ( csstips.horizontal
+  )
 
 const styles =
   { wrapper: wrapperStyle
   , title: titleStyle
-  , components: componentsStyle
+  , body: componentsStyle
+  , methodsWrapper:
+      style
+      ( { flex: 1
+        }
+      )
+  , configWrapper:
+      style
+      ( { flex: 1
+        }
+      )
   }
 
 const view =
-  (state$, components) =>
-    xs.combine(state$, ...components)
+  (state$, config, methods) =>
+    xs.combine(state$, config, ...methods)
       .map
-       ( ([{ count }, ...components]) =>
+       ( ([{ count }, config, ...methods]) =>
          div
          ( `.${styles.wrapper}`
          , [ div(`.${styles.title}`, 'Instapy Tools GUI')
-           , div(`.${styles.components}`, components)
+           , div
+             ( `.${styles.body}`
+             , [ div(`.${styles.methodsWrapper}`, methods)
+               , div(`.${styles.configWrapper}`, config)
+               ]
+             )
            ]
          )
        )
