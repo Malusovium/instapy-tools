@@ -10,20 +10,24 @@ const container =
   , vertical
   )
 
-const title =
+const name =
   style
   ( { color: '#222'
     }
   )
 
-const paragraph =
+const config =
   style
-  ( { color: '#444'
+  ( { fontSize: '.6em'
+    // , whiteSpace: 'pre-line'
+    , backgroundColor: '#225'
+    , color: 'white'
+    , padding: '.2em'
     }
   )
 
 export
   { container
-  , title
-  , paragraph
+  , name
+  , config
   }

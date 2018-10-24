@@ -2,7 +2,7 @@
 import { Stream } from 'xstream'
 import { div
        , h2
-       , p
+       , pre
        } from '@cycle/dom'
 import { State } from './types'
 import * as styles from './styles'
@@ -29,8 +29,8 @@ const dom =
   ) =>
     div
     ( `.${styles.container}`
-    , [ h2(`.${styles.title}`, name)
-      , div(`.${styles.paragraph}`, config)
+    , [ h2(`.${styles.name}`, name)
+      , pre(`.${styles.config}`, config)
       ]
     )
 
