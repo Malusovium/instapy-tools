@@ -63,7 +63,7 @@ const getDocConfig =
       .init
        ( { homeDir: '.'
          , target: 'browser@es6'
-         , output: 'docs/$name.js'
+         , output: isProduction ? 'docs/$name.js' : './docSrc/tmp/$name.js'
          , modulesFolder: ['node-modules', 'docSrc/node_modules']
          , plugins:
            [ WebIndexPlugin({ template: './docSrc/src/index.html'})
@@ -98,7 +98,8 @@ task
       .bundle('app')
       .instructions('> docSrc/src/index.ts')
       .hmr()
-      .watch()
+      .watch('docSrc/src/**')
+
     await fuse.run()
   }
 )
