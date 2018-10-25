@@ -6,6 +6,7 @@ import { State, Reducer } from './types'
 
 const defaultState: State =
   { name: ''
+  , isIncluded: false
   , value: []
   , _default: []
   }
@@ -24,7 +25,23 @@ const intent =
            )
          )
 
-    return xs.merge(init$, ...childComponents)
+    const include$ =
+      DOM
+        .select('[data-include]')
+        .events('click')
+        .mapTo
+         ( (prevState) => (
+             { ...prevState
+             , isIncluded: !prevState.isIncluded
+             }
+           )
+         )
+
+    return xs.merge
+              ( init$
+              , include$
+              , ...childComponents
+              )
   }
 
 export

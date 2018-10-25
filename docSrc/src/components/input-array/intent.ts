@@ -15,6 +15,7 @@ import { path
 
 const defaultState: State =
   { name: ''
+  , isIncluded: false
   , value: []
   , _default: []
   }
@@ -40,6 +41,18 @@ const intent =
            )
          )
 
+    const include$ =
+      DOM
+        .select('[data-include]')
+        .events('click')
+        .mapTo
+         ( (prevState) => (
+             { ...prevState
+             , isIncluded: !prevState.isIncluded
+             }
+           )
+         )
+
     const input$ =
       DOM
         .select('textarea')
@@ -58,7 +71,11 @@ const intent =
              )
          )
 
-    return xs.merge(init$, input$)
+    return xs.merge
+              ( init$
+              , include$
+              , input$
+              )
   }
 
 export

@@ -12,8 +12,23 @@ const container =
 
 const name =
   style
-  ( { color: '#222'
+  ( { fontSize: '1.2em'
+    , background: '#bbb'
+    , color: 'white'
+    , padding: '.2em'
+    , marginBottom: '.2em'
     }
+  )
+
+const hidden =
+  style
+  ( { display: 'none'
+    }
+  )
+
+const included =
+  style
+  ( { background: '#6c6' }
   )
 
 const childWrapper =
@@ -25,12 +40,6 @@ const childWrapper =
 const pickListWrapper =
   style
   ( {}
-  )
-
-const hidden =
-  style
-  ( { display: 'none'
-    }
   )
 
 const pickWrapper =
@@ -76,6 +85,7 @@ export
   , childWrapper
   , pickListWrapper
   , hidden
+  , included
   , pick
   , pickWrapper
   , open

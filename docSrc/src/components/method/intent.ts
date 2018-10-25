@@ -21,9 +21,9 @@ const intent =
            )
          )
 
-    const flip$ =
+    const include$ =
       DOM
-        .select('[data-flip]')
+        .select('[data-include]')
         .events('click')
         .mapTo
          ( (prevState) => (
@@ -35,7 +35,7 @@ const intent =
 
     return xs.merge
               ( init$
-              , flip$
+              , include$
               , ...childComponentOnion
               )
   }

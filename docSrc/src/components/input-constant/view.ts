@@ -10,6 +10,7 @@ import { mustArray } from './../../utils/must'
 
 const dom =
   ( { name
+    , isIncluded
     , value
     , _default
     }
@@ -21,14 +22,21 @@ const dom =
       }
     , [ ...mustArray
         ( name !== ''
-        , h4
-          ( { class: { [styles.title]: true }
+        , div
+          ( { dataset: { include: true }
+            , class:
+              { [styles.name]: true
+              , [styles.included]: isIncluded
+              }
             }
           , name
           )
         )
       , div
-        ( { class: { [styles.paragraph]: true }
+        ( { class:
+            { [styles.paragraph]: true
+            , [styles.hidden]: !isIncluded
+            }
           }
         , value
         )

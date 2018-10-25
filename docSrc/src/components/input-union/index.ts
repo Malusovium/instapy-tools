@@ -30,7 +30,11 @@ import
 const defaultLens =
   (def, index) => (
     { get:
-        (parentState) => parentState[`_${index}`]
+        (parentState) => (
+          { ...parentState[`_${index}`]
+          , isIncluded: true
+          }
+        )
     , set:
         (parentState, childState) => (
           { ...parentState
@@ -44,7 +48,8 @@ const constantComponentLens =
   (value: any, index:number) => (
     { get:
         (parentState) => (
-          { ...parentState[index]
+          { ...parentState[`_${index}`]
+          , isIncluded: true
           , value: value
           , _default: value
           }
@@ -52,7 +57,7 @@ const constantComponentLens =
     , set:
         (parentState, childState) => (
           { ...parentState
-          , [index]: childState
+          , [`_${index}`]: childState
           }
         )
     }
@@ -136,6 +141,7 @@ const inputUnion =
         { DOM:
             view
             ( onion.state$
+                .debug('union')
             , childComponentsSinks.DOM
             )
         , onion:

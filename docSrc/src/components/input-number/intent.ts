@@ -12,6 +12,7 @@ import
 
 const defaultState: State =
   { name: ''
+  , isIncluded: false
   , value: 1
   , _default: 1
   , step: 1
@@ -59,6 +60,18 @@ const intent =
            )
          )
 
+    const include$ =
+      DOM
+        .select('[data-include]')
+        .events('click')
+        .mapTo
+         ( (prevState) => (
+             { ...prevState
+             , isIncluded: !prevState.isIncluded
+             }
+           )
+         )
+
     const input$ =
       DOM
         .select('input')
@@ -77,7 +90,11 @@ const intent =
              )
          )
 
-    return xs.merge(init$, input$)
+    return xs.merge
+              ( init$
+              , include$
+              , input$
+              )
   }
 
 export

@@ -16,6 +16,7 @@ import
   , Dictionary
   } from 'rambda'
 
+// import { api } from 'instapy-tools'
 import { api } from './../../../../src'
 
 const { raw, setupMethod } = api
@@ -74,9 +75,9 @@ const toConfigReducer =
 const view =
   (state$: Stream<State>) =>
     state$
-      .debug('config-state')
+      // .debug('config-state')
       .map(toConfigReducer)
-      .debug('post-state')
+      // .debug('post-state')
       .map(dom)
 
 export

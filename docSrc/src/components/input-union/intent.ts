@@ -10,6 +10,7 @@ import
 
 const defaultState: State =
   { name: ''
+  , isIncluded: false
   , value: ''
   , active: 0
   , pickListOpen: false
@@ -63,8 +64,21 @@ const intent =
            )
          )
 
+    const include$ =
+      DOM
+        .select('[data-include]')
+        .events('click')
+        .mapTo
+         ( (prevState) => (
+             { ...prevState
+             , isIncluded: !prevState.isIncluded
+             }
+           )
+         )
+
     return xs.merge
               ( init$
+              , include$
               , pick$
               , openPickList$
               , closePickList$

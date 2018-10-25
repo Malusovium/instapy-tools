@@ -4,16 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node fuse dev",
-    "build": "node fuse build",
+    "dev": "parcel ./src/index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "cycle-restart": "^0.2.3",
-    "fuse-box": "^3.4.0",
-    "typescript": "^3.0.1",
+    "typescript": "^2.9.2",
     "uglify-es": "^3.3.9"
   },
   "dependencies": {
@@ -23,6 +21,7 @@
     "csx": "^9.0.0",
     "cycle-onionify": "^6.1.0",
     "cyclejs-utils": "^3.2.0",
+    "instapy-tools": "^0.5.0",
     "rambda": "^1.2.0",
     "typestyle": "^2.0.1",
     "xstream": "^11.7.0"

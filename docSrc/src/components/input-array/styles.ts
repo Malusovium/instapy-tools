@@ -12,8 +12,23 @@ const container =
 
 const name =
   style
-  ( { color: '#222'
+  ( { fontSize: '1.2em'
+    , background: '#bbb'
+    , color: 'white'
+    , padding: '.2em'
+    , marginBottom: '.2em'
     }
+  )
+
+const hidden =
+  style
+  ( { display: 'none'
+    }
+  )
+
+const included =
+  style
+  ( { background: '#6c6' }
   )
 
 const textarea =
@@ -25,5 +40,7 @@ const textarea =
 export
   { container
   , name
+  , hidden
+  , included
   , textarea
   }

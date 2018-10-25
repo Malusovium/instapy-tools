@@ -10,6 +10,7 @@ import { mustArray } from './../../utils/must'
 
 const dom =
   ( { name
+    , isIncluded
     , value
     }
   ) =>
@@ -17,12 +18,21 @@ const dom =
     ( `.${styles.container}`
     , [ ...mustArray
         ( name !== ''
-        , h4(`.${styles.name}`, name)
+        , div
+          ( { dataset: { include: true }
+            , class:
+              { [styles.name]: true
+              , [styles.included]: isIncluded
+              }
+            }
+          , name
+          )
         )
       , div
         ( { class:
             { [styles.bool]: true
             , [styles.on]: value
+            , [styles.hidden]: !isIncluded
             }
           , dataset:
             { flip: true

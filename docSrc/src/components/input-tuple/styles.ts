@@ -12,7 +12,11 @@ const container =
 
 const name =
   style
-  ( { color: '#222'
+  ( { fontSize: '1.2em'
+    , background: '#bbb'
+    , color: 'white'
+    , padding: '.2em'
+    , marginBottom: '.2em'
     }
   )
 
@@ -22,8 +26,21 @@ const args =
     }
   )
 
+const hidden =
+  style
+  ( { display: 'none'
+    }
+  )
+
+const included =
+  style
+  ( { background: '#6c6' }
+  )
+
 export
   { container
   , name
   , args
+  , hidden
+  , included
   }

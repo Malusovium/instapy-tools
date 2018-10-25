@@ -11,6 +11,7 @@ import { mustArray } from './../../utils/must'
 
 const dom =
   ( { name
+    , isIncluded
     , value
     , step
     }
@@ -19,13 +20,27 @@ const dom =
     ( `.${styles.container}`
     , [ ...mustArray
         ( name !== ''
-        , h4(`.${styles.name}`, name)
+        , div
+          ( { dataset: { include: true }
+            , class:
+              { [styles.name]: true
+              , [styles.included]: isIncluded
+              }
+            }
+          , name
+          )
         )
       , div
-        ( `.${styles.wrapper}`
+        ( { class:
+            { [styles.wrapper]: true
+            , [styles.hidden]: !isIncluded
+            }
+          }
         , [ input
-            ( `.${styles.input}`
-            , { props:
+            ( { class:
+                { [styles.input]: true
+                }
+              , props:
                 { value: value
                 , type: 'number'
                 , step: step

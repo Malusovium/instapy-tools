@@ -1,5 +1,6 @@
 node_modules
 build
 .fusebox
+docSrc/tmp
 /lib
 /InstaPy

@@ -8,6 +8,7 @@ import { path } from 'rambda'
 
 const defaultState: State =
   { name: ''
+  , isIncluded: false
   , value: ''
   , _default: ''
   }
@@ -20,6 +21,18 @@ const intent =
          ( (prev) => (
              { ...defaultState
              , ...prev
+             }
+           )
+         )
+
+    const include$ =
+      DOM
+        .select('[data-include]')
+        .events('click')
+        .mapTo
+         ( (prevState) => (
+             { ...prevState
+             , isIncluded: !prevState.isIncluded
              }
            )
          )
@@ -38,7 +51,11 @@ const intent =
             )
          )
 
-    return xs.merge(init$, input$)
+    return xs.merge
+              ( init$
+              , include$
+              , input$
+              )
   }
 
 export

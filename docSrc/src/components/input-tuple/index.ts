@@ -28,6 +28,7 @@ const defaultLens =
   (_0, key, _1) => (
     { get: (parentState) => (
         { ...parentState[`_${key}`]
+        , isIncluded: true
         , _default: parentState._default[key]
         , value:
             pathOr
@@ -56,6 +57,7 @@ const numberLens =
     { get:
         (parentState) => (
           { ...parentState[`_${key}`]
+          , isIncluded: true
           , _default: parentState._default[key]
           , value:
               pathOr
@@ -88,6 +90,7 @@ const unionLens =
     { get:
         (parentState) => (
           { ...parentState[`_${key}`]
+          , isIncluded: true
           , _default: parentState._default[key]
           , value:
               pathOr

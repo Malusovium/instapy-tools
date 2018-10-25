@@ -1,7 +1,7 @@
 // index
 import { intent } from './intent'
 import { view } from './view'
-import { Type } from '../../../../src'
+import { Type } from './../../../../src'
 
 import
   { State

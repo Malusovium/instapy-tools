@@ -19,14 +19,18 @@ import
   , take // redact
   } from 'rambda'
 
-import { style } from 'typestyle'
+import { style, media } from 'typestyle'
 import * as csstips from 'csstips'
 import { setupPage, normalize } from 'csstips'
 
+// import { api
+//        , MethodComponentType
+//        , ArgComponentType
+//        } from '../../../src'
 import { api
        , MethodComponentType
        , ArgComponentType
-       } from '../../../src'
+       } from './../../../src/api'
 
 import { Arg } from './arg'
 import { method } from './method'
@@ -247,7 +251,7 @@ export const App =
       { DOM:
           view
           ( onion.state$
-              .debug('well?')
+              // .debug('well?')
           , config.DOM
           , methods.DOM
           // , [ setUserInteract.DOM ]
@@ -293,7 +297,8 @@ const titleStyle =
 
 const componentsStyle =
   style
-  ( csstips.horizontal
+  ( media({maxWidth: 900}, csstips.vertical)
+  , media({minWidth: 901}, csstips.horizontal)
   )
 
 const styles =
@@ -302,12 +307,16 @@ const styles =
   , body: componentsStyle
   , methodsWrapper:
       style
-      ( { flex: 1
+      ( { flex: 2
+        , height: '90vh'
+        , overflowY: 'scroll'
         }
       )
   , configWrapper:
       style
-      ( { flex: 1
+      ( { flex: 3
+        , height: '90vh'
+        , overflowY: 'scroll'
         }
       )
   }

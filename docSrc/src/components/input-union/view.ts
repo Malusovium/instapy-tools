@@ -49,6 +49,7 @@ const dom =
   ( [ { name
       , active
       , pickListOpen
+      , isIncluded
       }
     , childComponents
     ]
@@ -60,10 +61,22 @@ const dom =
       }
     , [ ...mustArray
         ( name !== ''
-        , h4({ class: { [styles.name]: true } }, name)
+        , div
+          ( { dataset: { include: true }
+            , class:
+              { [styles.name]: true
+              , [styles.included]: isIncluded
+              }
+            }
+          , name
+          )
         )
       , div
-        ( { class: { [styles.childWrapper]: true} }
+        ( { class:
+            { [styles.childWrapper]: true
+            , [styles.hidden]: !isIncluded
+            }
+          }
         , [ div
             ( { class:
                 { [styles.hidden]: pickListOpen

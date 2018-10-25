@@ -1,11 +1,15 @@
 import isolate from '@cycle/isolate'
 import { api
        , ArgComponentType
-       } from '../../../src'
+       } from './../../../src/api'
 
 import { ifElse
+       , omit
        , pathOr
        } from 'rambda'
+
+import { mustObject
+       } from './../utils/must'
 
 import { inputNone } from './input-none'
 import { inputBoolean } from './input-boolean'
@@ -16,6 +20,30 @@ import { inputTuple } from './input-tuple'
 import { inputUnion } from './input-union'
 
 const { setupArgComponent } = api
+
+const includeValue =
+  (argName:string, parentState, childState) => (
+    { value: childState.isIncluded
+        ?  { ...parentState.value
+            , [argName]: childState.value
+            }
+        : omit(argName, parentState.value)
+    }
+  )
+
+const includeValueUnion =
+  (argName:string, def, active, parentState, childState) => (
+    { value:
+        childState.isIncluded
+          ?  { ...parentState.value
+             , [argName]:
+                  childState[`_${active}`] === undefined
+                    ? def
+                    : childState[`_${active}`].value
+             }
+          : omit(argName, parentState.value)
+    }
+  )
 
 const defaultLens =
   (def, argName, _) => (
@@ -36,10 +64,7 @@ const defaultLens =
         (parentState, childState) => (
           { ...parentState
           , [`_${argName}`]: childState
-          , value:
-              { ...parentState.value
-              , [argName]: childState.value
-              }
+          , ...includeValue(argName, parentState, childState)
           }
         )
     }
@@ -73,10 +98,15 @@ const numberLens =
         (parentState, childState) => (
           { ...parentState
           , [`_${argName}`]: childState
-          , value:
-            { ...parentState.value
-            , [argName]: childState.value
-            }
+          , ...includeValue(argName, parentState, childState)
+          // , ...mustObject
+          //   ( childState.isIncluded
+          //   , [ 'value'
+          //     , { ...parentState.value
+          //       , [argName]: childState.value
+          //       }
+          //     ]
+          //   )
           }
         )
     }
@@ -101,13 +131,32 @@ const unionLens =
         (parentState, childState) => (
           { ...parentState
           , [`_${argName}`]: childState
-          , value:
-            { ...parentState.value
-            , [argName]:
-                childState[`_${childState.active}`] === undefined
-                  ? def
-                  : childState[`_${childState.active}`].value
-            }
+          // , value:
+          , ...includeValueUnion
+              ( argName
+              , def
+              , childState.active
+              , parentState
+              , childState
+              )
+          // , ...mustObject
+          //   ( childState.isIncluded
+          //   , [ 'value'
+          //     , { ...parentState.value
+          //       , [argName]:
+          //           childState[`_${childState.active}`] === undefined
+          //             ? def
+          //             : childState[`_${childState.active}`].value
+          //       }
+          //     ]
+          //   )
+          // , value:
+          //   { ...parentState.value
+          //   , [argName]:
+          //       childState[`_${childState.active}`] === undefined
+          //         ? def
+          //         : childState[`_${childState.active}`].value
+          //   }
           }
         )
     }

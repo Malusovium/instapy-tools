@@ -4,6 +4,7 @@ import { StateSource } from 'cycle-onionify'
 
 type State =
   { name: string
+  , isIncluded: boolean
   , value: any[]
   , _default: any[]
   }

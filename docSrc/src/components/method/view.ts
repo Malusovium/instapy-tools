@@ -19,7 +19,7 @@ const dom =
     div
     ( `.${styles.container}`
     , [ h2
-        ( { dataset: { flip: true }
+        ( { dataset: { include: true }
           , class:
             { [styles.name]: true
             , [styles.includeTrue]: isIncluded

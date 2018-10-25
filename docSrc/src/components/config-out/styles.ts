@@ -6,6 +6,8 @@ const container =
   style
   ( { borderStyle: 'solid'
     , padding: '.4em'
+    , overflowY: 'scroll'
+    , maxHeight: '90vh'
     }
   , vertical
   )
@@ -19,7 +21,6 @@ const name =
 const config =
   style
   ( { fontSize: '.6em'
-    // , whiteSpace: 'pre-line'
     , backgroundColor: '#225'
     , color: 'white'
     , padding: '.2em'

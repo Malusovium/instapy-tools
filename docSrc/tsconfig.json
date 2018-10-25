@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
+    "baseUrl": "./..",
     "module": "commonjs",
+    "sourceMap": true,
     "target": "ES6",
     "jsx": "react",
     "importHelpers": true,
