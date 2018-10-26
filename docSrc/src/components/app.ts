@@ -202,6 +202,7 @@ export const App =
           , methods.onion
           , config.onion
           )
+      , copy: config.copy
       }
     )
   }

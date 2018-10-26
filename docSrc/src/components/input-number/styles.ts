@@ -22,7 +22,7 @@ const name =
 
 const hidden =
   style
-  ( { display: 'none'
+  ( { display: 'none !important'
     }
   )
 

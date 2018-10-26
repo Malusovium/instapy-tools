@@ -10,19 +10,25 @@ import * as styles from './styles'
 import
   { compose
   , ifElse
+  , reject
+  , filter
+  , startsWith
   , equals
   , map
   , join
   , values
+  , find
   , Dictionary
   } from 'rambda'
 
+import { mustArray } from './../../utils/must'
 // import { api } from 'instapy-tools'
 import { api } from './../../../../src'
 
-const { raw, setupMethod } = api
+const { raw, setupMethod, setupCreate } = api
 
 const pyMethod = setupMethod(raw)
+const pyCreate = setupCreate()
 
 const dom =
   ( { name
@@ -31,7 +37,12 @@ const dom =
   ) =>
     div
     ( `.${styles.container}`
-    , [ h2(`.${styles.name}`, name)
+    , [ div
+        ( `.${styles.head}`
+        , [ h2(`.${styles.name}`, name)
+          , div(`#copy.${styles.copy}`, 'copy')
+          ]
+        )
       , pre(`.${styles.config}`, config)
       ]
     )
@@ -44,13 +55,61 @@ const lY =
       return val
     }
 
+type orderMethods =
+  (methods: {name:string, args:any[]}[] ) => {name:string, args:any[]}
+const orderMethods =
+  (methods) => {
+    const init =
+      find
+      ( ({name}) => name === '__init__'
+      , methods
+      )
+    const end =
+      find
+      ( ({name}) => name === 'end'
+      , methods
+      )
+    const methodsWithoutInitEnd =
+      reject
+      ( ({name}) =>
+          name === '__init__'
+          || name === 'end'
+      , methods
+      )
+    const setMethods =
+      filter
+      ( ({name}) => startsWith('set_', name)
+      , methodsWithoutInitEnd
+      )
+    const notSetMethods =
+      reject
+      ( ({name}) => startsWith('set_', name)
+      , methodsWithoutInitEnd
+      )
+
+    const orderedArray =
+      [ ...mustArray
+        ( init !== undefined
+        , init
+        )
+      , ...setMethods
+      , ...notSetMethods
+      , ...mustArray
+        ( end !== undefined
+        , end
+        )
+      ]
+
+    return orderedArray
+  }
+
 type methodsToConfig =
   (methods: {[index:string]: {} }) => string
-
-const methodsToConfig =
+const methodsToConfig:methodsToConfig =
   compose
-  ( join('\n')
+  ( pyCreate
   , map<any, any>(pyMethod)
+  , orderMethods
   , values
   , map<any, any>
     ( (args, methodName) => (
@@ -74,12 +133,10 @@ const toConfigReducer =
   )
 
 const view =
-  (state$: Stream<State>) =>
+  (state$: Stream<any>) =>
     state$
-      .compose(dropRepeats())
-      // .debug('config-state')
-      .map(toConfigReducer)
-      // .debug('post-state')
+      // .compose(dropRepeats())
+      // .map(toConfigReducer)
       .map(dom)
 
 export

@@ -9,4 +9,5 @@ export interface BaseSources {
 
 export interface BaseSinks {
   DOM: Stream<VNode>
+  copy: Stream<string>
 }
