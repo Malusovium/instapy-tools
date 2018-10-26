@@ -62,7 +62,7 @@ const getDocConfig =
     FuseBox
       .init
        ( { homeDir: '.'
-         , target: 'browser'
+         , target: 'browser@es6'
          , output: isProduction ? './docs/$name.js' : './docSrc/tmp/$name.js'
          , modulesFolder: ['node-modules', 'docSrc/node_modules']
          , plugins:
@@ -73,8 +73,8 @@ const getDocConfig =
              )
            , isProduction
              && QuantumPlugin
-                ( { uglify: false
-                  , threeshake: false
+                ( { uglify: true
+                  , threeshake: true
                   }
                 )
            ]
