@@ -189,38 +189,18 @@ export const App =
         }
       )({DOM, onion})
 
-    // const methods =
-    //   { DOM: take<any>(3, methodsPre.DOM)
-    //   , onion: take<any>(3, methodsPre.onion)
-    //   }
-
-    // const setUserInteract =
-    //   interfaceApi['set_sleep_reduce']({DOM, onion})
-      // interfaceApi['__init__']({DOM, onion})
-      // interfaceApi['end']({DOM, onion})
-      // interfaceApi['unfollow_users']({DOM, onion})
-      // interfaceApi['interact_by_URL']({DOM, onion})
-      // interfaceApi['set_user_interact']({DOM, onion})
-      // interfaceApi['set_selenium_remote_session']({DOM, onion})
-
-    // const template =
-    //   isolate(component, 'template')({DOM, onion})
-
     return (
       { DOM:
           view
           ( onion.state$
-              // .debug('well?')
           , config.DOM
           , methods.DOM
-          // , [ setUserInteract.DOM ]
           )
       , onion:
           actions
           ( DOM
           , methods.onion
           , config.onion
-          // , [ setUserInteract.onion.debug('onion') ]
           )
       }
     )
@@ -244,6 +224,9 @@ const wrapperStyle =
   ( { fontSize: '1em'
     , padding: '2em'
     , borderRadius: '.4em'
+    , height: '100vh'
+    , width: '100vw'
+    , overflow: 'hidden'
     }
   , csstips.vertical
   )
@@ -251,12 +234,16 @@ const wrapperStyle =
 const titleStyle =
   style
   ( { fontSize: '3em'
+    , flex: 1
     }
   )
 
 const componentsStyle =
   style
-  ( media({maxWidth: 900}, csstips.vertical)
+  ( { flex: 99
+    , overflow: 'hidden'
+    }
+  , media({maxWidth: 900}, csstips.vertical)
   , media({minWidth: 901}, csstips.horizontal)
   )
 
@@ -267,14 +254,12 @@ const styles =
   , methodsWrapper:
       style
       ( { flex: 2
-        , height: '90vh'
         , overflowY: 'scroll'
         }
       )
   , configWrapper:
       style
       ( { flex: 3
-        , height: '90vh'
         , overflowY: 'scroll'
         }
       )

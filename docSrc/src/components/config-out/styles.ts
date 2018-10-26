@@ -7,7 +7,7 @@ const container =
   ( { borderStyle: 'solid'
     , padding: '.4em'
     , overflowY: 'scroll'
-    , maxHeight: '90vh'
+    , height: '100%'
     }
   , vertical
   )
