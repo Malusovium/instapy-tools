@@ -65,54 +65,13 @@ const { raw, setupInterface, setupArgComponent } = api
 const lY =
   (value: any) => {console.log(value); return value}
 
-// const methodLens =
-//   (methodName, args) => (
-//     { get: (parentState) => (
-//         { ...parentState[methodName]
-//         , subComponents: lY(args)
-//         , title: methodName
-//         }
-//       )
-//     , set: (parentState, childState) => (
-//         { ...parentState
-//         , [methodName]: childState
-//         }
-//       )
+// const tempComponent =
+//   ({DOM, onion}) => (
+//     { DOM: onion.state$.map( ({count}) => div(`The counter is at: ${count}`))
+//     , onion: xs.of((prev => prev ? prev : {count: 1}))
 //     }
 //   )
-// const methodLens =
-//   (name: string) => (
-//     { get: (state) => state[name]
-//     , set: (state, childState) => (
-//         { ...state
-//         , [name]: childState
-//         }
-//       )
-//     }
-//   )
-
-const tempComponent =
-  ({DOM, onion}) => (
-    { DOM: onion.state$.map( ({count}) => div(`The counter is at: ${count}`))
-    , onion: xs.of((prev => prev ? prev : {count: 1}))
-    }
-  )
-
-const tempMethodComponentList =
-  [ isolate
-    ( tempComponent
-    , 'first'
-    )
-  , isolate
-    ( tempComponent
-    , 'second'
-    )
-  , isolate
-    ( tempComponent
-    , 'third'
-    )
-  ]
-
+//
 const methodLens =
   (methodName) => (
     { get: (parentState) => (
@@ -185,7 +144,7 @@ const filterIncludedMethods =
       , methods
       )
 
-    console.log(includedMethodNames)
+    // console.log(includedMethodNames)
 
     return includedMethods
   }

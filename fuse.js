@@ -62,15 +62,15 @@ const getDocConfig =
     FuseBox
       .init
        ( { homeDir: '.'
-         , target: 'browser@es6'
-         , output: isProduction ? 'docs/$name.js' : './docSrc/tmp/$name.js'
+         , target: 'browser'
+         , output: isProduction ? './docs/$name.js' : './docSrc/tmp/$name.js'
          , modulesFolder: ['node-modules', 'docSrc/node_modules']
          , plugins:
            [ WebIndexPlugin({ template: './docSrc/src/index.html'})
            , isProduction
              && QuantumPlugin
-                ( { uglify: true
-                  , threeshake: true
+                ( { uglify: false
+                  , threeshake: false
                   }
                 )
            ]
@@ -83,7 +83,7 @@ task
     const fuse = getDocConfig(true)
     fuse
       .bundle('app')
-      .instructions('> index.ts')
+      .instructions('> docSrc/src/index.ts')
     await fuse.run()
   }
 )

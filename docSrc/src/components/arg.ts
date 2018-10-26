@@ -99,14 +99,6 @@ const numberLens =
           { ...parentState
           , [`_${argName}`]: childState
           , ...includeValue(argName, parentState, childState)
-          // , ...mustObject
-          //   ( childState.isIncluded
-          //   , [ 'value'
-          //     , { ...parentState.value
-          //       , [argName]: childState.value
-          //       }
-          //     ]
-          //   )
           }
         )
     }
@@ -131,7 +123,6 @@ const unionLens =
         (parentState, childState) => (
           { ...parentState
           , [`_${argName}`]: childState
-          // , value:
           , ...includeValueUnion
               ( argName
               , def
@@ -139,24 +130,6 @@ const unionLens =
               , parentState
               , childState
               )
-          // , ...mustObject
-          //   ( childState.isIncluded
-          //   , [ 'value'
-          //     , { ...parentState.value
-          //       , [argName]:
-          //           childState[`_${childState.active}`] === undefined
-          //             ? def
-          //             : childState[`_${childState.active}`].value
-          //       }
-          //     ]
-          //   )
-          // , value:
-          //   { ...parentState.value
-          //   , [argName]:
-          //       childState[`_${childState.active}`] === undefined
-          //         ? def
-          //         : childState[`_${childState.active}`].value
-          //   }
           }
         )
     }

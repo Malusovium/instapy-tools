@@ -1,5 +1,6 @@
 // view
 import { Stream } from 'xstream'
+import throttle from 'xstream/extra/throttle'
 import { div
        , h2
        , pre
@@ -75,6 +76,7 @@ const toConfigReducer =
 const view =
   (state$: Stream<State>) =>
     state$
+      .compose(throttle(60))
       // .debug('config-state')
       .map(toConfigReducer)
       // .debug('post-state')

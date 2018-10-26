@@ -134,7 +134,7 @@ const toPythonArgs =
       compose
       ( addParenthesis
       , join(', ')
-      , log
+      // , log
       , values
       , map<any, any>(arg(apiJsonArgs))
       )(args)

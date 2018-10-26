@@ -141,7 +141,6 @@ const inputUnion =
         { DOM:
             view
             ( onion.state$
-                .debug('union')
             , childComponentsSinks.DOM
             )
         , onion:

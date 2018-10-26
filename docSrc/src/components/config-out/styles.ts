@@ -24,6 +24,7 @@ const config =
     , backgroundColor: '#225'
     , color: 'white'
     , padding: '.2em'
+    , overflowX: 'hidden'
     }
   )
 
