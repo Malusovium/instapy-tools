@@ -66,7 +66,11 @@ const getDocConfig =
          , output: isProduction ? './docs/$name.js' : './docSrc/tmp/$name.js'
          , modulesFolder: ['node-modules', 'docSrc/node_modules']
          , plugins:
-           [ WebIndexPlugin({ template: './docSrc/src/index.html'})
+           [ WebIndexPlugin
+             ( { template: './docSrc/src/index.html'
+               , path: isProduction ? '/instapy-tools' : '.'
+               }
+             )
            , isProduction
              && QuantumPlugin
                 ( { uglify: false
