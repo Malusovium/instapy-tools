@@ -4,8 +4,13 @@ import { vertical } from 'csstips'
 
 const container =
   style
-  ( { borderStyle: 'solid'
-    , padding: '.4em'
+  ( { fontSize: '1em'
+    , backgroundColor: '#eee'
+    , borderTopStyle: 'solid'
+    , borderTopColor: 'rgba(0,0,0,.6)'
+    , borderTopWidth: '.1em'
+    , overflow: 'hidden'
+    , paddingBottom: '.2em'
     }
   , vertical
   )
@@ -13,6 +18,7 @@ const container =
 const name =
   style
   ( { fontSize: '1.2em'
+    , cursor: 'pointer'
     , background: '#bbb'
     , color: 'white'
     , padding: '.2em'
@@ -51,6 +57,7 @@ const pickWrapper =
 const pick =
   style
   ( { position: 'absolute'
+    , cursor: 'pointer'
     , top: 0
     , bottom: 0
     , left: 0
@@ -67,6 +74,7 @@ const pick =
 const open =
   style
   ( { transform: 'rotateX(180deg)'
+    , cursor: 'pointer'
     , padding: '.4em'
     , textAlign: 'center'
     , background: '#555'

@@ -34,7 +34,7 @@ const dom =
         )
       , div
         ( { class:
-            { [styles.paragraph]: true
+            { [styles.value]: true
             , [styles.hidden]: !isIncluded
             }
           }

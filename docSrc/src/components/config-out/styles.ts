@@ -8,9 +8,10 @@ import
 
 const container =
   style
-  ( { borderStyle: 'solid'
-    , padding: '.4em'
-    , overflowY: 'scroll'
+  ( { position: 'relative'
+    , overflow: 'hidden'
+    , backgroundColor: '#225'
+    , borderStyle: 'solid'
     , height: '100%'
     }
   , vertical
@@ -24,27 +25,40 @@ const head =
 
 const name =
   style
-  ( { color: '#222'
+  ( { fontSize: '2em'
+    , color: '#bbb'
     }
   )
 
 const copy =
   style
   ( { fontSize: '1.2em'
+    , cursor: 'pointer'
     , padding: '.4em'
     , color: 'white'
-    , backgroundColor: '#229'
+    , backgroundColor: '#44a'
+    , borderRadius: '.2em'
+    , boxShadow: '0 .1em .2em 0 rgba(0,0,0,.4)'
+    , $nest:
+      { '&:hover':
+        { backgroundColor: '#66c'
+        }
+      }
     }
   , content
   )
 
 const config =
   style
-  ( { fontSize: '.6em'
-    , backgroundColor: '#225'
+  ( { position: 'absolute'
+    , fontSize: '.6rem'
     , color: 'white'
-    , padding: '.2em'
     , overflowX: 'hidden'
+    , overflowY: 'scroll'
+    , top: '4em'
+    , bottom: '1em'
+    , left: '1em'
+    , right: '0em'
     }
   )
 

@@ -4,18 +4,24 @@ import { vertical, horizontal } from 'csstips'
 
 const container =
   style
-  ( { borderStyle: 'solid'
-    , padding: '.4em'
+  ( { position: 'relative'
+    // , backgroundColor: '#eee'
     , fontSize: '.8em'
+    , borderRadius: '.4em'
+    , boxShadow: '0 .1em .2em 0 rgba(0,0,0,.2)'
+    , marginBottom: '.6em'
+    , overflow: 'hidden'
     }
   , vertical
   )
 
 const name =
   style
-  ( { color: 'white'
-    , background: '#ccc'
+  ( { fontSize: '1.4em'
+    , cursor: 'pointer'
+    , color: 'white'
     , padding: '.4em'
+    , background: '#ccc'
     }
   )
 

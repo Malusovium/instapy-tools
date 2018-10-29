@@ -5,7 +5,7 @@ import { DOMSource } from '@cycle/dom'
 import { State, Reducer } from './types'
 
 const defaultState: State =
-  { name: 'Python conf'
+  { name: 'Python Configuration'
   , methods: {}
   }
 

@@ -144,8 +144,6 @@ const filterIncludedMethods =
       , methods
       )
 
-    // console.log(includedMethodNames)
-
     return includedMethods
   }
 
@@ -158,7 +156,6 @@ const configLens =
               ( parentState.methods
               , parentState._methods
               )//parentState.methods
-
           }
         )
       , set: (parentState, childState) => (
@@ -223,7 +220,7 @@ const actions =
 const wrapperStyle =
   style
   ( { fontSize: '1em'
-    , padding: '2em'
+    // , padding: '.4em'
     , borderRadius: '.4em'
     , height: '100vh'
     , width: '100vw'
@@ -256,6 +253,7 @@ const styles =
       style
       ( { flex: 2
         , overflowY: 'scroll'
+        , padding: '.4em'
         }
       )
   , configWrapper:

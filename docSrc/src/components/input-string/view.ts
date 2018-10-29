@@ -34,8 +34,8 @@ const dom =
             { [styles.input]: true
             , [styles.hidden]: !isIncluded
             }
+          , props: { value: value }
           }
-        , { props: { value: value } }
         )
       ]
     )

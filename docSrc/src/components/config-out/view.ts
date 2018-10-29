@@ -22,7 +22,6 @@ import
   } from 'rambda'
 
 import { mustArray } from './../../utils/must'
-// import { api } from 'instapy-tools'
 import { api } from './../../../../src'
 
 const { raw, setupMethod, setupCreate } = api
@@ -37,13 +36,13 @@ const dom =
   ) =>
     div
     ( `.${styles.container}`
-    , [ div
+    , [ pre(`.${styles.config}`, config)
+      , div
         ( `.${styles.head}`
-        , [ h2(`.${styles.name}`, name)
+        , [ div(`.${styles.name}`, name)
           , div(`#copy.${styles.copy}`, 'copy')
           ]
         )
-      , pre(`.${styles.config}`, config)
       ]
     )
 

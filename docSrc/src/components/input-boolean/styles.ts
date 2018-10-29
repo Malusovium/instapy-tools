@@ -4,8 +4,13 @@ import { vertical } from 'csstips'
 
 const container =
   style
-  ( { borderStyle: 'solid'
-    , padding: '.4em'
+  ( { fontSize: '1em'
+    , backgroundColor: '#eee'
+    , borderTopStyle: 'solid'
+    , borderTopColor: 'rgba(0,0,0,.6)'
+    , borderTopWidth: '.1em'
+    , overflow: 'hidden'
+    , boxShadow: '0 .1em 0 .2em rgba(0,0,0,.2)'
     }
   , vertical
   )
@@ -13,6 +18,7 @@ const container =
 const name =
   style
   ( { fontSize: '1.2em'
+    , cursor: 'pointer'
     , background: '#bbb'
     , color: 'white'
     , padding: '.2em'

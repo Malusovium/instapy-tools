@@ -1,7 +1,6 @@
 // view
 import xs, { Stream } from 'xstream'
 import { div
-       , h2
        , VNode
        } from '@cycle/dom'
 import { State } from './types'
@@ -17,8 +16,11 @@ const dom =
     ]
   ) =>
     div
-    ( `.${styles.container}`
-    , [ h2
+    ( { class:
+        { [styles.container]: true
+        }
+      }
+    , [ div
         ( { dataset: { include: true }
           , class:
             { [styles.name]: true
