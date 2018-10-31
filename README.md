@@ -25,9 +25,10 @@ import { api } from 'instapy-tools'
 
 const { raw
       , setupValidateMethod
-      , setupCreate
       , setupMethod
-      , makeDoAtType
+      , setupCreate
+      , setupArgComponent
+      , setupInterface
       } = api
 ```
 
@@ -164,11 +165,105 @@ create([...string], true) // will write the output to 'docker_quickstart.py'
 create([...string], true, 'my-config.py') // will write the output to 'my-config.py'
 ```
 
-#### makeDoAtType
+#### Setup interface/ setup arg component
+To "easily" generate an ui from api.json use these functions `setupInterface` and `setupArgComponent`
 ```ts
-comming soonTM this will probably be nicer in the next version
-```
+// def: default value given to argComponent
+// argName: name given of argument
+const fallbackComponent =
+  (def, argName) => {
+    // gets returned when it couldn't make out the type
+    console.log(`${argName} has Type: fallback with default: ${def}`)
+  }
 
+const noneComponent =
+  (def, argName) => () => {
+    console.log(`${argName} has Type: None with default: ${def}`)
+  }
+
+const booleanComponent =
+  (def, argName) => () => {
+    console.log(`${argName} has Type: Boolean with default: ${def}`)
+  }
+
+const stringComponent =
+  (def, argName) => () => {
+    console.log(`${argName} has Type: String with default: ${def}`)
+  }
+
+// _constraints:
+// { _step: undefined | number
+// , _min: undefined | number
+// , _max: undefined | number
+// }
+const numberComponent =
+  (_constraints) => (def, argName) => () => {
+    console.log(`${argName}, Type: Number, default: ${def}`)
+  }
+
+// _subType: 'Number' | 'String'  // Note: It is never 'Number'
+const arrayComponent =
+  (_subType) => (def, argName) => () => {
+    console.log(`${argName}, Type: Array, default: ${def}`)
+  }
+
+// _subTypes list of all the types in order
+const tupleComponent =
+  (_subTypes) => (def, argName) => () => {
+    // _subTypes.map(argComponent) <- use something like this here
+    console.log(`${argName}, Type: Tuple, default: ${def}`)
+  }
+
+// _options: list of Types, Numbers and Strings
+const unionComponent =
+  (_options) => (def, argName) => () => {
+    console.log(`${argName}, Type: Union, default: ${def}`)
+  }
+
+const argComponent =
+  setupArgComponent
+  ( { _default: fallbackComponent
+    , boolean: booleanComponent
+    , string: stringComponent
+    , number: numberComponent
+    , array: arrayComponent
+    , tuple: tupleComponent
+    , union: unionComponent
+    }
+  )
+
+// args: { argName: buildArg } from raw.<methodName>.args
+// methodName: said name of method from raw.<methodName>
+const methodComponent =
+  (args, methodName) => () => {
+    //do everything you need to do
+    console.log(methodName)
+    if (args !== undefined) {
+      if (args.enabled !== undefined) {
+        args.enabled()
+      }
+      if (args.percentage !== undefined) {
+        args.percentage()
+      }
+      if (args.times !== undefined) {
+        args.times()
+      }
+    }
+  }
+
+const interface =
+  setupInterface
+  ( raw
+  , methodComponent
+  , argComponent
+  )
+
+interface.set_do_follow()
+// set_do_follow
+// enabled, Type: Union, default: false
+// percentage, Type: Union, default: 0
+// times, Type: Number, default: 1
+```
 
 ### Control bot from TS/JS
 
