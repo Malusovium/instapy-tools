@@ -220,7 +220,6 @@ const actions =
 const wrapperStyle =
   style
   ( { fontSize: '1em'
-    // , padding: '.4em'
     , borderRadius: '.4em'
     , height: '100vh'
     , width: '100vw'
@@ -259,7 +258,7 @@ const styles =
   , configWrapper:
       style
       ( { flex: 3
-        , overflowY: 'scroll'
+        , borderRadius: '.4em'
         }
       )
   }

@@ -9,9 +9,9 @@ import
 const container =
   style
   ( { position: 'relative'
+    , padding: '.4em'
     , overflow: 'hidden'
     , backgroundColor: '#225'
-    , borderStyle: 'solid'
     , height: '100%'
     }
   , vertical
@@ -19,7 +19,9 @@ const container =
 
 const head =
   style
-  ( { justifyContent: 'space-between' }
+  ( { justifyContent: 'space-between' 
+    , flex: 1
+    }
   , horizontal
   )
 
@@ -33,6 +35,7 @@ const name =
 const copy =
   style
   ( { fontSize: '1.2em'
+    , marginLeft: '4px'
     , cursor: 'pointer'
     , padding: '.4em'
     , color: 'white'
@@ -50,15 +53,11 @@ const copy =
 
 const config =
   style
-  ( { position: 'absolute'
-    , fontSize: '.6rem'
+  ( { fontSize: '.6rem'
     , color: 'white'
     , overflowX: 'hidden'
     , overflowY: 'scroll'
-    , top: '4em'
-    , bottom: '1em'
-    , left: '1em'
-    , right: '0em'
+    , flex: 99
     }
   )
 

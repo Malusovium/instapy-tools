@@ -36,13 +36,13 @@ const dom =
   ) =>
     div
     ( `.${styles.container}`
-    , [ pre(`.${styles.config}`, config)
-      , div
+    , [ div
         ( `.${styles.head}`
         , [ div(`.${styles.name}`, name)
           , div(`#copy.${styles.copy}`, 'copy')
           ]
         )
+      , pre(`.${styles.config}`, config)
       ]
     )
 
