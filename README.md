@@ -320,6 +320,8 @@ logs()
 
 ### Generating api.json
 
+# Deprecated this kind of functionality will be moved to InstaPy soon, hopefully
+
 #### Cloning InstaPy Project
 
 ```
