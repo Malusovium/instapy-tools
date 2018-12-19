@@ -1,12 +1,63 @@
 import { split
-       , reverse
-       , takeLast
+       , join
+       , tail
+       , map
+       , reduce
+       , startsWith
+       , filter
+       , compose
+       , toString
+       , type as rType
        } from 'rambda'
-import { composeExec } from './utils'
+import { composeSpawn } from './utils'
 
-export const logs =
+const takeFrom =
+  (char: string) =>
+    reduce
+    ( (acc, curr) =>
+        acc.length > 0
+          ? [ ...acc, curr ]
+          : curr === char
+              ? [ curr ]
+              : []
+    , []
+    )
+
+const removeServicePrefix =
+  (log:string) =>
+    startsWith('web', log)
+      ? compose<any, any, any, any, any>
+        ( join('')
+        , tail
+        , takeFrom('|')
+        , split('')
+        )(log)
+      : log
+
+const logs =
   (projectPath:string) =>
-    composeExec(projectPath)('logs', 'web')
-      .then(split('\n'))
-      .then<any>(takeLast(30))
+    (cb: (log:string) => void) => {
+      const logger =
+        composeSpawn
+        (projectPath)
+        ('logs', '-f', '--no-color', 'web')
 
+      logger
+        .stdout
+        .on
+         ( 'data'
+         , (data) => {
+             compose
+             ( map<any, any>(cb)
+             // , map<any, any>(removeServicePrefix)
+             , filter((log) => log !== '')
+             , split('\n')
+             , toString
+             )(data)
+           }
+         )
+    }
+
+export
+  { logs
+  }

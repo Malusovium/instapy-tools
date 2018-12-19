@@ -21,7 +21,6 @@ const isFirstReducer =
 const toBotStatus =
   (stdout:string):string => {
     const stdoutArr = stdout.split('\n')
-    console.log(stdoutArr)
     const totalUp =
       stdoutArr.reduce(countIncludesReducer('Up'), 0)
     const totalExit =

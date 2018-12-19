@@ -1,10 +1,11 @@
-import { exec } from 'child_process'
+import
+  { exec
+  , spawn
+  } from 'child_process'
 
 const dockerCompose =
-  (projectPath:string, ...args:string[]) =>
-      [ `docker-compose --file ${projectPath}/docker-prod.yml`
-      , ...args
-      ].join(' ')
+  (projectPath: string, composeFile: string = 'docker-prod.yml') =>
+    `docker-compose --file ${projectPath}/${composeFile}`
 
 const wrappedExec =
   (command:string) =>
@@ -18,7 +19,24 @@ const wrappedExec =
       )
     )
 
-export const composeExec =
+const composeExec =
   (projectPath: string) =>
     (...args:string[]) =>
-      wrappedExec( dockerCompose(projectPath, ...args) )
+      wrappedExec
+      ( [ dockerCompose(projectPath)
+        , ...args
+        ]
+        .join(' ')
+      )
+
+const composeSpawn =
+  (projectPath: string) =>
+    (...args:string[]) => {
+      const [compose, ...preArgs] = dockerCompose(projectPath).split(' ')
+      return spawn(compose, [ ...preArgs, ...args])
+    }
+
+export
+ { composeExec
+ , composeSpawn
+ }

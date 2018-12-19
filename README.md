@@ -270,16 +270,13 @@ interface.set_do_follow()
 #### Setup controls
 
 ```ts
-import { controls } from 'instapy-tools'
+import { setupControls } from 'instapy-tools'
 
-const { start
-      , stop
-      , status
-      , logs
-      } = controls('Instapy') // Takes a string location to InstaPy Project Location
+const controls = setupControls('Instapy') // Takes a string location to InstaPy Project Location
 
-start()
-  .then( (val:any) => {console.log(val)}) // succes
+controls
+  .start()
+  .then( (val:any) => {console.log(val)}) // Bot started
 
 ```
 
@@ -288,34 +285,61 @@ start()
 ```ts
 // Starts bot using docker-compose
 // Uses "docker_quickstart.py" as configuration file taken from InstaPy Project path
-start()
-  .then( (val:any) => {console.log(val)}) // succes
+controls
+  .start()
+  .then( (val:any) => {console.log(val)}) // Bot started
 ```
 
 #### stop
 
 ```ts
 // Stops bot using docker-compose
-stop()
-  .then( (val:any) => {console.log(val)}) // succes
+controls
+  .stop()
+  .then( (val:any) => {console.log(val)}) // Bot stopped
 ```
 
 #### status
 
 ```ts
-// Get bot-status using docker-compose
+// Watch bot-status using docker-compose
 // returns: 'Not Initialised' | 'Done' | 'Running' | 'Stopped'
+// (status: string) => {}
 status()
   .then( (val:any) => {console.log(val)}) // Done
+
+// Give a function to set that gets called everytime botStatus get changed.
+controls
+  .status
+  .set( (botStatus:string) => { console.log(botStatus) })
+
+// Remove given function
+controls
+  .status
+  .reset()
+
 ```
 
 #### logs
 
 ```ts
-// Get bot-logs using docker-compose
-// returns: Last 30 lines of logs from InstaPy's output
-logs()
-  .then( (val:any) => {console.log(val)}) // Array of logLines
+// Watch bot-logs using docker-compose
+// returns: a log line concurrently at InstaPy's output
+
+// Give a function to set that gets called everytime a new log is given
+// (logLine: string) => {}
+controls
+  .logs
+  .set((logLine: string) => {console.log(logLine)} )
+
+// Attaching to instapy_web_1...
+// web_1_3e4... | --2018-12-19 ...
+// ''           | Resolving...
+
+// Remove given function
+controls
+  .logs
+  .reset()
 ```
 
 ### Generating api.json
