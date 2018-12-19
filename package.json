@@ -1,6 +1,6 @@
 {
   "name": "instapy-tools",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "description": "Build tools around InstaPy",
   "types": "src/index.ts",
   "main": "lib/index.js",
