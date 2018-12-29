@@ -36,9 +36,7 @@ const setupControls: SetupControls =
     let watchBotStatus: Watch | null = null
 
     const _start =
-      () =>
-        start(projectPath)
-          .then((message) => { _logs(); return message })
+      () => start(projectPath)
     const _stop =
       () => stop(projectPath)
     const _status =
