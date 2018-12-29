@@ -36,7 +36,9 @@ const setupControls: SetupControls =
     let watchBotStatus: Watch | null = null
 
     const _start =
-      () => start(projectPath)
+      () =>
+        start(projectPath)
+          .then((message) => { _logs(); return message })
     const _stop =
       () => stop(projectPath)
     const _status =
@@ -85,7 +87,6 @@ const setupControls: SetupControls =
         { set:
             (watch) => {
               watchBotLogs = watch
-              // console.log('seter')
               _logs()
             }
         , reset:
@@ -111,12 +112,3 @@ const setupControls: SetupControls =
 export
   { setupControls
   }
-
-// export const controls: controls =
-//   (projectPath = defaultInstapyPath) => (
-//     { start: () => start(projectPath)
-//     , stop: () => stop(projectPath)
-//     , logs: () => logs(projectPath)
-//     , status: () => prettyBotStatus(projectPath)
-//     }
-//   )
