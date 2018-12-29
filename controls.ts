@@ -11,9 +11,11 @@ const selfLog: selfLog =
   (out) =>
     (val) => { console.log(out); return val }
 
-// controls
-//   .start()
-//   .then(console.log)
+controls
+  .start()
+  .then(console.log)
+  .then(controls.stop)
+  .then(console.log)
 // setTimeout
 // ( () => {
 //     controls
@@ -23,11 +25,16 @@ const selfLog: selfLog =
 // , 10000
 // )
 
-controls
-  .logs
-  .set((log) => {console.log(log)})
+// controls
+//   .logs
+//   .set((log) => {console.log(log)})
 // controls
 //   .status
 //   .set((status) => {console.log(status)})
+//
+
+// controls
+//   .stop()
+//   .then(console.log)
 
 setTimeout(() => {}, 100000)

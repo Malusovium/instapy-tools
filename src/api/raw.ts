@@ -701,7 +701,7 @@ export const raw =
       "sleep_delay": 600,
       "interact": false
     },
-    "follow_likers ": {
+    "follow_likers": {
       "usernames": null,
       "photos_grab_amount": 3,
       "follow_likers_per_photo": 3,
@@ -715,7 +715,7 @@ export const raw =
       "sleep_delay": 600,
       "interact": false
     },
-    "set_relationship_bounds ": {
+    "set_relationship_bounds": {
       "enabled": null,
       "potency_ratio": null,
       "delimit_by_numbers": null,
@@ -883,3 +883,4 @@ export const raw =
     }
   }
 }
+
