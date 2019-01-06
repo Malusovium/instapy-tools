@@ -23,7 +23,7 @@ type MakeSmartRun =
      PythonMethod[]
 const makeSmartRun: MakeSmartRun =
   (init, configLines) =>
-    [ `with smart_run(${takeSessionName(init)})`
+    [ `with smart_run(${takeSessionName(init)}):`
     , ...padLeft4List(configLines.slice(0, -1))
     ]
 
