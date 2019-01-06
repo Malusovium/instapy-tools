@@ -23,10 +23,6 @@ import { style, media } from 'typestyle'
 import * as csstips from 'csstips'
 import { setupPage, normalize } from 'csstips'
 
-// import { api
-//        , MethodComponentType
-//        , ArgComponentType
-//        } from '../../../src'
 import { api
        , MethodComponentType
        , ArgComponentType
@@ -65,13 +61,6 @@ const { raw, setupInterface, setupArgComponent } = api
 const lY =
   (value: any) => {console.log(value); return value}
 
-// const tempComponent =
-//   ({DOM, onion}) => (
-//     { DOM: onion.state$.map( ({count}) => div(`The counter is at: ${count}`))
-//     , onion: xs.of((prev => prev ? prev : {count: 1}))
-//     }
-//   )
-//
 const methodLens =
   (methodName) => (
     { get: (parentState) => (
@@ -155,7 +144,7 @@ const configLens =
               filterIncludedMethods
               ( parentState.methods
               , parentState._methods
-              )//parentState.methods
+              )
           }
         )
       , set: (parentState, childState) => (

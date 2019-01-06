@@ -27,7 +27,7 @@ import { api } from './../../../../src'
 const { raw, setupMethod, setupCreate } = api
 
 const pyMethod = setupMethod(raw)
-const pyCreate = setupCreate()
+const pyCreate = setupCreate(true)
 
 type orderMethods =
   (methods: {name:string, args:any[]}[] ) => {name:string, args:any[]}

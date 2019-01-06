@@ -1,5 +1,6 @@
 // index
 import isolate from '@cycle/isolate'
+import { omit, pathOr } from 'rambda'
 import { intent } from './intent'
 import { view } from './view'
 
@@ -41,6 +42,28 @@ const defaultLens =
           , [`_${index}`]: childState
           }
         )
+    }
+  )
+
+const unionLens =
+  (def, index) => (
+    { get:
+        (parentState) => (
+          { ...parentState[`_${index}`]
+          , isIncluded: true
+          }
+        )
+    , set:
+      (parentState, childState) => (
+        { ...parentState
+        , [`_${index}`]:
+          { ...childState
+          , value: childState[`_${childState.active}`] === undefined
+            ? def
+            : childState[`_${childState.active}`].value
+          }
+        }
+      )
     }
   )
 
@@ -122,7 +145,7 @@ const inputUnion =
               , number: defaultLens
               , array: defaultLens
               , tuple: defaultLens
-              , union: defaultLens
+              , union: unionLens
               }
             )
           )
@@ -140,7 +163,7 @@ const inputUnion =
       return (
         { DOM:
             view
-            ( onion.state$
+            ( onion.state$.debug('union state')
             , childComponentsSinks.DOM
             )
         , onion:
