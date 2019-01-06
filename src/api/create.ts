@@ -8,36 +8,43 @@ const importInstapy =
   ]
 
 type Path = string
+type Init = string
 type PythonMethod = string
 
 const takeSessionName =
-  (configLine: PythonMethod) =>
-    configLine.split('.')[0]
+  (init: Init) =>
+    init.split(' ')[0]
+
+const padLeft4List =
+  (inList: string[]) => inList.map((str) => `    ${str}`)
 
 type MakeSmartRun =
-  (configLines: PythonMethod[]) =>
+  (init: Init, configLines: PythonMethod[]) =>
      PythonMethod[]
 const makeSmartRun: MakeSmartRun =
-  (configLines) =>
-    [ `with smart_run(${takeSessionName(configLines[0])}`
-    , ...configLines.slice(0, -1)
+  (init, configLines) =>
+    [ `with smart_run(${takeSessionName(init)})`
+    , ...padLeft4List(configLines.slice(0, -1))
     ]
 
 type setupCreate =
-  (projectPath?: Path, smartRun?: boolean) =>
-    (init:PythonMethod, configLines: PythonMethod[], write?: boolean, out?: string) =>
+  (smartRun?: boolean, projectPath?: Path) =>
+    (configLines: PythonMethod[], write?: boolean, out?: string) =>
       string
 
 export const setupCreate: setupCreate =
-  (projectPath = defaultInstapyPath, smartRun = false) =>
-    (init, configLines, write = false, out = 'docker_quickstart.py') => {
+  (smartRun = false, projectPath = defaultInstapyPath) =>
+    (configLines, write = false, out = 'docker_quickstart.py') => {
+      const [ init, ...configMethods ] = configLines
+      console.log(configLines)
+      console.log()
       const config =
         [ ...importInstapy
         , '\n'
         , init
         , ...smartRun
-          ? makeSmartRun(configLines)
-          : configLines
+          ? makeSmartRun(init, configMethods || [])
+          : configMethods || []
         ].join('\n') + '\n'
 
       if(write) {
