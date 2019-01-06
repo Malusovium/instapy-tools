@@ -123,8 +123,9 @@ console.log(methodInit) // session = InstaPy(username='userName', password='pass
 
 #### Seting up and using create
 ```ts
-const create = setupCreate() // uses default InstaPyPath
-const create = setupCreate('/path/to/instapy/project')
+const create = setupCreate() // normal run, uses default InstaPyPath
+const smartRunCreate = setupCreate(true) // uses smart_run, default InstaPyPath
+const create = setupCreate(false, '/path/to/instapy/project')
 
 const config =
   create
@@ -142,10 +143,28 @@ const config =
     , method({name: 'end'})
     ]
   )
+  
+const smartConfig =
+  create
+  ( [ method({name: '__init__', args: {someArgs...}})
+    , method(with some input...)
+    , method(with some input...)
+    , method(with some input...)
+    , method(with some input...)
+    , method(with some input...)
+    , method(with some input...)
+    , method(with some input...)
+    , '# a python comment in the code'
+    , method(with some input...)
+    , method(with some input...)
+    , method({name: 'end'})
+    ]
+  )
 
-console.log(create)
+console.log(config)
 /*
 from instapy import InstaPy
+from instapy.util import smart_run
 
 session = InstaPy(...)
 session.method(...)
@@ -159,6 +178,26 @@ session.method(...)
 session.method(...)
 session.method(...)
 session.end()
+*/
+
+console.log(smartConfig)
+/*
+from instapy import InstaPy
+from instapy.util import smart_run
+
+session = InstaPy(...)
+with smart_run(session):
+    session.method(...)
+    session.method(...)
+    session.method(...)
+    session.method(...)
+    session.method(...)
+    session.method(...)
+    session.method(...)
+    # a python comment in the code
+    session.method(...)
+    session.method(...)
+    session.end()
 */
 
 create([...string], true) // will write the output to 'docker_quickstart.py'
